@@ -45,11 +45,11 @@ const rolls = await import("../src/lib/db/rolls.ts");
 // A solo table with a lasting companion, the way the AI recruits one.
 async function table({ gameSettings = {}, companion = {}, hero = {} } = {}) {
   const world = await openWorld({ gameSettings });
-  const pc = world.addHero({ name: "Kael", gender: "Male", ...hero });
+  const pc = world.addHero({ name: "Kael", sex: "Male", ...hero });
   const added = await world.invoke("add_companion", {
     name: "Seren",
     class: "paladin",
-    gender: "Female",
+    sex: "Female",
     alignment: "LG",
     personality: "Stern, devout, slow to anger and slower to forgive.",
     kind: "party",
@@ -78,7 +78,7 @@ await test("a lasting companion holds values from its class and alignment, and t
   const added = await world.invoke("add_companion", {
     name: "Vex",
     class: "rogue",
-    gender: "Male",
+    sex: "Male",
     personality: "Grins too much.",
     kind: "party",
     values: [{ value: "ruthless", strength: "cares" }, { value: "mercenary", strength: "red_line" }],
@@ -89,14 +89,14 @@ await test("a lasting companion holds values from its class and alignment, and t
   const loyalToNobody = await world.invoke("add_companion", {
     name: "Ash",
     class: "fighter",
-    gender: "Male",
+    sex: "Male",
     personality: "Quiet.",
     kind: "party",
     values: [{ value: "faction_loyalty", strength: "cares" }],
   });
   assert.equal(loyalToNobody.ok, false, "a faction loyalty with no faction is refused, not dropped");
   assert.ok(!world.sheets().some((entry) => entry.name === "Ash"), "nothing was added");
-  const guest = await world.invoke("add_companion", { name: "Guard", class: "fighter", gender: "Female", personality: "Brisk.", kind: "guest" });
+  const guest = await world.invoke("add_companion", { name: "Guard", class: "fighter", sex: "Female", personality: "Brisk.", kind: "guest" });
   assert.equal(guest.ok, true, guest.error);
   assert.ok(!npcs.listNpcs(world.campaignId).some((npc) => npc.name === "Guard"), "a guest holds nothing: no row behind them");
 });
@@ -206,7 +206,7 @@ await test("values cut both ways: a ruthless companion warms to cruelty and mind
 
 await test("every witness a deed names is moved by their own nature; a name nobody tracks is listed back", async () => {
   const { world, pc, deed } = await table();
-  await world.invoke("set_npc", { name: "Brother Aldo", gender: "Male", location: "the chapel" });
+  await world.invoke("set_npc", { name: "Brother Aldo", sex: "Male", location: "the chapel" });
   const done = await deed("desecration", { witnesses: ["Brother Aldo", "a passing farmer", "Kael"] });
   assert.equal(done.ok, true, done.error);
   assert.equal(done.result.witnesses.length, 1);
@@ -340,9 +340,9 @@ async function humanTable({ gameSettings = {}, composure = 0, kael = {}, brin = 
   const world = await openWorld({ gameSettings: { dmMode: "human", companions: "full", ...gameSettings } });
   const kaelUser = world.addUser("kael");
   const brinUser = world.addUser("brin");
-  const kaelSheet = world.addHero({ user: kaelUser, name: "Kael", gender: "Male", ...kael });
-  const brinSheet = world.addHero({ user: brinUser, name: "Brin", gender: "Female", ...brin });
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
+  const kaelSheet = world.addHero({ user: kaelUser, name: "Kael", sex: "Male", ...kael });
+  const brinSheet = world.addHero({ user: brinUser, name: "Brin", sex: "Female", ...brin });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const sheet = world.sheets().find((entry) => entry.name === "Seren");
   const row = () => npcs.listNpcs(world.campaignId).find((npc) => npc.companionSheetId === sheet.id);
@@ -526,7 +526,7 @@ await test("a companion written back in is the same person: their sheet, at the 
   const row = () => npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
   const before = world.sheet(sheet.id);
   await world.invoke("dismiss_companion", { characterId: sheet.id });
-  const back = await world.invoke("add_companion", { name: "Seren", class: "wizard", gender: "Female", personality: "Returned.", kind: "party", level: 5 });
+  const back = await world.invoke("add_companion", { name: "Seren", class: "wizard", sex: "Female", personality: "Returned.", kind: "party", level: 5 });
   assert.equal(back.ok, true, back.error);
   assert.equal(back.result.returned, true);
   const now = world.sheets().find((entry) => entry.name === "Seren");
@@ -557,7 +557,7 @@ await test("rewinding past a recruitment leaves no bot user behind", async () =>
   world.addHero({ name: "Kael" });
   ensureOpenChapter(world.campaignId);
   captureBoundarySnapshot(world.campaignId, 1, campaigns.latestSeq(world.campaignId));
-  const added = await world.invoke("add_companion", { name: "Late", class: "fighter", gender: "Male", personality: "New.", kind: "party" });
+  const added = await world.invoke("add_companion", { name: "Late", class: "fighter", sex: "Male", personality: "New.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const userId = world.sheets().find((entry) => entry.name === "Late").userId;
   const result = await performRollback(world.campaignId, 1);

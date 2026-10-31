@@ -39,7 +39,7 @@ async function stage(extra = {}) {
   await kit.endFight();
   fresh();
   const joined = await world.invoke("add_companion", {
-    gender: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest",
+    sex: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest",
   });
   assert.equal(joined.ok, true, joined.error);
   const id = joined.result.characterId;

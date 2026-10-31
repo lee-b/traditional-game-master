@@ -21,7 +21,7 @@ async function test(name, fn) {
 const { freshPlaySheet, threeThingsToTry, revealLine, afterFirstSave } = await import("../src/lib/characters/hero-tips.ts");
 
 const base = {
-  subclass: "", alignment: "", gender: "", appearance: "", speed: 30, classes: [], hitDicePools: null,
+  subclass: "", alignment: "", sex: "", appearance: "", speed: 30, classes: [], hitDicePools: null,
   gold: 0, copper: 0, feats: [], asiChoices: [], spellcasting: null, portrait: null, notes: "", backstory: "", background: "",
 };
 const pack = (...names) => names.map((name) => ({ name, qty: 1 }));

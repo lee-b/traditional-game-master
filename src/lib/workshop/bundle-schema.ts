@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { storedSheetSchema } from "@/lib/schemas/sheet";
-import { GENDERS } from "@/lib/gender";
+import { SEXES } from "@/lib/sex";
 import { GENRES } from "@/lib/schemas/game-settings";
 import { BEAT_KINDS, BODY_MAX, ROUTE_KINDS, ROUTE_LABEL_MAX } from "@/lib/workshop/board";
 import { LORE_BODY_MAX } from "@/lib/dm/world-lore-logic";
@@ -121,18 +121,17 @@ const locationSchema = z.object({
   shared: sharedSchema,
 });
 
-const npcSchema = z.object({
+const npcSchemaObject = z.object({
   name: z.string().trim().min(1).max(120),
   attitude: z.enum(["hostile", "indifferent", "friendly"]).default("indifferent"),
   trait: z.string().max(500).default(""),
   location: z.string().max(120).default(""),
   // A role id or free text; bundles written before the field have none.
   role: z.string().trim().max(40).default(""),
-  // src/lib/gender.ts; bundles written before the field have none.
-  gender: z.enum(["", ...GENDERS]).default(""),
-  // Who they are drawn to (src/lib/attraction.ts); bundles written before
-  // the field have none, and an unreadable one reads as undecided.
-  attraction: z.unknown().optional(),
+  // src/lib/sex.ts; bundles written before the field have none. Ones
+  // written before the rename carry it under "gender", which the schema's
+  // shim copies over before the fields are read.
+  sex: z.enum(["", ...SEXES]).default(""),
   aliases: z.array(z.string().trim().max(80)).max(20).default([]),
   personality: z.string().max(4_000).default(""),
   goals: z.string().max(4_000).default(""),
@@ -150,6 +149,16 @@ const npcSchema = z.object({
   ref: refSchema,
   shared: sharedSchema,
 });
+
+// Bundles written before the sex rename carried the value under "gender";
+// the shim copies it over so the older bundles still import.
+export const npcSchema = z.preprocess(
+  (raw) =>
+    raw && typeof raw === "object"
+      ? { ...raw, sex: (raw as { sex?: unknown }).sex ?? (raw as { gender?: unknown }).gender }
+      : raw,
+  npcSchemaObject,
+);
 
 // Factions (docs/vtt-parity-implementation-plan.md section 6). Members are
 // matched back by NPC name on import, the way relations are.

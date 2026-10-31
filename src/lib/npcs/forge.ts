@@ -23,7 +23,7 @@
 // which are one-sided, and which point at somebody who does not exist.
 //
 // Pure by design: no DB and no I/O, so scripts/test-npc-forge.mjs drives it
-// directly. Its imports, npc-logic.ts, gender.ts and attraction.ts, are pure;
+// directly. Its imports, npc-logic.ts and sex.ts, are pure;
 // the impure rim is src/lib/db/npcs.ts.
 
 import {
@@ -33,8 +33,7 @@ import {
   type NpcPersonality,
   type NpcRelation,
 } from "@/lib/dm/npc-logic";
-import { storedGender, type Gender } from "@/lib/gender";
-import { normalizeAttraction, type Attraction } from "@/lib/attraction";
+import { storedSex, type Sex } from "@/lib/sex";
 import { textKey } from "@/lib/language/text-logic";
 
 export const ATTITUDES = ["hostile", "indifferent", "friendly"] as const;
@@ -249,11 +248,8 @@ export type NpcDraft = {
   // What they do: a role id from the picker ("merchant", "mystery-inspector")
   // or free text. Chooses the placeholder face (src/lib/placeholders.ts).
   role: string;
-  // src/lib/gender.ts; "" for unspecified.
-  gender: Gender;
-  // Who they are drawn to (src/lib/attraction.ts); blank or absent =
-  // undecided. Optional so drafts made by code (a settlement) need not say.
-  attraction?: Attraction;
+  // src/lib/sex.ts; "" for unspecified.
+  sex: Sex;
   personality: NpcPersonality | null;
   goals: NpcGoals;
   relations: NpcRelation[];
@@ -273,8 +269,7 @@ export function blankDraft(): NpcDraft {
     trait: "",
     location: "",
     role: "",
-    gender: "",
-    attraction: { genders: [], note: "" },
+    sex: "",
     personality: null,
     goals: {},
     relations: [],
@@ -295,8 +290,7 @@ export function draftFrom(npc: {
   location: string;
   // Optional so rows stored before the column existed still open.
   role?: string;
-  gender?: Gender;
-  attraction?: Attraction;
+  sex?: Sex;
   voice?: NpcVoice | null;
   factionId?: string;
   statBlock?: string;
@@ -314,8 +308,7 @@ export function draftFrom(npc: {
     trait: npc.trait,
     location: npc.location,
     role: npc.role ?? "",
-    gender: npc.gender ?? "",
-    attraction: normalizeAttraction(npc.attraction),
+    sex: npc.sex ?? "",
     personality: npc.agency.personality ? { ...npc.agency.personality } : null,
     goals: structuredClone(npc.agency.goals),
     relations: npc.agency.relations.map((relation) => ({ ...relation })),
@@ -408,8 +401,8 @@ export function normalizeNpcDraft(input: unknown): DraftOutcome {
       trait: String(raw.trait ?? "").trim().slice(0, 200),
       location: String(raw.location ?? "").trim().slice(0, 120),
       role: String(raw.role ?? "").trim().slice(0, 40),
-      gender: storedGender(raw.gender),
-      attraction: normalizeAttraction(raw.attraction),
+      // Bundles written before the rename carry the value under "gender".
+      sex: storedSex(raw.sex ?? raw.gender),
       personality: normalizePersonality(raw.personality),
       goals,
       relations,

@@ -222,7 +222,7 @@ export function CharacterSheetDialog({
                 ) : (
                   <CharacterPortrait
                     fallback={portraitFallback}
-                    look={{ race: sheet.race, class: sheet.class, gender: sheet.gender }}
+                    look={{ race: sheet.race, class: sheet.class, sex: sheet.sex }}
                     alt={sheet.name}
                     size="size-full"
                   />

@@ -61,7 +61,7 @@
 
   // Each figure wears the picture it wears on the flat board (its portrait,
   // or its plate), asked for once per figure with the "face" message.
-  // A model-based view can use token.character?.gender (Female/Male/Nonbinary);
+  // A model-based view can use token.character?.sex (Female/Male);
   // missing or empty means use its ordinary model. Portraits already handle it.
   const faces = new Map();
   function askForFaces() {

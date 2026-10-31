@@ -77,7 +77,7 @@ const titled = (name) => name.replace(/(^|\s)\w/g, (c) => c.toUpperCase());
 function sheet(overrides = {}) {
   return {
     id: "s1", campaignId: "c1", userId: "u1", libraryCharacterId: null,
-    name: "Lys", race: "human", class: "wizard", subclass: "", background: "", alignment: "", gender: "",
+    name: "Lys", race: "human", class: "wizard", subclass: "", background: "", alignment: "", sex: "",
     level: 9, xp: 0,
     abilities: { str: 8, dex: 14, con: 14, int: 18, wis: 12, cha: 10 },
     maxHp: 50, currentHp: 50, tempHp: 0, ac: 12, acOverride: false, speed: 30,

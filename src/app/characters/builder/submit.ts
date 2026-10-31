@@ -26,7 +26,6 @@ import type { BuilderDerived } from "./useBuilderDerived";
 import type { BuilderState, EquipmentItem } from "./useBuilderState";
 import { textKey } from "@/lib/language/text-logic";
 import { featChoice } from "@/lib/schemas/sheet";
-import { normalizeAttraction } from "@/lib/attraction";
 
 export type BuilderResult = { level: number; sheet: CreateSheetInput };
 
@@ -745,10 +744,7 @@ export function buildBuilderResult(input: SubmitInput): BuilderResult {
       subclass: picks.subclass,
       background: background.id,
       alignment: state.alignment,
-      gender: state.gender,
-      // Who they are drawn to (issue 501): identity, so an edit keeps it
-      // the way it keeps the gender, because the builder holds it.
-      attraction: normalizeAttraction(state.attraction),
+      sex: state.sex,
       appearance: state.appearance.trim(),
       abilities,
       maxHp: preview.maxHp,

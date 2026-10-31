@@ -87,7 +87,7 @@ export function PartyGone({
           <CharacterPortrait
             url={sheet.portrait?.url}
             fallback={packArt.characterUrl({ race: sheet.race, class: sheet.class })}
-            look={{ race: sheet.race, class: sheet.class, gender: sheet.gender }}
+            look={{ race: sheet.race, class: sheet.class, sex: sheet.sex }}
             alt=""
             size="size-12"
             className="party-card-portrait border-stone-700/50"
@@ -111,7 +111,7 @@ export function PartyGone({
                 <CharacterPortrait
                   url={entry.portraitUrl}
                   fallback={packArt.characterUrl({ race: entry.race, class: entry.class })}
-                  look={{ race: entry.race, class: entry.class, gender: entry.gender }}
+                  look={{ race: entry.race, class: entry.class, sex: entry.sex }}
                   alt=""
                   size="size-10"
                   className="shrink-0 border-stone-700/50"

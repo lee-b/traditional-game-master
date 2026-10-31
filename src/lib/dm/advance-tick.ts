@@ -21,8 +21,6 @@ import { closeAdvance, suitorContext, suitorFrom, suitorIdentity, targetFrom } f
 import { resolveSubject } from "@/lib/dm/relationship-subject";
 import { romanceEnabled } from "@/lib/dm/relationship-tools";
 import { rollExpression } from "@/lib/dice";
-import { getNpcByName } from "@/lib/db/npcs";
-import { attractionBlank } from "@/lib/attraction";
 import { abilityMod } from "@/lib/srd";
 import { livingHero } from "@/lib/characters/fallen-logic";
 
@@ -122,10 +120,7 @@ export function advanceDirectorNotes(campaign: Campaign): string[] {
     if (!sheet?.openToAdvances || !livingHero(sheet)) {
       return [];
     }
-    const row = getNpcByName(campaign.id, relationship.subjectName);
-    const companion = sheets.find((entry) => entry.isCompanion && entry.id === row?.companionSheetId);
-    const undecided = attractionBlank(row?.attraction) && attractionBlank(companion?.attraction);
-    return [advanceCue(relationship.subjectName, sheet.name, windowTurnsLeft(relationship.advanceReadyUntil, context.aiTurns), undecided)];
+    return [advanceCue(relationship.subjectName, sheet.name, windowTurnsLeft(relationship.advanceReadyUntil, context.aiTurns))];
   });
 }
 

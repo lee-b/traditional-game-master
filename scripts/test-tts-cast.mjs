@@ -6,8 +6,8 @@ import { register } from "node:module";
 
 register("./lib/register-alias.mjs", import.meta.url);
 
-const { castingPool, pickVoice, voiceGender } = await import("../src/lib/tts-cast.ts");
-const { genderMark } = await import("../src/lib/gender.ts");
+const { castingPool, pickVoice, voiceSex } = await import("../src/lib/tts-cast.ts");
+const { sexMark } = await import("../src/lib/sex.ts");
 
 let passed = 0;
 function test(name, fn) {
@@ -27,21 +27,22 @@ test("the pool is the narrator's language, without the narrator, old takes and n
   assert.deepEqual(castingPool(["alloy", "nova", "onyx"], "alloy"), ["nova", "onyx"], "a server with its own names is taken as it is");
 });
 
-test("a voice says what it sounds like, and a gender field which voice it asks for", () => {
-  assert.equal(voiceGender("af_heart"), "f");
-  assert.equal(voiceGender("bm_george"), "m");
-  assert.equal(voiceGender("onyx"), "m");
-  assert.equal(voiceGender("af_heart(30)+af_bella(70)"), "");
-  assert.equal(genderMark("Female"), "f");
-  assert.equal(genderMark("Male"), "m");
-  assert.equal(genderMark("Nonbinary"), "");
-  assert.equal(genderMark(""), "");
+test("a voice says what it sounds like, and a sex field which voice it asks for", () => {
+  assert.equal(voiceSex("af_heart"), "f");
+  assert.equal(voiceSex("bm_george"), "m");
+  assert.equal(voiceSex("onyx"), "m");
+  assert.equal(voiceSex("af_heart(30)+af_bella(70)"), "");
+  assert.equal(sexMark("Female"), "f");
+  assert.equal(sexMark("Male"), "m");
+  // A value the choice held before "Nonbinary" was dropped marks nothing.
+  assert.equal(sexMark("Nonbinary"), "");
+  assert.equal(sexMark(""), "");
 });
 
 test("a pick suits the speaker, is stable, and avoids voices already taken", () => {
   const pool = castingPool(KOKORO, "af_heart");
   const first = pickVoice("Old Pike", "m", pool, []);
-  assert.equal(voiceGender(first), "m");
+  assert.equal(voiceSex(first), "m");
   assert.equal(pickVoice("Old Pike", "m", pool, []), first, "the same speaker is always cast the same way");
   const taken = [];
   for (const name of ["Pike", "Aldric", "Bram"]) {
@@ -49,7 +50,7 @@ test("a pick suits the speaker, is stable, and avoids voices already taken", () 
   }
   assert.equal(new Set(taken).size, 3, "three men, three voices, while the server has them");
   assert.ok(taken.every((voice) => ["am_michael", "am_fenrir", "bm_george"].includes(voice)), "the named voices go first");
-  assert.equal(voiceGender(pickVoice("Wren", "", pool, [])) !== "", true);
+  assert.equal(voiceSex(pickVoice("Wren", "", pool, [])) !== "", true);
   assert.equal(pickVoice("Wren", "f", [], []), "", "a server with no voices casts no one");
   assert.equal(pickVoice("Wren", "f", ["onyx"], []), "onyx", "with nothing suitable, any voice beats none");
 });
@@ -57,7 +58,7 @@ test("a pick suits the speaker, is stable, and avoids voices already taken", () 
 const { unvoicedSpeakers } = await import("../src/lib/tts.ts");
 
 test("a voice is cast for whoever the stored lines say spoke, or the one the passage is spoken as", () => {
-  const entry = (key, name) => ({ key, kind: "npc", name, aliases: [], portraitUrl: "", ownerUserId: "", gender: "", voice: null });
+  const entry = (key, name) => ({ key, kind: "npc", name, aliases: [], portraitUrl: "", ownerUserId: "", sex: "", voice: null });
   const roster = [entry("npc:marla", "Marla"), entry("npc:pike", "Old Pike"), entry("monster:goblin", "Goblin")];
   const lines = [{ line: "We go,", speaker: { kind: "npc", id: "marla", name: "Marla" } }];
   assert.deepEqual([...unvoicedSpeakers(lines, roster, null)], ["npc:marla"], "Pike, only spoken to, has no line");

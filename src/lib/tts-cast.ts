@@ -7,10 +7,10 @@ import { textKey } from "@/lib/language/text-logic";
 // choice is saved the moment it is made, so it never drifts afterwards and
 // the table can change it like any other.
 
-export type VoiceGender = "f" | "m" | "";
+export type VoiceSex = "f" | "m" | "";
 
 // OpenAI's voices do not say what they sound like in their names.
-const OPENAI_GENDER: Record<string, VoiceGender> = {
+const OPENAI_SEX: Record<string, VoiceSex> = {
   ash: "m",
   ballad: "m",
   coral: "f",
@@ -25,12 +25,12 @@ const OPENAI_GENDER: Record<string, VoiceGender> = {
 // Kokoro ids are <language><f|m>_<name>: af_heart, bm_george.
 const KOKORO_ID = /^([a-z])([fm])_[a-z0-9]+$/;
 
-export function voiceGender(voiceId: string): VoiceGender {
+export function voiceSex(voiceId: string): VoiceSex {
   const kokoro = KOKORO_ID.exec(voiceId);
   if (kokoro) {
-    return kokoro[2] as VoiceGender;
+    return kokoro[2] as VoiceSex;
   }
-  return OPENAI_GENDER[voiceId] ?? "";
+  return OPENAI_SEX[voiceId] ?? "";
 }
 
 const ENGLISH = new Set(["a", "b"]);
@@ -68,11 +68,11 @@ function hash(text: string): number {
 // fewest others at the table already have, a named voice before an unnamed
 // one, and among equals the speaker's own name decides, so two tables do not
 // cast everyone in the same order. "" when the server offers nothing.
-export function pickVoice(name: string, gender: VoiceGender, pool: string[], taken: string[]): string {
+export function pickVoice(name: string, sex: VoiceSex, pool: string[], taken: string[]): string {
   if (!pool.length) {
     return "";
   }
-  const suited = gender ? pool.filter((id) => voiceGender(id) === gender) : [];
+  const suited = sex ? pool.filter((id) => voiceSex(id) === sex) : [];
   const candidates = suited.length ? suited : pool;
   const uses = (id: string) => taken.filter((entry) => entry === id).length;
   const fewest = Math.min(...candidates.map(uses));

@@ -1,6 +1,5 @@
 "use client";
 
-import { attractionWords } from "@/lib/attraction";
 import { TravelFormation } from "@/app/campaigns/[campaignId]/TravelFormation";
 import { PartyStory } from "@/app/campaigns/[campaignId]/PartyStory";
 import type { PartyState } from "@/lib/dm/party-logic";
@@ -568,7 +567,7 @@ export function PartyPanel({
               <CharacterPortrait
                 url={sheet.portrait?.url}
                 fallback={packArt.characterUrl({ race: sheet.race, class: sheet.class })}
-                look={{ race: sheet.race, class: sheet.class, gender: sheet.gender }}
+                look={{ race: sheet.race, class: sheet.class, sex: sheet.sex }}
                 alt={sheet.name}
                 size="size-12"
                 className="party-card-portrait border-amber-500/30 shadow-glow-gold"
@@ -1059,19 +1058,17 @@ export function PartyPanel({
 
 // A torch burning down: a sliver of ember that shortens as the clock moves,
 // and reddens when the last quarter hour is on it.
-// The DM's line for one card: who they are drawn to, and whether their
-// player opened them to advances. The opt-in reaches only the owner and a
-// DM seat (src/lib/dm/sheet-view.ts), so nothing here shows it to anyone else.
+// The DM's line for one card: whether their player opened them to
+// advances. The opt-in reaches only the owner and a DM seat
+// (src/lib/dm/sheet-view.ts), so nothing here shows it to anyone else.
 function RomanceNote({ sheet }: { sheet: CharacterSheet }) {
-  const drawn = attractionWords(sheet.attraction);
   // A hero who fell is courted by nobody (issue 657), so the chip goes.
   const open = livingHero(sheet) && Boolean(sheet.openToAdvances);
-  if (!drawn && !open) {
+  if (!open) {
     return null;
   }
   return (
     <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-stone-400" data-romance-note={sheet.id}>
-      {drawn ? <span>Drawn to {drawn}</span> : null}
       {open ? (
         <span className="rounded-full border border-rose-500/40 bg-rose-500/10 px-1.5 text-rose-200">Open to advances</span>
       ) : null}

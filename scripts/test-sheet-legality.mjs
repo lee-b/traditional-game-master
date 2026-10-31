@@ -62,7 +62,7 @@ function context(sheet, overrides = {}) {
 
 const FIGHTER = {
   name: "Brakka", race: "human", class: "fighter", subclass: "", background: "soldier",
-  alignment: "N", gender: "", appearance: "",
+  alignment: "N", sex: "", appearance: "",
   abilities: { str: 16, dex: 15, con: 14, int: 13, wis: 11, cha: 9 },
   maxHp: 12, ac: 18, acOverride: false, speed: 30,
   hitDice: { die: "d10", total: 1, spent: 0 }, classes: [], hitDicePools: null,

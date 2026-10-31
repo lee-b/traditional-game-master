@@ -1,7 +1,7 @@
 // What every face the server paints is drawn from, in the words an image
 // model reads (issue 569). Each painter used to build its own prompt and each
-// dropped something the record held: a companion's gender and appearance, an
-// NPC's gender and role, a homebrew race's name, a dragonborn's colour. One
+// dropped something the record held: a companion's sex and appearance, an
+// NPC's sex and role, a homebrew race's name, a dragonborn's colour. One
 // builder per kind of subject, fed by callers that turn ids into words, so a
 // field one painter reads every painter reads.
 //
@@ -13,7 +13,7 @@ const FINISH = "Detailed digital painting, dramatic lighting, plain dark backgro
 // A character with a sheet: a player's, one in the library, a companion.
 // Every field is words, never an id ("Marsh Folk", not "homebrew:<id>").
 export type CharacterLook = {
-  gender: string;
+  sex: string;
   race: string;
   // A dragonborn's dragon ("gold"), painted as the colour of their scales.
   ancestry?: string;
@@ -29,7 +29,7 @@ export type CharacterLook = {
 // portrait style: classes span all six genre catalogs.
 export function characterPortraitPrompt(look: CharacterLook, style = ""): string {
   const race = look.ancestry && look.race ? `${look.ancestry}-scaled ${look.race}` : look.race;
-  const identity = [look.gender, race, look.className].filter(Boolean).join(" ");
+  const identity = [look.sex, race, look.className].filter(Boolean).join(" ");
   return [
     FRAME,
     identity,
@@ -43,15 +43,15 @@ export function characterPortraitPrompt(look: CharacterLook, style = ""): string
     .join(". ");
 }
 
-// Who an NPC is at a glance: their gender and what they do ("Female
+// Who an NPC is at a glance: their sex and what they do ("Female
 // Merchant"). The name stays out: a render is not improved by a proper noun
 // the model has never seen.
-export function npcIdentity(npc: { gender: string; role: string }): string {
-  return [npc.gender, npc.role.trim()].filter(Boolean).join(" ");
+export function npcIdentity(npc: { sex: string; role: string }): string {
+  return [npc.sex, npc.role.trim()].filter(Boolean).join(" ");
 }
 
 export type NpcLook = {
-  gender: string;
+  sex: string;
   // The role's label ("Merchant"), or the text the author typed.
   role: string;
   // Their distinguishing trait, in English.

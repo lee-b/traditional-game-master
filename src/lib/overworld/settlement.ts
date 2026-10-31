@@ -215,7 +215,7 @@ export function generateSettlement(input: { name?: string; size?: unknown; terra
     trait: pick(random, TRAITS[role] ?? TRAITS.farmer),
     location: name,
     role,
-    gender: "",
+    sex: "",
     personality: null,
     goals: {},
     relations: [],

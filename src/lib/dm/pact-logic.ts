@@ -237,7 +237,7 @@ export type ApproachArgs = {
   pactId: string;
   recruiter: string;
   portraitUrl: string;
-  look: { gender: string; race: string; class: string };
+  look: { sex: string; race: string; class: string };
 };
 
 export function approachArgs(argsJson: string): ApproachArgs | null {
@@ -251,7 +251,7 @@ export function approachArgs(argsJson: string): ApproachArgs | null {
       pactId: parsed.pactId,
       recruiter: str(parsed.recruiter, 80),
       portraitUrl: str(parsed.portraitUrl, 400),
-      look: { gender: str(look.gender, 40), race: str(look.race, 40), class: str(look.class, 40) },
+      look: { sex: str(look.sex, 40), race: str(look.race, 40), class: str(look.class, 40) },
     };
   } catch {
     return null;

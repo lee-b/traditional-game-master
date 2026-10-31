@@ -64,7 +64,7 @@ export async function openBuilder() {
     return {
       name: "Test Hero",
       alignment: "N",
-      gender: "",
+      sex: "",
       appearance: "",
       backstory: "",
       portrait: null,

@@ -178,7 +178,7 @@ export default function HeroReadyPage({ params }: { params: Promise<{ characterI
               />
             ) : (
               <CharacterPortrait
-                look={{ race: character.race, class: character.class, gender: character.sheet.gender }}
+                look={{ race: character.race, class: character.class, sex: character.sheet.sex }}
                 alt={`${character.name}, placeholder portrait`}
                 size="size-28 sm:size-32"
                 rounded="rounded-xl"

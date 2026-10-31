@@ -1,8 +1,8 @@
 // Issue 569 and its kin: every face the server paints is drawn from who the
-// character is. A companion's portrait used to drop its gender (and a built
-// companion's appearance), an NPC's dropped its gender and role, a homebrew
+// character is. A companion's portrait used to drop its sex (and a built
+// companion's appearance), an NPC's dropped its sex and role, a homebrew
 // race or workshop class reached the prompt and the AI GM as its id, a
-// dragonborn's colour never reached it, and a drafted hero had no gender at
+// dragonborn's colour never reached it, and a drafted hero had no sex at
 // all. These pin the words, then the doors that feed them.
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -27,9 +27,9 @@ async function test(name, fn) {
 
 const world = await openWorld();
 
-await test("a character's prompt names the gender, the race, the class and the dragon's colour", () => {
+await test("a character's prompt names the sex, the race, the class and the dragon's colour", () => {
   const prompt = characterPortraitPrompt({
-    gender: "Female",
+    sex: "Female",
     race: "dragonborn",
     ancestry: "gold",
     className: "paladin",
@@ -50,18 +50,18 @@ await test("an id that names nothing reads as no words, and an SRD id as its wor
   assert.equal(idWords("homebrew-3f2a8b7c"), "");
 });
 
-await test("a companion the GM wrote is painted with the gender on its sheet, from its personality (the issue)", () => {
-  const hero = world.addHero({ class: "cleric", gender: "Female" });
+await test("a companion the GM wrote is painted with the sex on its sheet, from its personality (the issue)", () => {
+  const hero = world.addHero({ class: "cleric", sex: "Female" });
   const sheet = world.sheet(hero.id);
   const look = companionLook(sheet, { personality: "Warm, wry, hums old hymns." });
-  assert.equal(look.gender, "Female");
+  assert.equal(look.sex, "Female");
   const prompt = characterPortraitPrompt(look);
   assert.match(prompt, /\. Female human cleric\. /, prompt);
   assert.match(prompt, /Warm, wry, hums old hymns/);
 });
 
 await test("a companion built by hand is painted from its appearance, and a dragonborn's colour from the build or its feature", () => {
-  const hero = world.addHero({ class: "paladin", race: "dragonborn", gender: "Female" });
+  const hero = world.addHero({ class: "paladin", race: "dragonborn", sex: "Female" });
   const sheet = world.sheet(hero.id);
   const built = companionLook(sheet, { personality: "Stern.", appearance: "silver braids, a dented shield", ancestry: "silver" });
   assert.equal(built.appearance, "silver braids, a dented shield");
@@ -71,10 +71,10 @@ await test("a companion built by hand is painted from its appearance, and a drag
   assert.equal(companionLook(featured, { personality: "Stern." }).ancestry, "gold");
 });
 
-await test("an NPC is painted as who they are at a glance: gender and role", () => {
-  assert.equal(npcIdentity({ gender: "Female", role: "Merchant" }), "Female Merchant");
-  assert.equal(npcIdentity({ gender: "", role: "" }), "");
-  const prompt = npcPortraitPrompt({ gender: "Male", role: "Guard", trait: "a broken nose", personality: "gruff" });
+await test("an NPC is painted as who they are at a glance: sex and role", () => {
+  assert.equal(npcIdentity({ sex: "Female", role: "Merchant" }), "Female Merchant");
+  assert.equal(npcIdentity({ sex: "", role: "" }), "");
+  const prompt = npcPortraitPrompt({ sex: "Male", role: "Guard", trait: "a broken nose", personality: "gruff" });
   assert.match(prompt, /\. Male Guard\. /);
   assert.match(prompt, /a broken nose\. gruff\. /);
 });
@@ -84,7 +84,7 @@ await test("a homebrew race and background read as their names: on the sheet, to
   const background = createHomebrew(world.owner.id, { kind: "background", name: "Bog Warden", data: { desc: "" } });
   assert.equal(homebrewLabel(world.owner.id, `homebrew:${race.id}`, "race"), "Marsh Folk");
   assert.equal(homebrewLabel(world.owner.id, `homebrew:${race.id}`, "background"), undefined, "the kind must match");
-  const hero = world.addHero({ class: "ranger", race: `homebrew:${race.id}`, background: `homebrew:${background.id}`, gender: "Male" });
+  const hero = world.addHero({ class: "ranger", race: `homebrew:${race.id}`, background: `homebrew:${background.id}`, sex: "Male" });
   const sheet = world.sheet(hero.id);
   assert.equal(sheet.raceLabel, "Marsh Folk");
   assert.equal(sheet.backgroundLabel, "Bog Warden");
@@ -98,7 +98,7 @@ await test("a homebrew race and background read as their names: on the sheet, to
   // And a library character's: the same names, for its pages and its portrait.
   const library = { userId: world.owner.id, race: sheet.race, class: "ranger", background: sheet.background };
   assert.deepEqual(libraryLabels(library), { raceLabel: "Marsh Folk", backgroundLabel: "Bog Warden" });
-  const look = libraryLook({ ...library, sheet: { ...library, gender: "Male", appearance: "", backstory: "" } });
+  const look = libraryLook({ ...library, sheet: { ...library, sex: "Male", appearance: "", backstory: "" } });
   assert.equal(look.race, "Marsh Folk");
   assert.equal(look.background, "Bog Warden");
   // A race whose entry is gone says nothing rather than its id.
@@ -127,32 +127,32 @@ await test("a content-pack species is painted from the builder's name for it, no
   // "bhain kwai" tells the painter nothing; the 0.31.1 playtest's minotaur
   // was given a human face.
   const library = { userId: world.owner.id, race: "bhain-kwai", class: "fighter", background: "soldier" };
-  assert.equal(libraryLook({ ...library, sheet: { ...library, gender: "Male", appearance: "", backstory: "" } }).race, "Minotaur (Bhain Kwai)");
-  const hero = world.addHero({ class: "fighter", race: "bhain-kwai", gender: "Male" });
+  assert.equal(libraryLook({ ...library, sheet: { ...library, sex: "Male", appearance: "", backstory: "" } }).race, "Minotaur (Bhain Kwai)");
+  const hero = world.addHero({ class: "fighter", race: "bhain-kwai", sex: "Male" });
   assert.match(characterPortraitPrompt(companionLook(world.sheet(hero.id), { personality: "" })), /Male Minotaur \(Bhain Kwai\) fighter/);
 });
 
-await test("a drafted hero keeps the gender the GM gave them, and none when it named none", () => {
-  assert.match(draftSystemPrompt(1, { classes: ["fighter"], races: ["human"], backgrounds: ["soldier"] }), /"gender": "Female" \| "Male" \| "Nonbinary"/);
+await test("a drafted hero keeps the sex the GM gave them, and none when it named none", () => {
+  assert.match(draftSystemPrompt(1, { classes: ["fighter"], races: ["human"], backgrounds: ["soldier"] }), /"sex": "Female" \| "Male"/);
   const hero = { name: "Mira", concept: "a scout", class: "fighter", race: "human", background: "soldier", backstory: "She ran.", role: "tank" };
-  const told = parseDraftReply(JSON.stringify({ heroes: [{ ...hero, gender: "female" }] }), 1);
-  assert.equal(told.ok && told.heroes[0].gender, "Female");
-  const untold = parseDraftReply(JSON.stringify({ heroes: [{ ...hero, gender: "wizard" }] }), 1);
-  assert.equal(untold.ok && untold.heroes[0].gender, "");
-  assert.match(read("src/lib/characters/pregen-drafts.ts"), /gender: proposal\.gender,/);
+  const told = parseDraftReply(JSON.stringify({ heroes: [{ ...hero, sex: "female" }] }), 1);
+  assert.equal(told.ok && told.heroes[0].sex, "Female");
+  const untold = parseDraftReply(JSON.stringify({ heroes: [{ ...hero, sex: "wizard" }] }), 1);
+  assert.equal(untold.ok && untold.heroes[0].sex, "");
+  assert.match(read("src/lib/characters/pregen-drafts.ts"), /sex: proposal\.sex,/);
 });
 
 await test("every painter reads the shared prompt and the fields it needs", () => {
   const portrait = read("src/lib/portrait.ts");
-  assert.doesNotMatch(portrait, /gender: ""/, "no painter blanks the gender");
+  assert.doesNotMatch(portrait, /sex: ""/, "no painter blanks the sex");
   assert.match(portrait, /characterPortraitPrompt\(libraryLook\(character\)\)/);
-  assert.match(portrait, /npcPortraitPrompt\(\{ gender: npc\.gender, role,/);
+  assert.match(portrait, /npcPortraitPrompt\(\{ sex: npc\.sex, role,/);
   const tools = read("src/lib/dm/companion-tools.ts");
   assert.match(tools, /queueCompanionPortrait\(campaign, sheet, \{\n\s+personality,\n\s+appearance: input\.appearance,\n\s+ancestry: input\.racialChoices\?\.ancestry,/);
   for (const route of ["src/app/api/campaigns/[campaignId]/dm/npcs/route.ts", "src/app/api/campaigns/[campaignId]/dm/npcs/[npcId]/route.ts"]) {
-    assert.match(read(route), /gender: (npc|outcome\.draft)\.gender,\n\s+role: (npc|outcome\.draft)\.role,/, route);
+    assert.match(read(route), /sex: (npc|outcome\.draft)\.sex,\n\s+role: (npc|outcome\.draft)\.role,/, route);
   }
-  assert.match(read("src/lib/dm/world-ai.ts"), /npcIdentity\(\{ gender: npc\.gender, role: npcRoleLabel\(npc\.role\) \}\)/);
+  assert.match(read("src/lib/dm/world-ai.ts"), /npcIdentity\(\{ sex: npc\.sex, role: npcRoleLabel\(npc\.role\) \}\)/);
 });
 
 await test("a companion's portrait can be painted again by whoever runs the story, and only for a companion", async () => {

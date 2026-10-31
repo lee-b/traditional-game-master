@@ -22,8 +22,8 @@ const proposals = await import("../src/lib/db/item-proposals.ts");
 // a real roll: d20 + 0 + warmth 0 against DC 12.
 async function courting(name) {
   const world = await openWorld();
-  const hero = world.addHero({ name: "Vex", gender: "Female" });
-  const set = await world.invoke("set_npc", { name, gender: "Male", location: "Highmoor" });
+  const hero = world.addHero({ name: "Vex", sex: "Female" });
+  const set = await world.invoke("set_npc", { name, sex: "Male", location: "Highmoor" });
   assert.equal(set.ok, true, set.error);
   const npc = npcs.getNpcByName(world.campaignId, name);
   npcs.patchNpcAgency(npc.id, { personality: { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 0 } });
@@ -104,8 +104,8 @@ await test("an AI table keeps its guard on the turn: the same turn is held, the 
 await test("at the console an NPC's first move turned down is not made again until the GM's next narration", async () => {
   const table = await openWorld({ gameSettings: { dmMode: "human" } });
   const player = table.addUser("lio");
-  const hero = table.addHero({ user: player, name: "Lio", gender: "Male" });
-  const set = await table.invoke("set_npc", { name: "Senna", gender: "Female", drawnTo: ["men"] });
+  const hero = table.addHero({ user: player, name: "Lio", sex: "Male" });
+  const set = await table.invoke("set_npc", { name: "Senna", sex: "Female", drawnTo: ["men"] });
   assert.equal(set.ok, true, set.error);
   const row = relationships.ensureRelationship({ campaignId: table.campaignId, characterId: hero.id, characterName: "Lio", subjectKind: "npc", subjectName: "Senna" });
   relationships.patchRelationship(row.id, { approval: 70 });
@@ -144,8 +144,8 @@ await test("at the console an NPC's first move turned down is not made again unt
 
 await test("at the console an attitude a social check moved holds until the GM's next narration", async () => {
   const world = await openWorld();
-  const hero = world.addHero({ name: "Vex", gender: "Female" });
-  const set = await world.invoke("set_npc", { name: "Bryn", gender: "Male", attitude: "friendly" });
+  const hero = world.addHero({ name: "Vex", sex: "Female" });
+  const set = await world.invoke("set_npc", { name: "Bryn", sex: "Male", attitude: "friendly" });
   assert.equal(set.ok, true, set.error);
   const attitude = () => npcs.getNpcByName(world.campaignId, "Bryn").attitude;
   // The lowest die misses by five or more, which moves Bryn a step colder.

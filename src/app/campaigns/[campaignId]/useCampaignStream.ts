@@ -128,13 +128,13 @@ export type ItemProposal = {
   toCharacterId?: string;
   offer?: { toCharacterId: string; give: Array<{ name: string; qty: number }>; giveCp: number; want: Array<{ name: string; qty: number }>; wantCp: number } | null;
   // An NPC's romantic advance (issue 501): who makes it, and their face.
-  advance?: { suitor: string; portraitUrl: string; look: { gender: string; race: string; class: string; role: string } };
+  advance?: { suitor: string; portraitUrl: string; look: { sex: string; race: string; class: string; role: string } };
   // Only its own player is sent it and answers it (issue 503: a pact's
   // approach); the apps notify on it.
   ownerOnly?: boolean;
   // A pact's approach: the answers it offers, and who makes it.
   choices?: Array<{ id: string; label: string; hint: string }>;
-  from?: { name: string; portraitUrl: string; look: { gender: string; race: string; class: string } };
+  from?: { name: string; portraitUrl: string; look: { sex: string; race: string; class: string } };
 };
 
 // A disputed ruling (src/lib/dm/dispute-logic.ts), open or under vote.

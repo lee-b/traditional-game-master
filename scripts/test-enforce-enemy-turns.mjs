@@ -262,7 +262,7 @@ await test("A mounted rider moves at the mount's speed, and mounting costs half 
 await test("An AI companion walks on its own turn with its own speed, through move_token, as a player would from the board.", async () => {
   await kit.endFight();
   const joined = await world.invoke("add_companion", {
-    gender: "Unknown",
+    sex: "Unknown",
     name: "Brannoc", class: "fighter", race: "human", level: 1, personality: "Steady.", kind: "guest",
   });
   assert.equal(joined.ok, true, joined.error);
@@ -361,7 +361,7 @@ await test("The AI teleports an enemy by the ability on its stat block, and by n
 await test("A companion whose action is already spent this turn is not given a second one by the auto-act backstop.", async () => {
     await kit.endFight();
     const joined = await world.invoke("add_companion", {
-      gender: "Unknown",
+      sex: "Unknown",
       name: "Wren", class: "fighter", race: "human", level: 1, personality: "Quiet.", kind: "guest",
     });
     assert.equal(joined.ok, true, joined.error);

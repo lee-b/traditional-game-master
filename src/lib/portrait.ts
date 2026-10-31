@@ -54,7 +54,7 @@ function dragonOf(choice: string | undefined, features: ReadonlyArray<{ name: st
 export function libraryLook(character: LibraryCharacter): CharacterLook {
   const sheet = character.sheet;
   return {
-    gender: sheet.gender ?? "",
+    sex: sheet.sex ?? "",
     race: homebrewLabel(character.userId, sheet.race, "race") ?? serverSpeciesName(sheet.race) ?? idWords(sheet.race),
     ancestry: dragonOf(sheet.racialChoices?.ancestry),
     className: workshopClassName(sheet.class) ?? idWords(sheet.class),
@@ -74,12 +74,12 @@ export type CompanionPortraitSource = {
 };
 
 // A companion as a face: the same fields a player's character is painted
-// from (issue 569: the gender used to be left out). Its appearance stands
+// from (issue 569: the sex used to be left out). Its appearance stands
 // in the appearance's place, or its personality when it has none.
 export function companionLook(sheet: CharacterSheet, source: CompanionPortraitSource): CharacterLook {
   const appearance = source.appearance?.trim() ? source.appearance.trim().slice(0, 300) : source.personality.slice(0, 160);
   return {
-    gender: sheet.gender ?? "",
+    sex: sheet.sex ?? "",
     race: sheet.raceLabel ?? idWords(sheet.race),
     ancestry: dragonOf(source.ancestry, sheet.features),
     className: workshopClassName(sheet.class) ?? idWords(sheet.class),
@@ -187,7 +187,7 @@ export function queueNpcPortrait(
     // distinguishing trait and their personality in words, which is all a
     // face needs. The name is deliberately absent: a render prompt is not
     // improved by a proper noun the model has never seen.
-    gender: string;
+    sex: string;
     // The stored role: a catalog id or the author's own words.
     role: string;
     trait: string;
@@ -200,7 +200,7 @@ export function queueNpcPortrait(
     enqueueMediaJob(`npc portrait ${npc.id}`, async () => {
       try {
         const { trait, role } = await toEnglishForImage(campaign, { trait: npc.trait, role: npcRoleLabel(npc.role) });
-        const prompt = npcPortraitPrompt({ gender: npc.gender, role, trait, personality: npc.personality }, style);
+        const prompt = npcPortraitPrompt({ sex: npc.sex, role, trait, personality: npc.personality }, style);
         const settings = configuredDefaultStorySettings();
         const image = await generateStoryImage(settings, {
           prompt,

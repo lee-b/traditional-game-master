@@ -10,9 +10,9 @@ import type { CastMember } from "@/lib/dm/cast";
 // painted plates come last because they ship with the server and the apps
 // (scripts/test-placeholders.mjs checks every one resolves).
 
-type FaceSheet = Pick<CharacterSheet, "portrait" | "race" | "class" | "gender">;
+type FaceSheet = Pick<CharacterSheet, "portrait" | "race" | "class" | "sex">;
 
-const plateOf = (sheet: FaceSheet) => characterPlaceholder({ race: sheet.race, class: sheet.class, gender: sheet.gender });
+const plateOf = (sheet: FaceSheet) => characterPlaceholder({ race: sheet.race, class: sheet.class, sex: sheet.sex });
 
 const present = (urls: Array<string | null | undefined>) => urls.filter((url): url is string => Boolean(url));
 

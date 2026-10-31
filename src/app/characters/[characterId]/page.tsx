@@ -372,7 +372,7 @@ export default function CharacterDetailPage({
               </span>
             ) : (
               <CharacterPortrait
-                look={{ race: character.race, class: character.class, gender: sheet.gender }}
+                look={{ race: character.race, class: character.class, sex: sheet.sex }}
                 alt={character.name}
                 size="size-20 sm:size-24"
                 rounded="rounded-xl"

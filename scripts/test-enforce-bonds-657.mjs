@@ -40,10 +40,10 @@ const DEAD = { successes: 0, failures: 3, stable: false, dead: true };
 
 async function table({ gameSettings = {}, status } = {}) {
   const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings }, ...(status ? { status } : {}) });
-  const kael = world.addHero({ name: "Kael", gender: "Male" });
-  const lyra = world.addHero({ name: "Lyra", gender: "Female" });
+  const kael = world.addHero({ name: "Kael", sex: "Male" });
+  const lyra = world.addHero({ name: "Lyra", sex: "Female" });
   const bond = (who, subject) => relationships.getRelationship(world.campaignId, who.id, subject);
-  const prepare = (name, attitude = "indifferent") => npcs.upsertNpc({ campaignId: world.campaignId, name, attitude, gender: "Female" });
+  const prepare = (name, attitude = "indifferent") => npcs.upsertNpc({ campaignId: world.campaignId, name, attitude, sex: "Female" });
   const kill = (sheet) => world.patch(sheet.id, { deathSaves: DEAD, currentHp: 0 });
   const liking = (sheet, subject, approval, subjectKind = "npc") => {
     const row = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: sheet.id, characterName: sheet.name, subjectKind, subjectName: subject });
@@ -114,7 +114,7 @@ await test("a fallen hero gains no bond when the party meets someone, by any roa
   const { world, kael, lyra, bond, prepare, kill } = await table();
   kill(lyra);
   world.dice(4, 4);
-  const met = await world.invoke("npc_reaction", { name: "Mara", gender: "Female" });
+  const met = await world.invoke("npc_reaction", { name: "Mara", sex: "Female" });
   assert.equal(met.ok, true, met.error);
   assert.ok(bond(kael, "Mara"), "the living hero has met her");
   assert.equal(bond(lyra, "Mara"), null, "the dead hero gained a bond");
@@ -125,7 +125,7 @@ await test("a fallen hero gains no bond when the party meets someone, by any roa
   const speaker = prepare("Brother Aldo");
   assert.equal(meetSpeakers(world.campaign(), [{ line: "Welcome.", speaker: { kind: "npc", id: speaker.id, name: "Brother Aldo" } }]), 1);
   assert.equal(bond(lyra, "Brother Aldo"), null, "a line of narration");
-  const joined = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern.", kind: "party" });
+  const joined = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern.", kind: "party" });
   assert.equal(joined.ok, true, joined.error);
   assert.ok(bond(kael, "Seren"));
   assert.equal(bond(lyra, "Seren"), null, "a companion who joined after the death");
@@ -133,8 +133,8 @@ await test("a fallen hero gains no bond when the party meets someone, by any roa
 
 await test("a fallen hero has no advances or pacts switches: the Bonds tab hides them and the server refuses them", async () => {
   const { world, kael, kill, call } = await table();
-  const tor = world.addHero({ name: "Tor", gender: "Male" });
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern.", kind: "party" });
+  const tor = world.addHero({ name: "Tor", sex: "Male" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern.", kind: "party" });
   kill(kael);
   const romance = await call(world.owner, "campaigns/[campaignId]/sheet/romance", "PUT", { characterId: kael.id, open: true });
   assert.equal(romance.status, 409, JSON.stringify(romance.json));
@@ -154,7 +154,7 @@ await test("a fallen hero has no advances or pacts switches: the Bonds tab hides
 await test("an advance waiting on a hero who falls is withdrawn, and the dead draw no new one", async () => {
   const { world, kael, kill, liking } = await table();
   world.signIn(world.owner);
-  await world.invoke("set_npc", { name: "Mira", gender: "Female", drawnTo: ["men"], location: "Highmoor" });
+  await world.invoke("set_npc", { name: "Mira", sex: "Female", location: "Highmoor" });
   sheetsDb.setOpenToAdvances(kael.id, true);
   liking(kael, "Mira", 60);
   const pending = () => proposals.listOpenItemProposals(world.campaignId).filter((row) => row.toolName === "romance_advance");
@@ -188,10 +188,10 @@ await test("a hero raised from the dead catches up on whoever the party met whil
     spellcasting: { ability: "wis", slots: { 3: { max: 2, used: 0 } }, prepared: ["Revivify"], known: [], cantrips: [] },
     equipment: [{ name: "Diamond", qty: 1, worth: 300 }, { name: "Component pouch", qty: 1 }],
   });
-  const lyra = world.addHero({ name: "Lyra", gender: "Female" });
+  const lyra = world.addHero({ name: "Lyra", sex: "Female" });
   world.patch(lyra.id, { deathSaves: DEAD, currentHp: 0 });
   world.dice(4, 4);
-  await world.invoke("npc_reaction", { name: "Mara", gender: "Female" });
+  await world.invoke("npc_reaction", { name: "Mara", sex: "Female" });
   assert.ok(relationships.getRelationship(world.campaignId, tam.id, "Mara"));
   assert.equal(relationships.getRelationship(world.campaignId, lyra.id, "Mara"), null);
   const raised = await world.invoke("heal", { characterId: lyra.id, casterId: tam.id, spell: "Revivify", level: 3 });
@@ -206,7 +206,7 @@ await test("a newcomer named in a moment with someone who died finds them dead, 
   const own = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: kael.id, characterName: kael.name, subjectKind: "npc", subjectName: "Hesper" });
   relationships.patchRelationship(own.id, { approval: 50 });
   assert.equal((await world.invoke("relationship_end", { characterId: kael.id, subject: "Hesper", reason: "death" })).ok, true);
-  const tor = world.addHero({ name: "Tor", gender: "Male" });
+  const tor = world.addHero({ name: "Tor", sex: "Male" });
   const beat = await world.invoke("relationship_beat", { characterId: tor.id, subject: "Hesper", beat: "helped" });
   assert.equal(beat.ok, false);
   assert.match(beat.error, /Hesper is dead/);
@@ -220,7 +220,7 @@ await test("a new companion who shares a dead NPC's name does not reopen the dea
     relationships.ensureRelationship({ campaignId: world.campaignId, characterId: hero.id, characterName: hero.name, subjectKind: "npc", subjectName: "Hesper" });
   }
   await world.invoke("relationship_end", { characterId: kael.id, subject: "Hesper", reason: "death" });
-  const joined = await world.invoke("add_companion", { name: "Hesper", class: "fighter", gender: "Female", personality: "A stranger.", kind: "party" });
+  const joined = await world.invoke("add_companion", { name: "Hesper", class: "fighter", sex: "Female", personality: "A stranger.", kind: "party" });
   assert.equal(joined.ok, true, joined.error);
   assert.ok(endedByDeath(bond(kael, "Hesper")), "the dead NPC's bond came back to life for a namesake");
   assert.ok(endedByDeath(bond(lyra, "Hesper")));
@@ -231,7 +231,7 @@ await test("a new companion who shares a dead NPC's name does not reopen the dea
 await test("a foe the party knew who dies in the fight is closed as died for every hero, and the GM is told", async () => {
   const { world, kael, lyra, bond, armed } = await table();
   world.dice(4, 4);
-  assert.equal((await world.invoke("npc_reaction", { name: "Raider Captain", gender: "Male" })).ok, true);
+  assert.equal((await world.invoke("npc_reaction", { name: "Raider Captain", sex: "Male" })).ok, true);
   assert.ok(bond(kael, "Raider Captain") && bond(lyra, "Raider Captain"));
   armed("Raider Captain");
   await world.beginFight([{ monster: "Raider Captain" }]);
@@ -254,7 +254,7 @@ await test("a foe the party knew who dies in the fight is closed as died for eve
 await test("a foe who fled, a bestiary goblin and her name asked for twice close nobody's bonds", async () => {
   const { world, kael, bond, armed } = await table();
   world.dice(4, 4);
-  await world.invoke("npc_reaction", { name: "Raider Captain", gender: "Male" });
+  await world.invoke("npc_reaction", { name: "Raider Captain", sex: "Male" });
   armed("Raider Captain");
   await world.beginFight([{ monster: "Raider Captain" }]);
   const ended = await world.invoke("end_encounter", { outcome: "enemies_fled" });
@@ -275,7 +275,7 @@ await test("a foe who fled, a bestiary goblin and her name asked for twice close
 await test("a foe the fight linked to a Cast NPC closes that NPC's bonds whatever the tracker called it", async () => {
   const { world, kael, bond, armed } = await table();
   world.dice(4, 4);
-  await world.invoke("npc_reaction", { name: "Raider Captain", gender: "Male" });
+  await world.invoke("npc_reaction", { name: "Raider Captain", sex: "Male" });
   armed("Raider Captain");
   await world.beginFight([{ monster: "Raider Captain" }, { monster: "goblin" }]);
   const [her] = world.enemies().filter((enemy) => enemy.npcId);
@@ -291,9 +291,9 @@ await test("a foe the fight linked to a Cast NPC closes that NPC's bonds whateve
 await test("the lead's force-end closes a dead foe's bonds and runs the fight's cleanup", async () => {
   const { world, kael, bond, armed, call } = await table();
   world.dice(4, 4);
-  await world.invoke("npc_reaction", { name: "Raider Captain", gender: "Male" });
+  await world.invoke("npc_reaction", { name: "Raider Captain", sex: "Male" });
   armed("Raider Captain");
-  const guest = await world.invoke("add_companion", { name: "Dace", class: "fighter", gender: "Male", personality: "Hired blade.", kind: "guest" });
+  const guest = await world.invoke("add_companion", { name: "Dace", class: "fighter", sex: "Male", personality: "Hired blade.", kind: "guest" });
   assert.equal(guest.ok, true, guest.error);
   await world.beginFight([{ monster: "Raider Captain" }, { monster: "goblin" }]);
   const captain = world.enemies().find((enemy) => enemy.displayName === "Raider Captain");
@@ -317,10 +317,10 @@ await test("the chapter's close longs for nobody on a fallen hero's behalf, and 
     advanceRelationships(world.campaignId, "The party travels north.");
   }
   assert.ok(!facts.listActiveFacts(world.campaignId).some((fact) => /Kael/.test(fact.fact)), "the GM was asked to send word to the dead");
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern.", kind: "party" });
   const seren = world.sheets().find((sheet) => sheet.name === "Seren");
   world.patch(seren.id, { deathSaves: DEAD, currentHp: 0 });
-  const tor = world.addHero({ name: "Tor", gender: "Male" });
+  const tor = world.addHero({ name: "Tor", sex: "Male" });
   advanceRelationships(world.campaignId, "");
   assert.equal(bond(tor, "Seren"), null, "a bond opened toward a dead companion");
   assert.ok(bond(lyra, "Seren"), "one opened before she fell stays");
@@ -328,7 +328,7 @@ await test("the chapter's close longs for nobody on a fallen hero's behalf, and 
 
 await test("a fallen hero's standing no longer drives a companion, and the GM's roster leaves out their bonds", async () => {
   const { world, kael, liking, kill, prepare } = await table();
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern.", kind: "party" });
   relationships.patchRelationship(relationships.getRelationship(world.campaignId, kael.id, "Seren").id, { approval: -60 });
   assert.equal(worstApproval(world.campaignId, "Seren", world.sheets()), -60);
   prepare("Bram", "friendly");
@@ -341,7 +341,7 @@ await test("a fallen hero's standing no longer drives a companion, and the GM's 
 
 await test("a fallen hero leaves the travel formation: a hazard at the front finds the living, and a stale order keeps the rest", async () => {
   const { world, kael, lyra, kill, call } = await table();
-  const tor = world.addHero({ name: "Tor", gender: "Male" });
+  const tor = world.addHero({ name: "Tor", sex: "Male" });
   const set = await call(world.owner, "campaigns/[campaignId]/party/formation", "POST", { do: "set", order: [lyra.id, kael.id, tor.id] });
   assert.equal(set.status, 200, JSON.stringify(set.json));
   kill(lyra);

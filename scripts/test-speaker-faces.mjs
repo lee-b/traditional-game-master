@@ -25,11 +25,11 @@ function test(name, fn) {
   passed += 1;
 }
 
-const sheet = (id, more = {}) => ({ id, userId: `u-${id}`, name: id, race: "dwarf", class: "fighter", gender: "", level: 3, portrait: null, ...more });
+const sheet = (id, more = {}) => ({ id, userId: `u-${id}`, name: id, race: "dwarf", class: "fighter", sex: "", level: 3, portrait: null, ...more });
 const brannoc = sheet("Brannoc", { portrait: { url: "/uploads/brannoc.webp" } });
 const ysolde = sheet("Ysolde", { race: "elf", class: "wizard" });
 const sheetsById = new Map([brannoc, ysolde].map((entry) => [entry.id, entry]));
-const plate = (entry) => characterPlaceholder({ race: entry.race, class: entry.class, gender: entry.gender });
+const plate = (entry) => characterPlaceholder({ race: entry.race, class: entry.class, sex: entry.sex });
 const pc = (entry) => ({ kind: "pc", id: entry.id, name: entry.name });
 
 test("a character with a portrait speaks with it, and falls back to their plate", () => {
@@ -103,7 +103,7 @@ test("a player's line draws the first of their faces in the medallion", () => {
 // the player had played for her read as the player's own.
 const krag = sheet("Krag", { userId: "u-player", race: "bhain-kwai", class: "fighter" });
 const tamsin = sheet("Tamsin", { userId: "u-player", race: "human", class: "ranger" });
-const goneRow = { sheetId: tamsin.id, name: "Tamsin", how: "Walked out on the party", at: "", portraitUrl: "", race: "human", class: "ranger", gender: "" };
+const goneRow = { sheetId: tamsin.id, name: "Tamsin", how: "Walked out on the party", at: "", portraitUrl: "", race: "human", class: "ranger", sex: "" };
 
 test("the story log keeps a departed companion's sheet: a Gone row, a dimming card, and the party's own first", () => {
   const byId = transcriptSheets([krag], [], [goneRow]);
@@ -131,7 +131,7 @@ test("a card played for a companion stays hers after she leaves, never the autho
 // before she left name the old one, and read as a letter and the player's
 // name again once her Gone row went away.
 test("a returned companion's earlier card and speech find her live sheet by the ids it held", () => {
-  const back = { ...sheet("Tamsin-back", { userId: "u-bot", race: "bhain-kwai", class: "ranger", gender: "Female" }), name: "Tamsin", formerSheetIds: [tamsin.id] };
+  const back = { ...sheet("Tamsin-back", { userId: "u-bot", race: "bhain-kwai", class: "ranger", sex: "Female" }), name: "Tamsin", formerSheetIds: [tamsin.id] };
   const byId = transcriptSheets([krag, back], [], []);
   assert.deepEqual(speakerFaces(pc({ ...back, id: tamsin.id }), byId), [plate(back)]);
   const message = { id: "m3", characterId: tamsin.id, userId: "u-player", authorType: "player", content: "I loose an arrow with my Longbow.", createdAt: new Date().toISOString() };
@@ -143,11 +143,11 @@ test("a returned companion's earlier card and speech find her live sheet by the 
 });
 
 // The cinematic table's initiative strip and party rail drew the plate
-// without the sheet's gender, so a woman's face on the Party tab was the
+// without the sheet's sex, so a woman's face on the Party tab was the
 // neutral one there.
 const { facesFor } = await import("../src/app/campaigns/[campaignId]/CinematicParts.tsx");
 test("the cinematic table draws the same face as the Party tab and the chronicle", () => {
-  const seraphine = sheet("Seraphine", { race: "bhain-kwai", class: "paladin", gender: "Female" });
+  const seraphine = sheet("Seraphine", { race: "bhain-kwai", class: "paladin", sex: "Female" });
   const [, drawn] = facesFor({ id: seraphine.id, kind: "pc", name: seraphine.name }, [seraphine], [], null);
   assert.equal(drawn, plate(seraphine));
   assert.match(drawn, /feminine/);

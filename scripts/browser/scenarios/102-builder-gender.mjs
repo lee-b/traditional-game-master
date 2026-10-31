@@ -1,5 +1,5 @@
-// The gender is asked on the class step, above the cards whose art follows
-// it (scripts/test-builder-gender-first.mjs). A new hero starts with it
+// The sex is asked on the class step, above the cards whose art follows
+// it (scripts/test-builder-sex-first.mjs). A new hero starts with it
 // unchosen and the cards in a mix of looks; choosing one turns every class
 // card to it at once, and the ancestry cards after them. The Hero step says
 // it and goes back to the class step to change it. The library's pages are
@@ -75,17 +75,17 @@ async function allIn(page, root, want, label) {
   }
 }
 
-async function choose(t, field, gender) {
+async function choose(t, field, sex) {
   const { page } = t;
-  await t.tap(field.getByRole("button", { name: "Gender" }));
-  const row = page.getByRole("menuitemradio", { name: gender, exact: true }).locator("visible=true").first();
+  await t.tap(field.getByRole("button", { name: "Sex" }));
+  const row = page.getByRole("menuitemradio", { name: sex, exact: true }).locator("visible=true").first();
   await row.waitFor({ state: "visible", timeout: 10_000 });
   await t.tap(row);
-  await eventually(async () => (await field.innerText()).includes(gender), { label: `${gender} chosen` });
+  await eventually(async () => (await field.innerText()).includes(sex), { label: `${sex} chosen` });
 }
 
 export default {
-  name: "builder-gender",
+  name: "builder-sex",
   viewports: ["desktop", "phone"],
   async run(t) {
     const { page, root, ids } = t;
@@ -95,15 +95,15 @@ export default {
     if (await fresh.count()) {
       await t.tap(fresh.first());
     }
-    const field = page.locator(`${root}section[data-active] [data-builder-target="gender"]`).locator("visible=true").first();
+    const field = page.locator(`${root}section[data-active] [data-builder-target="sex"]`).locator("visible=true").first();
     await field.waitFor({ state: "visible", timeout: 30_000 });
-    check(/^Step 1:/.test(await currentStep(page, root)), "the gender is on the first step");
+    check(/^Step 1:/.test(await currentStep(page, root)), "the sex is on the first step");
     check((await field.innerText()).includes("Not chosen"), "it starts unchosen");
-    const trigger = field.getByRole("button", { name: "Gender" });
+    const trigger = field.getByRole("button", { name: "Sex" });
     const box = await trigger.boundingBox();
     check(box && box.height >= 40, `a finger-sized select (${box?.height})`);
-    const found = await axeViolations(page, `${root}section[data-active] [data-builder-target="gender"]`);
-    check(!found.length, `axe on the gender field: ${found.map((entry) => `${entry.id}: ${entry.help}`).join("; ").slice(0, 600)}`);
+    const found = await axeViolations(page, `${root}section[data-active] [data-builder-target="sex"]`);
+    check(!found.length, `axe on the sex field: ${found.map((entry) => `${entry.id}: ${entry.help}`).join("; ").slice(0, 600)}`);
 
     // Unchosen: a mix of looks, the same one after a reload.
     await eventually(async () => (await cardLooks(page, root)).length >= 6, { timeoutMs: 30_000, label: "the class cards" });
@@ -137,7 +137,7 @@ export default {
       for (const key of Object.keys(window.localStorage)) if (key.startsWith("odm:builder-draft:")) window.localStorage.removeItem(key);
     });
 
-    // A stored build's Hero step says the gender and goes back to the class
+    // A stored build's Hero step says the sex and goes back to the class
     // step to change it.
     await t.open(`/characters/${ids.library}/edit`);
     const ahead = page.locator(`${root}button[aria-label^="Back to step 5"], ${root}button[aria-label^="Go to step 5"]`).locator("visible=true");
@@ -151,8 +151,8 @@ export default {
     await t.tap(back);
     await eventually(async () => /^Step 1:/.test(await currentStep(page, root)), { label: "back on the class step" });
     await eventually(
-      () => page.evaluate(() => Boolean(document.activeElement?.closest('[data-builder-target="gender"]'))),
-      { label: "the gender select focused" },
+      () => page.evaluate(() => Boolean(document.activeElement?.closest('[data-builder-target="sex"]'))),
+      { label: "the sex select focused" },
     );
   },
 };

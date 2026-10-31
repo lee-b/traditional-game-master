@@ -1,14 +1,12 @@
-// NPCs who make the first move, and who a character is drawn to (issue 501),
-// the pure half: attraction matching both ways, the roll's clamp and its
-// cadence, cooldowns and windows, who may court whom (exclusivity, presence,
-// companions and guests), the table's safety tools, who answers, and what
-// the DM and the Director are told.
+// NPCs who make the first move, the pure half: the opposite-sex gate, the
+// roll's clamp and its cadence, cooldowns and windows, who may court whom
+// (exclusivity, presence, companions and guests), the table's safety tools,
+// who answers, and what the DM and the Director are told.
 import assert from "node:assert/strict";
 import { register } from "node:module";
 
 register("./lib/register-alias.mjs", import.meta.url);
 
-const attraction = await import("../src/lib/attraction.ts");
 const logic = await import("../src/lib/dm/advance-logic.ts");
 const director = await import("../src/lib/dm/director-logic.ts");
 const profiles = await import("../src/lib/dm/tool-profiles.ts");
@@ -24,55 +22,6 @@ function test(name, fn) {
     throw error;
   }
 }
-
-// ---- who a character is drawn to ----
-
-test("an attraction reads back as known genders and a trimmed note, anything else as blank", () => {
-  const read = attraction.normalizeAttraction({ genders: ["Male", "Robot", "Male", "Female"], note: `  only   the ${"x".repeat(80)}` });
-  assert.deepEqual(read.genders, ["Female", "Male"], "unknown dropped, repeats folded, in the fixed order");
-  assert.equal(read.note.length, attraction.ATTRACTION_NOTE_MAX);
-  assert.ok(read.note.startsWith("only the x"), "inner space folded");
-  assert.deepEqual(attraction.normalizeAttraction('{"genders":["Nonbinary"],"note":""}'), { genders: ["Nonbinary"], note: "" });
-  assert.deepEqual(attraction.normalizeAttraction("not json"), { genders: [], note: "" });
-  assert.deepEqual(attraction.normalizeAttraction(""), { genders: [], note: "" });
-  assert.deepEqual(attraction.normalizeAttraction(null), { genders: [], note: "" });
-  assert.equal(attraction.attractionBlank(attraction.normalizeAttraction(undefined)), true);
-  assert.equal(attraction.attractionBlank({ genders: [], note: "kind people" }), false);
-  assert.equal(attraction.attractionJson({ genders: [], note: "" }), "", "a blank one stores as nothing");
-});
-
-test("blank fits anyone; a chosen set fits only its genders; an unspecified gender fits only blank", () => {
-  const blank = { genders: [], note: "" };
-  const women = { genders: ["Female"], note: "" };
-  assert.equal(attraction.drawnTo(blank, "Male"), true);
-  assert.equal(attraction.drawnTo(blank, ""), true);
-  assert.equal(attraction.drawnTo(undefined, "Nonbinary"), true);
-  assert.equal(attraction.drawnTo(women, "Female"), true);
-  assert.equal(attraction.drawnTo(women, "Male"), false);
-  assert.equal(attraction.drawnTo(women, ""), false, "the server never guesses a gender");
-  assert.equal(attraction.drawnTo({ genders: [], note: "the brave" }, "Male"), true, "a note alone limits nothing");
-});
-
-test("an attraction fits both ways or not at all", () => {
-  const mira = { gender: "Female", attraction: { genders: ["Male"], note: "" } };
-  const kael = { gender: "Male", attraction: { genders: [], note: "" } };
-  const sera = { gender: "Female", attraction: { genders: ["Female"], note: "" } };
-  assert.equal(attraction.attractionFits(mira, kael), true);
-  assert.equal(attraction.attractionFits(kael, mira), true);
-  assert.equal(attraction.attractionFits(mira, sera), false, "Mira is drawn to men only");
-  assert.equal(attraction.attractionFits(sera, { gender: "Male", attraction: null }), false, "Sera is drawn to women only");
-});
-
-test("the DM reads an attraction in words, and a tool's words become one", () => {
-  assert.equal(attraction.attractionWords({ genders: ["Female", "Nonbinary"], note: "" }), "women and nonbinary people");
-  assert.equal(attraction.attractionWords({ genders: ["Female", "Male", "Nonbinary"], note: "rarely" }), "women, men and nonbinary people (rarely)");
-  assert.equal(attraction.attractionWords({ genders: [], note: "whoever makes them laugh" }), "whoever makes them laugh");
-  assert.equal(attraction.attractionWords({ genders: [], note: "" }), "");
-  assert.deepEqual(attraction.attractionFromTold(["men", "Women", "elves"]), { genders: ["Female", "Male"], note: "" });
-  assert.deepEqual(attraction.attractionFromTold(["Nonbinary"]), { genders: ["Nonbinary"], note: "" });
-  assert.equal(attraction.attractionFromTold([]), null, "nothing said is nothing written");
-  assert.equal(attraction.attractionFromTold(undefined), null);
-});
 
 // ---- the roll ----
 
@@ -139,7 +88,7 @@ test("an NPC is in the scene where the party is, or when the narration names the
 
 // ---- who may court whom ----
 
-const kael = { name: "Kael", gender: "Male", attraction: null, open: true, isCompanion: false };
+const kael = { name: "Kael", sex: "Male", open: true, isCompanion: false };
 const mira = {
   name: "Mira",
   kind: "npc",
@@ -148,13 +97,12 @@ const mira = {
   approval: 60,
   romance: "none",
   warmth: 1,
-  gender: "Female",
-  attraction: { genders: ["Male"], note: "" },
+  sex: "Female",
   committedElsewhere: false,
   pendingAdvance: false,
 };
 
-test("a suitor who likes them enough, in the scene, free and drawn both ways may court", () => {
+test("a suitor who likes them enough, in the scene and free may court", () => {
   assert.equal(logic.suitorProblem(mira, kael), null);
   assert.equal(logic.suitorProblem({ ...mira, romance: "interested" }, kael), null, "an unspoken pull may become the open step");
 });
@@ -171,12 +119,18 @@ test("every rule says why it refuses", () => {
     [{ ...mira, approval: 54 }, kael, /courting needs 55/],
     [{ ...mira, committedElsewhere: true }, kael, /already with someone else/],
     [{ ...mira, pendingAdvance: true }, kael, /already has an advance waiting/],
-    [{ ...mira, attraction: { genders: ["Female"], note: "" } }, kael, /not drawn to each other/],
-    [{ ...mira }, { ...kael, attraction: { genders: ["Male"], note: "" } }, /not drawn to each other/],
+    [{ ...mira }, { ...kael, sex: "Female" }, /same sex/],
+    [{ ...mira, sex: "Male" }, kael, /same sex/],
   ];
   for (const [suitor, target, why] of cases) {
     assert.match(logic.suitorProblem(suitor, target) ?? "", why);
   }
+});
+
+test("a sex the story has not shown never blocks the moment", () => {
+  assert.equal(logic.suitorProblem({ ...mira, sex: "" }, { ...kael, sex: "" }), null, "nobody is refused on a guess");
+  assert.equal(logic.suitorProblem({ ...mira, sex: "" }, kael), null);
+  assert.equal(logic.suitorProblem(mira, { ...kael, sex: "" }), null);
 });
 
 test("a lasting companion may court; the best suitor is who feels most, then the warmest, then by name", () => {
@@ -216,8 +170,6 @@ test("the DM's cue names the move and never the answer", () => {
   assert.match(cue, /romance_advance with initiator npc/);
   assert.match(cue, /Never decide how Kael feels/);
   assert.match(logic.advanceCue("Mira", "Kael", 1), /last reply/);
-  assert.doesNotMatch(cue, /drawnTo/, "nothing to settle when she is decided");
-  assert.match(logic.advanceCue("Mira", "Kael", 2, true), /settle it with set_npc drawnTo, and it stays/, "an undecided suitor is settled once");
   assert.equal(logic.advanceSummary("Mira", "Kael"), "Mira asks to court Kael");
 });
 

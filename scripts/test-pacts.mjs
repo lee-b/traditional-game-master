@@ -163,7 +163,7 @@ test("the approach: four answers, a card safe for a lock screen, words that name
   assert.equal(logic.approachSummary("Brin"), "A private offer for Brin");
   assert.match(logic.approachWords("Seren", { plan: "sabotage", tactic: "theft", trigger: "night_watch" }), /Seren takes you aside.*steal the party's best thing in the night, then leave together, at the night watch/);
   const args = logic.approachArgs(JSON.stringify({ pactId: "p1", recruiter: "Seren", portraitUrl: "", look: { race: "elf" } }));
-  assert.deepEqual(args, { pactId: "p1", recruiter: "Seren", portraitUrl: "", look: { gender: "", race: "elf", class: "" } });
+  assert.deepEqual(args, { pactId: "p1", recruiter: "Seren", portraitUrl: "", look: { sex: "", race: "elf", class: "" } });
   assert.equal(logic.approachArgs("{}"), null);
 });
 

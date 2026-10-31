@@ -22,7 +22,7 @@ export type GoneEntry = {
   portraitUrl: string;
   race: string;
   class: string;
-  gender: string;
+  sex: string;
   // Who they still cared for as they went (issue 563); an older server
   // sends none.
   caresFor?: string[];
@@ -35,7 +35,7 @@ export type GoneEntry = {
 // the face beside it. A companion who has left keeps theirs (0.31.1
 // playtest): with no sheet to read, their speech fell to a letter and a card
 // they had played was put in the player's mouth.
-export type TranscriptSheet = Pick<CharacterSheet, "id" | "name" | "race" | "class" | "gender" | "portrait">;
+export type TranscriptSheet = Pick<CharacterSheet, "id" | "name" | "race" | "class" | "sex" | "portrait">;
 
 // The party's sheets, then the ones who left: a card still dimming carries
 // its whole sheet, and a Gone row what the server kept of it. A sheet still
@@ -63,7 +63,7 @@ export function transcriptSheets(
         name: entry.name,
         race: entry.race,
         class: entry.class,
-        gender: (entry.gender as CharacterSheet["gender"]) || "",
+        sex: (entry.sex as CharacterSheet["sex"]) || "",
         portrait: entry.portraitUrl ? ({ url: entry.portraitUrl } as CharacterSheet["portrait"]) : null,
       };
       under(sheet, entry.formerSheetIds);

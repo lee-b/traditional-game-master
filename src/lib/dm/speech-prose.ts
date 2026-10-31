@@ -6,11 +6,11 @@
 // sentence ends, known names and where they stand. The one exception is
 // English, whose pronouns ("she", "he", "her") are followed back to the
 // person they mean (Reading.pronouns): languages that drop the subject
-// pronoun (Italian, Spanish, Portuguese) or have no gendered one (Finnish,
+// pronoun (Italian, Spanish, Portuguese) or have no sexed one (Finnish,
 // Hungarian, Indonesian) give that reading nothing to hold on to.
 
 import type { Speaker } from "@/lib/dm/speech";
-import type { GenderMark } from "@/lib/gender";
+import type { SexMark } from "@/lib/sex";
 import { namesPattern, splitWords, textKey, words } from "@/lib/language/text-logic";
 
 // A quoted line, in any pair prose uses: “…”, "…", «…», „…“, »…«. Only a
@@ -164,13 +164,13 @@ function englishPronounCounts(text: string, reading: Reading): { f: number; m: n
 }
 
 // What a stretch of prose about one person calls them, when it is clear.
-export function genderOf(text: string, reading: Reading): GenderMark {
+export function sexOf(text: string, reading: Reading): SexMark {
   const { f, m } = englishPronounCounts(text, reading);
   return f > 0 && f >= 2 * m ? "f" : m > 0 && m >= 2 * f ? "m" : "";
 }
 
 // Every way a stretch calls the people it is about.
-export function gendersIn(text: string, reading: Reading): GenderMark[] {
+export function sexesIn(text: string, reading: Reading): SexMark[] {
   const { f, m } = englishPronounCounts(text, reading);
   return [...(f ? ["f" as const] : []), ...(m ? ["m" as const] : [])];
 }

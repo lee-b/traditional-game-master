@@ -20,7 +20,6 @@ import {
   type ClassOption,
   type RaceOption,
 } from "@/lib/characters/options";
-import { normalizeAttraction } from "@/lib/attraction";
 import { settingClassIds } from "@/lib/classes";
 import { textKey } from "@/lib/language/text-logic";
 import type { Genre } from "@/lib/schemas/game-settings";
@@ -172,8 +171,7 @@ function freshFields(proposal: HeroProposal, level: number, ids: { classId: stri
     optionPicks: [],
     backstory: proposal.backstory,
     hopes: "",
-    gender: proposal.gender,
-    attraction: normalizeAttraction(undefined),
+    sex: proposal.sex,
     appearance: "",
     portrait: null,
     gold: 0,

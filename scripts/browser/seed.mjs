@@ -453,7 +453,7 @@ const bondTables = {};
     const other = world.addUser("bonds");
     campaigns.joinByInviteCode(other.id, campaigns.getCampaignById(table.id).inviteCode);
     const lyra = sheets.createSheet(table.id, other.id, 3, heroInput({ name: "Lyra Venn", class: "wizard", level: 3 }));
-    npcs.upsertNpc({ campaignId: table.id, name: "Mira Vell", attitude: "friendly", gender: "Female" });
+    npcs.upsertNpc({ campaignId: table.id, name: "Mira Vell", attitude: "friendly", sex: "Female" });
     // A companion Kael married, with a long two-word name (issue 644): at
     // phone width its "companion" label ran under the standing chip.
     const hollisBot = createCompanionUser("Sir Hollis Stonebridge");
@@ -1092,7 +1092,7 @@ for (const viewport of ["desktop", "phone"]) {
     table.id,
     world.owner.id,
     3,
-    heroInput({ name: "Kael Ashvale", class: "bard", level: 3, gender: "Male", attraction: { genders: ["Female"], note: "" }, abilities: { cha: 16 } }),
+    heroInput({ name: "Kael Ashvale", class: "bard", level: 3, sex: "Male", abilities: { cha: 16 } }),
   );
   courtingSheets.setOpenToAdvances(kael.id, true);
   const mira = courtingNpcs.upsertNpc({
@@ -1101,8 +1101,7 @@ for (const viewport of ["desktop", "phone"]) {
     attitude: "friendly",
     trait: "A ferrywoman with a quick laugh",
     location: "the ford",
-    gender: "Female",
-    attraction: { genders: ["Male"], note: "" },
+    sex: "Female"
   });
   const bond = courtingBonds.ensureRelationship({
     campaignId: table.id,
@@ -1131,7 +1130,7 @@ for (const viewport of ["desktop", "phone"]) {
       note: ADVANCE_LINE,
       madeAtTurn: 0,
       portraitUrl: "",
-      look: { gender: "Female", role: "" },
+      look: { sex: "Female", role: "" },
     }),
     summary: `${mira.name} asks to court ${kael.name}`,
     reason: ADVANCE_LINE,
@@ -1214,7 +1213,7 @@ for (const viewport of ["desktop", "phone"]) {
     table.id,
     world.owner.id,
     3,
-    heroInput({ name: "Kael Ashvale", class: "bard", level: 3, gender: "Male", abilities: { wis: 18 } }),
+    heroInput({ name: "Kael Ashvale", class: "bard", level: 3, sex: "Male", abilities: { wis: 18 } }),
   );
   sheets.setOpenToAdvances(kael.id, true);
   const senna = maskedNpcs.upsertNpc({
@@ -1223,8 +1222,7 @@ for (const viewport of ["desktop", "phone"]) {
     attitude: "friendly",
     trait: "A ferrywoman who laughs a little too easily",
     location: "the ford",
-    gender: "Female",
-    attraction: { genders: ["Male"], note: "" },
+    sex: "Female"
   });
   maskedNpcs.patchNpcAgency(senna.id, { personality: { drive: -3, diligence: 0, boldness: 0, warmth: 2, empathy: 3, composure: -3 } });
   const bond = maskedBonds.ensureRelationship({
@@ -1583,7 +1581,7 @@ const pactTables = { consent: {}, offer: {}, secret: {}, reveal: {} };
     }
     campaigns.setCampaignStatus(table.id, "active");
     const bot = createCompanionUser("Seren Vale");
-    const seren = sheets.createSheet(table.id, bot.id, 3, heroInput({ name: "Seren Vale", class: "paladin", alignment: "LG", gender: "Female", level: 3 }));
+    const seren = sheets.createSheet(table.id, bot.id, 3, heroInput({ name: "Seren Vale", class: "paladin", alignment: "LG", sex: "Female", level: 3 }));
     sheets.markSheetAsCompanion(seren.id, "party", "Stern, devout, and losing faith in the people she walks with.");
     const row = companionNpcFor(sheets.getSheetById(seren.id));
     patchNpcAgency(row.id, { personality: { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 0 } });
@@ -1597,14 +1595,14 @@ const pactTables = { consent: {}, offer: {}, secret: {}, reveal: {} };
   for (const viewport of ["desktop", "phone"]) {
     {
       const { table } = pactTable("Consent", viewport, false);
-      const kael = sheets.createSheet(table.id, world.owner.id, 3, heroInput({ name: "Kael Ashvale", class: "rogue", level: 3, gender: "Male" }));
-      sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "fighter", level: 3, gender: "Female" }));
+      const kael = sheets.createSheet(table.id, world.owner.id, 3, heroInput({ name: "Kael Ashvale", class: "rogue", level: 3, sex: "Male" }));
+      sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "fighter", level: 3, sex: "Female" }));
       pactTables.consent[viewport] = { id: table.id, kael: kael.id };
     }
     {
       const { table, seren, row } = pactTable("Offer", viewport, false);
-      const kael = sheets.createSheet(table.id, world.owner.id, 3, heroInput({ name: "Kael Ashvale", class: "rogue", level: 3, gender: "Male" }));
-      sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "fighter", level: 3, gender: "Female" }));
+      const kael = sheets.createSheet(table.id, world.owner.id, 3, heroInput({ name: "Kael Ashvale", class: "rogue", level: 3, sex: "Male" }));
+      sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "fighter", level: 3, sex: "Female" }));
       sheets.setOpenToPacts(kael.id, true);
       const pact = pactsDb.savePact({ ...formed(table, seren, row, []), approached: [kael.id] });
       const offer = itemProposals.insertItemProposal({
@@ -1613,7 +1611,7 @@ const pactTables = { consent: {}, offer: {}, secret: {}, reveal: {} };
         characterId: kael.id,
         userId: world.owner.id,
         toolName: "pact_approach",
-        argsJson: JSON.stringify({ pactId: pact.id, recruiter: seren.name, portraitUrl: "", look: { gender: "Female", race: "human", class: "paladin" } }),
+        argsJson: JSON.stringify({ pactId: pact.id, recruiter: seren.name, portraitUrl: "", look: { sex: "Female", race: "human", class: "paladin" } }),
         summary: approachSummary(kael.name),
         reason: approachWords(seren.name, pact),
         seq: campaigns.allocateSeq(table.id),
@@ -1623,14 +1621,14 @@ const pactTables = { consent: {}, offer: {}, secret: {}, reveal: {} };
     }
     {
       const { table, seren, row } = pactTable("Secret", viewport, false);
-      const kael = sheets.createSheet(table.id, world.owner.id, 3, heroInput({ name: "Kael Ashvale", class: "rogue", level: 3, gender: "Male", abilities: { dex: 20 } }));
-      sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "fighter", level: 3, gender: "Female", abilities: { wis: 1 } }));
+      const kael = sheets.createSheet(table.id, world.owner.id, 3, heroInput({ name: "Kael Ashvale", class: "rogue", level: 3, sex: "Male", abilities: { dex: 20 } }));
+      sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "fighter", level: 3, sex: "Female", abilities: { wis: 1 } }));
       formed(table, seren, row, [{ kind: "player", characterId: kael.id, name: kael.name, userId: world.owner.id, stance: "joined" }]);
       pactTables.secret[viewport] = { id: table.id, kael: kael.id };
     }
     {
       const { table, seren, row } = pactTable("Reveal", viewport, true);
-      const brin = sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "rogue", level: 3, gender: "Female", abilities: { dex: 20 } }));
+      const brin = sheets.createSheet(table.id, player.id, 3, heroInput({ name: "Brin Hale", class: "rogue", level: 3, sex: "Female", abilities: { dex: 20 } }));
       formed(table, seren, row, [{ kind: "player", characterId: brin.id, name: brin.name, userId: player.id, stance: "joined" }]);
       const secret = declareSecretAction(campaigns.getCampaignById(table.id), sheets.getSheetById(brin.id), { kind: "scheme", text: "cut the horses loose before dawn", skill: "stealth" });
       if ("error" in secret || secret.caught) {

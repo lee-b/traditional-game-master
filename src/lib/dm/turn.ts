@@ -255,7 +255,6 @@ import {
   relationshipTools,
   RELATIONSHIP_TOOL_NAMES,
   relationshipRosterForPrompt,
-  romanceEnabled,
 } from "@/lib/dm/relationship-tools";
 import { openToAdvanceNames } from "@/lib/dm/advance-logic";
 import { PARTY_TOOL_NAMES, partyTools } from "@/lib/dm/party-tools";
@@ -918,7 +917,7 @@ async function openTurn(
           ],
       withholdStorytellerSecrets: oocOnly,
       directorBlock,
-      npcs: npcRosterForPrompt(campaignId, { romance: romanceEnabled(campaign) }).map((npc) => ({ ...npc, world: world.npcNotes.get(npc.name) })),
+      npcs: npcRosterForPrompt(campaignId).map((npc) => ({ ...npc, world: world.npcNotes.get(npc.name) })),
       relationships:
         campaign.gameSettings.relationships === "off"
           ? []

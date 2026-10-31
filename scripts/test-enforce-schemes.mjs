@@ -32,11 +32,11 @@ const MOTIVE = "the key to the river vault";
 
 const world = await openWorld();
 // The owner leads this AI table and plays Bram; Kael and Nysa are players.
-const bram = world.addHero({ name: "Bram", gender: "Male" });
+const bram = world.addHero({ name: "Bram", sex: "Male" });
 const kaelUser = world.addUser("kael");
-const kael = world.addHero({ user: kaelUser, name: "Kael", gender: "Male", abilities: { wis: 14 } });
+const kael = world.addHero({ user: kaelUser, name: "Kael", sex: "Male", abilities: { wis: 14 } });
 const nysaUser = world.addUser("nysa");
-const nysa = world.addHero({ user: nysaUser, name: "Nysa", gender: "Female", abilities: { wis: 8 } });
+const nysa = world.addHero({ user: nysaUser, name: "Nysa", sex: "Female", abilities: { wis: 8 } });
 sheetsDb.setOpenToAdvances(kael.id, true);
 
 async function get(table, user, route, query = "") {
@@ -86,18 +86,18 @@ function takeTurn(table) {
 }
 const whispersTo = (user, table = world) => whispers.listWhispersForUser(table.campaignId, user.id).map((row) => row.content);
 
-await world.invoke("set_npc", { name: "Mira", gender: "Female", drawnTo: ["men"], location: "Highmoor" });
-await world.invoke("set_npc", { name: "Corin", gender: "Male", drawnTo: ["men"], location: "Highmoor" });
+await world.invoke("set_npc", { name: "Mira", sex: "Female", location: "Highmoor" });
+await world.invoke("set_npc", { name: "Corin", sex: "Female", location: "Highmoor" });
 
-await test("an act is refused toward a character not open to advances, or one the NPC is not drawn to", async () => {
+await test("an act is refused toward a character not open to advances, or one of the same sex", async () => {
   const closed = await world.invoke("relationship_scheme", { action: "start", characterId: bram.id, subject: "Mira", motive: MOTIVE });
   assert.equal(closed.ok, false);
   assert.match(closed.error, /has not opened Bram to advances/);
   const nysaOpen = sheetsDb.setOpenToAdvances(nysa.id, true);
   assert.ok(nysaOpen !== false);
   const mismatch = await world.invoke("relationship_scheme", { action: "start", characterId: nysa.id, subject: "Mira", motive: MOTIVE });
-  assert.equal(mismatch.ok, false, "Mira is drawn to men; Nysa is a woman");
-  assert.match(mismatch.error, /not drawn to each other/);
+  assert.equal(mismatch.ok, false, "Mira is a woman, and so is Nysa");
+  assert.match(mismatch.error, /same sex/);
   sheetsDb.setOpenToAdvances(nysa.id, false);
   const noMotive = await world.invoke("relationship_scheme", { action: "start", characterId: kael.id, subject: "Mira" });
   assert.equal(noMotive.ok, false);
@@ -190,7 +190,7 @@ await test("the AI's game state keeps the truth, and the act, its motive and how
   assert.match(block, /An act starts where they truly stand/);
   assert.match(block, /every warm beat lands on the warmth the table sees at its face value/);
   assert.match(block, /Open to advances from NPCs \(each player's private choice; never mention it at the table\): Kael\./);
-  assert.doesNotMatch(block, /Gender: Male \| Open to advances/, "the opt-in left the party lines for the section");
+  assert.doesNotMatch(block, /Sex: Male \| Open to advances/, "the opt-in left the party lines for the section");
 });
 
 await test("the lead cannot read the motive or the true meter through ?secrets=1 or the Context tab", async () => {
@@ -322,9 +322,9 @@ await test("relationship_scheme reveal shows everyone the truth without ending t
 await test("at a table a person runs, that person reads the act, its motive and the storyteller's facts", async () => {
   const table = await openWorld({ gameSettings: { dmMode: "human" } });
   const player = table.addUser("p");
-  const hero = table.addHero({ user: player, name: "Lio", gender: "Male", abilities: { wis: 14 } });
+  const hero = table.addHero({ user: player, name: "Lio", sex: "Male", abilities: { wis: 14 } });
   sheetsDb.setOpenToAdvances(hero.id, true);
-  await table.invoke("set_npc", { name: "Senna", gender: "Female", drawnTo: ["men"] });
+  await table.invoke("set_npc", { name: "Senna", sex: "Female" });
   liking(hero, "Senna", 5, table);
   const started = await table.invoke("relationship_scheme", { action: "start", characterId: hero.id, subject: "Senna", motive: "Lio's map" });
   assert.equal(started.ok, true, started.error);

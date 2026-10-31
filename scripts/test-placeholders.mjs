@@ -5,7 +5,7 @@
 // The resolver is a table of constants rather than a manifest lookup, which is
 // the right call for a render path but means the table can drift from what
 // scripts/generate-placeholders.mjs actually rendered. This walks the whole
-// input space - every race, class, gender, genre, role, scene kind and creature
+// input space - every race, class, sex, genre, role, scene kind and creature
 // type the app can hold, plus all 576 bestiary entries at their real cr - and
 // asserts the answer resolves. A missing plate is a broken image in front of
 // a player, so it fails the build rather than warning. The reverse check
@@ -54,8 +54,9 @@ function check(url, label) {
   }
 }
 
-// The sheet's choices (src/lib/gender.ts), plus free text an old sheet may hold.
-const GENDER_INPUTS = ["", "Female", "Male", "Nonbinary", "she/her", "?"];
+// The sheet's choices (src/lib/sex.ts), plus free text an old sheet may
+// hold — "Nonbinary" is a value the choice held before it was dropped.
+const SEX_INPUTS = ["", "Female", "Male", "Nonbinary", "she/her", "?"];
 const GENRES = [
   "high_fantasy", "dark_fantasy", "mystery", "horror",
   "cyberpunk", "steampunk", "post_apocalyptic", "custom", "",
@@ -69,35 +70,35 @@ for (const file of ["cyberpunk", "steampunk", "horror", "mystery", "post-apocaly
   genreClasses.push(...data.classes.map((entry) => entry.id));
 }
 
-// Characters: every race x gender, every class x gender, and the bare
+// Characters: every race x sex, every class x sex, and the bare
 // fallbacks with nothing known at all.
-for (const gender of GENDER_INPUTS) {
+for (const sex of SEX_INPUTS) {
   for (const race of races) {
-    check(R.characterPlaceholder({ race: race.id, gender }), `race ${race.id}/${gender}`);
+    check(R.characterPlaceholder({ race: race.id, sex }), `race ${race.id}/${sex}`);
   }
   // The content pack's classes from other books (Marshal, Mechanist) have
-  // three-gender plates like the genre classes (issue #116).
+  // three-sex plates like the genre classes (issue #116).
   for (const klass of [...srdClasses.map((entry) => entry.id), ...genreClasses, "marshal", "mechanist"]) {
-    check(R.characterPlaceholder({ class: klass, gender }), `class ${klass}/${gender}`);
+    check(R.characterPlaceholder({ class: klass, sex }), `class ${klass}/${sex}`);
   }
   for (const genre of GENRES) {
-    check(R.characterPlaceholder({ genre, gender }), `genre lead ${genre}/${gender}`);
-    check(R.characterPlaceholder({ gender }), `bare ${gender}`);
+    check(R.characterPlaceholder({ genre, sex }), `genre lead ${genre}/${sex}`);
+    check(R.characterPlaceholder({ sex }), `bare ${sex}`);
   }
   // Pack races mapped by id (Tome of Heroes and the rest), so their plates
   // are reachable.
   for (const id of R.raceFamilyIds()) {
-    check(R.characterPlaceholder({ race: id, gender }), `pack race ${id}/${gender}`);
+    check(R.characterPlaceholder({ race: id, sex }), `pack race ${id}/${sex}`);
   }
   // An unknown race or class must still land somewhere real.
-  check(R.characterPlaceholder({ race: "spacefolk", class: "chronomancer", gender }), `unknown/${gender}`);
+  check(R.characterPlaceholder({ race: "spacefolk", class: "chronomancer", sex }), `unknown/${sex}`);
   // Every race in every genre: the wasteland's half-orc is its mutant lead.
   for (const genre of GENRES) {
     for (const race of races) {
-      check(R.characterPlaceholder({ race: race.id, genre, gender }), `race ${race.id}/${genre}/${gender}`);
+      check(R.characterPlaceholder({ race: race.id, genre, sex }), `race ${race.id}/${genre}/${sex}`);
     }
   }
-  const mutant = R.characterPlaceholder({ race: "half_orc", genre: "post_apocalyptic", gender });
+  const mutant = R.characterPlaceholder({ race: "half_orc", genre: "post_apocalyptic", sex });
   if (!mutant.includes("post-apocalyptic-mutant")) {
     failures.push(`a wasteland half-orc drew ${mutant}, not the mutant lead`);
   }
@@ -114,8 +115,8 @@ for (const gender of GENDER_INPUTS) {
     ["high_elf", "wizard", "character-class/wizard-"],
     ["hill_dwarf", "cleric", "character-class/cleric-"],
   ]) {
-    const drawn = R.characterPlaceholder({ race, class: klass, gender });
-    check(drawn, `${race} ${klass}/${gender}`);
+    const drawn = R.characterPlaceholder({ race, class: klass, sex });
+    check(drawn, `${race} ${klass}/${sex}`);
     if (!drawn.includes(plate)) {
       failures.push(`a ${race} ${klass} drew ${drawn}, not ${plate}*`);
     }

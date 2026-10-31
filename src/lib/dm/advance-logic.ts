@@ -8,14 +8,13 @@
 // The shape of it: the server decides WHEN (an occasional roll per
 // opted-in character, raised by their Charisma), the server decides WHO (an
 // NPC or companion in the scene who already likes them enough to court, and
-// whose attraction fits both ways), the DM plays the moment through
+// of the opposite sex), the DM plays the moment through
 // romance_advance with initiator "npc", and the PLAYER answers through an
 // offer only they can settle. Nobody is courted who did not ask to be.
 
 import type { RomanceStage, RelationshipStatus } from "./relationship-logic.ts";
 import { friendshipTier, romanceIndex, ROMANCE_THRESHOLD, tierIndex } from "./relationship-logic.ts";
-import { attractionFits, type Attraction } from "../attraction.ts";
-import type { Gender } from "../gender.ts";
+import { sameKnownSex, type Sex } from "../sex.ts";
 import { compareNames, containsPhrase, textKey } from "../language/text-logic.ts";
 import { livingHero } from "../characters/fallen-logic.ts";
 
@@ -137,8 +136,7 @@ export type Suitor = {
   approval: number;
   romance: RomanceStage;
   warmth: number;
-  gender: Gender;
-  attraction: Attraction | null;
+  sex: Sex;
   // Together, betrothed or married to someone else.
   committedElsewhere: boolean;
   // An open window or an unanswered advance with anyone.
@@ -147,8 +145,7 @@ export type Suitor = {
 
 export type AdvanceTarget = {
   name: string;
-  gender: Gender;
-  attraction: Attraction | null;
+  sex: Sex;
   open: boolean;
   isCompanion: boolean;
   // Someone else's advance toward them is open or waiting on an answer.
@@ -188,8 +185,8 @@ export function suitorProblem(suitor: Suitor, target: AdvanceTarget): string | n
   if (suitor.pendingAdvance) {
     return `${suitor.name} already has an advance waiting on an answer.`;
   }
-  if (!attractionFits(suitor, target)) {
-    return `${suitor.name} and ${target.name} are not drawn to each other's gender, so this is not that kind of moment.`;
+  if (sameKnownSex(suitor.sex, target.sex)) {
+    return `${suitor.name} and ${target.name} are of the same sex, so this is not that kind of moment.`;
   }
   return null;
 }
@@ -240,10 +237,9 @@ export function canResolveAdvance(action: "approve" | "decline" | "cancel", acto
 
 // ---- what the DM, the table and the card say ----
 
-// The DM-only director note while a window is open. `undecided`: who the
-// suitor is drawn to was never set, so the DM is asked to settle it, once.
-export function advanceCue(suitorName: string, characterName: string, turnsLeft: number, undecided = false): string {
-  return `${suitorName} is ready to make a romantic move toward ${characterName} if this scene allows it: play the moment, then romance_advance with initiator npc (subject ${suitorName}, their own words in note). Never decide how ${characterName} feels; ${characterName}'s player answers. ${turnsLeft === 1 ? "This is the last reply it stays open." : `It stays open for ${turnsLeft} more replies.`}${undecided ? ` Who ${suitorName} is drawn to is not settled yet: settle it with set_npc drawnTo, and it stays.` : ""}`;
+// The DM-only director note while a window is open.
+export function advanceCue(suitorName: string, characterName: string, turnsLeft: number): string {
+  return `${suitorName} is ready to make a romantic move toward ${characterName} if this scene allows it: play the moment, then romance_advance with initiator npc (subject ${suitorName}, their own words in note). Never decide how ${characterName} feels; ${characterName}'s player answers. ${turnsLeft === 1 ? "This is the last reply it stays open." : `It stays open for ${turnsLeft} more replies.`}`;
 }
 
 export function advanceSummary(suitorName: string, characterName: string): string {

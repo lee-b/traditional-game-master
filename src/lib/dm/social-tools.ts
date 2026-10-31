@@ -19,7 +19,6 @@ import {
 } from "@/lib/db/npcs";
 import { companionNpcFor } from "@/lib/db/companion-npcs";
 import { meetNpc } from "@/lib/dm/party-bonds";
-import { attractionFromTold, attractionWords, TOLD_ATTRACTION } from "@/lib/attraction";
 import { agencyFragment, derivePersonality, driftPersonality, nearestNpcHint } from "@/lib/dm/npc-logic";
 import { ensureRelationship, patchRelationship } from "@/lib/db/relationships";
 import {
@@ -32,7 +31,7 @@ import {
 import { outwardApproval } from "@/lib/dm/scheme-logic";
 import { publishRelationshipsUpdated } from "@/lib/dm/relationship-tools";
 import type { DmTurn } from "@/lib/db/dm-turns";
-import { TOLD_GENDER_HELP, TOLD_GENDERS, toldGender } from "@/lib/gender";
+import { TOLD_SEX_HELP, TOLD_SEXES, toldSex } from "@/lib/sex";
 import { rollExpression } from "@/lib/dice";
 import { publishWithSeq } from "@/lib/events";
 import {
@@ -91,15 +90,10 @@ export const socialTools: ToolDef[] = [
             description: "A short note on their personality or bond, for your own recall.",
           },
           location: { type: "string", description: "Where they are usually found." },
-          gender: {
+          sex: {
             type: "string",
-            enum: [...TOLD_GENDERS],
-            description: `${TOLD_GENDER_HELP} Give it when you register someone new; omit it on later calls.`,
-          },
-          drawnTo: {
-            type: "array",
-            items: { type: "string", enum: TOLD_ATTRACTION },
-            description: "Who they could fall for, once the story shows it. The server keeps the first value it is given, so it never changes between characters.",
+            enum: [...TOLD_SEXES],
+            description: `${TOLD_SEX_HELP} Give it when you register someone new; omit it on later calls.`,
           },
           goal: {
             type: "string",
@@ -136,9 +130,9 @@ export const socialTools: ToolDef[] = [
           },
           trait: { type: "string", description: "Short personality note." },
           location: { type: "string", description: "Where they are found." },
-          gender: { type: "string", enum: [...TOLD_GENDERS], description: TOLD_GENDER_HELP },
+          sex: { type: "string", enum: [...TOLD_SEXES], description: TOLD_SEX_HELP },
         },
-        required: ["name", "gender"],
+        required: ["name", "sex"],
       },
     },
   },
@@ -227,7 +221,7 @@ const setNpcSchema = z.object({
   attitude: z.enum(["hostile", "indifferent", "friendly"]).optional(),
   trait: z.string().max(300).optional(),
   location: z.string().max(120).optional(),
-  gender: z.enum(TOLD_GENDERS).optional(),
+  sex: z.enum(TOLD_SEXES).optional(),
   drawnTo: z.array(z.string().max(40)).max(6).optional(),
   goal: z.string().max(300).optional(),
   ambition: z.string().max(300).optional(),
@@ -240,10 +234,10 @@ export function handleSetNpc(campaign: Campaign, rawArguments: string): ToolResu
   } catch {
     return { error: "Invalid arguments: set_npc needs at least a name.", retry: true };
   }
-  // gender is optional so an update need not restate it, which leaves a
+  // sex is optional so an update need not restate it, which leaves a
   // registration free to forget it: the result then asks, never refuses.
   const before = getNpcByName(campaign.id, args.name);
-  const untold = !args.gender && !before;
+  const untold = !args.sex && !before;
   const registered = bootstrapAgency(
     campaign,
     upsertNpc({
@@ -252,9 +246,7 @@ export function handleSetNpc(campaign: Campaign, rawArguments: string): ToolResu
       attitude: args.attitude,
       trait: args.trait,
       location: args.location,
-      gender: toldGender(args.gender),
-      // Written once (upsertNpc): the first answer is who they are.
-      attraction: attractionFromTold(args.drawnTo),
+      sex: toldSex(args.sex),
     }),
     { goal: args.goal, ambition: args.ambition },
   );
@@ -281,7 +273,7 @@ export function handleSetNpc(campaign: Campaign, rawArguments: string): ToolResu
     ...(npc.agency.goals.session ? { goal: npc.agency.goals.session.text } : {}),
     note: `${npc.name} is tracked as ${npc.attitude}. Their attitude persists until the story or a social_check changes it.${
       shifted ? ` The party has met them now, and how ${npc.name} feels about each character is tracked from here.` : ""
-    }${untold ? " Their gender is not recorded: pass gender on a set_npc for them (Unknown if the story has not shown it)." : ""}`,
+    }${untold ? " Their sex is not recorded: pass sex on a set_npc for them (Unknown if the story has not shown it)." : ""}`,
   };
 }
 
@@ -292,7 +284,7 @@ const reactionSchema = z.object({
   modifier: z.coerce.number().int().min(-10).max(10).optional(),
   trait: z.string().max(300).optional(),
   location: z.string().max(120).optional(),
-  gender: z.enum(TOLD_GENDERS),
+  sex: z.enum(TOLD_SEXES),
 });
 
 export function handleNpcReaction(
@@ -304,7 +296,7 @@ export function handleNpcReaction(
   try {
     args = reactionSchema.parse(JSON.parse(rawArguments || "{}"));
   } catch {
-    return { error: "Invalid arguments: npc_reaction needs a name and a gender (Female, Male, Nonbinary or Unknown).", retry: true };
+    return { error: "Invalid arguments: npc_reaction needs a name and a sex (Female, Male or Unknown).", retry: true };
   }
   // A reaction roll decides how a stranger takes the party, once. Someone
   // the party has dealt with keeps the attitude play gave them, and so does
@@ -316,7 +308,7 @@ export function handleNpcReaction(
   if (known && (known.metAt || known.attitude !== "indifferent")) {
     const met = meetNpc(
       campaign,
-      upsertNpc({ campaignId: campaign.id, name: args.name, trait: args.trait, location: args.location, gender: toldGender(args.gender) }),
+      upsertNpc({ campaignId: campaign.id, name: args.name, trait: args.trait, location: args.location, sex: toldSex(args.sex) }),
     );
     if (met.opened) {
       publishRelationshipsUpdated(campaign.id);
@@ -354,7 +346,7 @@ export function handleNpcReaction(
     attitude,
     trait: args.trait,
     location: args.location,
-    gender: toldGender(args.gender),
+    sex: toldSex(args.sex),
   });
   // The roll is the meeting, and every character's bond with them opens.
   const met = meetNpc(campaign, registered);
@@ -546,8 +538,9 @@ function buildSocialNote(
 // toward the party, and a bounded agency fragment (personality leans, goals,
 // pressure). How they feel about individual characters is the approval meter
 // and renders in its own section.
-// `romance`: who they are drawn to rides only at a romance table.
-export function npcRosterForPrompt(campaignId: string, options: { romance?: boolean } = {}): Array<{
+// `romance` no longer changes the roster: who someone is drawn to is not
+// tracked.
+export function npcRosterForPrompt(campaignId: string): Array<{
   name: string;
   attitude: Attitude;
   trait: string;
@@ -583,15 +576,14 @@ export function npcRosterForPrompt(campaignId: string, options: { romance?: bool
     witnessNote: renderWitnessNote(npc.name, facts),
     // The stat block they fight with (start_encounter takes their name).
     statBlock: npc.statBlock,
-    // Their gender, and at a romance table who they are drawn to (issue
-    // 501), so romance follows who people are. Blank says nothing.
-    identity: npcIdentity(npc, options.romance ?? false),
+    // Their sex, so romance and the speech reader follow who people
+    // are. Blank says nothing.
+    identity: npcIdentity(npc),
   }));
 }
 
-function npcIdentity(npc: Npc, romance: boolean): string {
-  const drawn = romance ? attractionWords(npc.attraction) : "";
-  return [npc.gender, drawn ? `drawn to ${drawn}` : ""].filter(Boolean).join(", ");
+function npcIdentity(npc: Npc): string {
+  return npc.sex;
 }
 
 const ATTITUDE_LADDER = ["hostile", "indifferent", "friendly"] as const;

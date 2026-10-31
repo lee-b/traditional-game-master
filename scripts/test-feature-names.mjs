@@ -194,7 +194,7 @@ await test("a feat's picks are found under its textKey: a map sent or stored und
   assert.deepEqual(keyedFeatChoices(withFeatChoice({}, "Magic Initiate (Wizard)", picks)), { "magic initiate wizard": picks });
   // A library character stored before the keys were textKey keeps its picks.
   const stored = createCharacter(world.owner.id, 1, {
-    name: "Ilse", race: "human", class: "wizard", subclass: "", background: "sage", alignment: "N", gender: "", appearance: "",
+    name: "Ilse", race: "human", class: "wizard", subclass: "", background: "sage", alignment: "N", sex: "", appearance: "",
     abilities: { str: 8, dex: 14, con: 12, int: 15, wis: 10, cha: 10 }, maxHp: 7, ac: 12, acOverride: false, speed: 30,
     hitDice: { die: "d6", total: 1, spent: 0 },
     proficiencies: { saves: ["int", "wis"], skills: ["arcana", "history"], expertise: [], languages: ["common"], tools: [], armor: [], weapons: ["simple"] },

@@ -561,20 +561,20 @@ await test("a snapshot is the viewer's projection, with only this addon's view d
   assert.equal(boardSnapshot(view, "other-addon", { canDirect: false, appearance }).view, null);
 });
 
-await test("character gender is optional and only travels with projected figures", () => {
+await test("character sex is optional and only travels with projected figures", () => {
   const appearance = { theme: "night", reducedMotion: false };
-  for (const gender of ["Female", "Male", "Nonbinary", ""]) {
+  for (const sex of ["Female", "Male", ""]) {
     const looks = new Map([
-      ["c1", { character: { race: "elf", class: "wizard", gender } }],
-      ["unseen", { character: { race: "human", class: "fighter", gender: "Male" } }],
+      ["c1", { character: { race: "elf", class: "wizard", sex } }],
+      ["unseen", { character: { race: "human", class: "fighter", sex: "Male" } }],
     ]);
     const snapshot = boardSnapshot(view, "hello-dungeon", { canDirect: false, appearance, looks });
-    assert.equal(snapshot.tokens[0].character.gender, gender);
+    assert.equal(snapshot.tokens[0].character.sex, sex);
     assert.equal(snapshot.tokens.length, view.tokens.length, "extra looks never reveal unprojected figures");
     assert.equal(snapshot.tokens.some(token => token.character?.class === "fighter"), false);
   }
   const looks = new Map([["c1", { character: { race: "elf", class: "wizard" } }]]);
-  assert.equal(boardSnapshot(view, "hello-dungeon", { canDirect: false, appearance, looks }).tokens[0].character.gender, undefined);
+  assert.equal(boardSnapshot(view, "hello-dungeon", { canDirect: false, appearance, looks }).tokens[0].character.sex, undefined);
 });
 
 await test("a walk's first tap is named to the view as its aim, and nothing else is", () => {

@@ -101,7 +101,7 @@ function AdvanceOfferCard({
   const suitor = proposal.advance?.suitor || "Someone";
   const look = proposal.advance?.look;
   const face = look?.race
-    ? characterPlaceholder({ race: look.race, class: look.class, gender: look.gender })
+    ? characterPlaceholder({ race: look.race, class: look.class, sex: look.sex })
     : npcPlaceholder(look?.role, suitor);
   const characterName = character?.name ?? "a character";
 

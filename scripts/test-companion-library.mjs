@@ -148,7 +148,7 @@ const voice = "Dry wit, hums sea shanties, never sits with her back to a door.";
 const { sheet: isolde } = finalizeNewCompanion(
   gmTable.campaign(),
   1,
-  createSheetSchema.parse(built("Isolde", { gender: "Female", backstory: "" })),
+  createSheetSchema.parse(built("Isolde", { sex: "Female", backstory: "" })),
   "party",
   voice,
 );
@@ -161,7 +161,7 @@ await test("a companion the GM wrote in is kept with Save to my characters, voic
   const entry = characters.getCharacter(kept.json.characterId);
   assert.equal(entry.userId, gmTable.owner.id);
   assert.equal(entry.role, "companion");
-  assert.equal(entry.sheet.gender, "Female");
+  assert.equal(entry.sheet.sex, "Female");
   assert.equal(entry.sheet.backstory, voice, "brought to a new table, she is played from the same voice");
   assert.equal(gmTable.sheet(isolde.id).libraryCharacterId, entry.id);
 });

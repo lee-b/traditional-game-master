@@ -34,7 +34,7 @@ async function table({ gameSettings = {}, axes = {}, heroes = 2, companion = {} 
   for (let index = 0; index < heroes; index += 1) {
     world.addHero({ name: index ? `Hero ${index + 1}` : "Kael" });
   }
-  const added = await world.invoke("add_companion", { name: "Seren", class: "rogue", gender: "Female", personality: "Quiet.", kind: "party", ...companion });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "rogue", sex: "Female", personality: "Quiet.", kind: "party", ...companion });
   assert.equal(added.ok, true, added.error);
   const row = () => npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
   npcs.patchNpcAgency(row().id, { personality: { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 0, ...axes } });
@@ -94,7 +94,7 @@ await test("at a table a person runs, that person reads the secret on the Bonds 
   const world = await openWorld({ gameSettings: { dmMode: "human", companions: "full" } });
   const lead = world.addUser("lead");
   const pc = world.addHero({ user: lead, name: "Kael" });
-  const added = await world.invoke("add_companion", { name: "Seren", class: "rogue", gender: "Female", personality: "Quiet.", kind: "party", agenda: AGENDA });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "rogue", sex: "Female", personality: "Quiet.", kind: "party", agenda: AGENDA });
   assert.equal(added.ok, true, added.error);
   const relationships = await import("../src/lib/db/relationships.ts");
   relationships.ensureRelationship({ campaignId: world.campaignId, characterId: pc.id, characterName: pc.name, subjectKind: "companion", subjectName: "Seren" });
@@ -148,7 +148,7 @@ await test("a cast member whose arc betrayal is pending brings it when she joins
     worldArcs: [],
     updatedAt: "2026-10-23T00:00:00.000Z",
   }));
-  const added = await world.invoke("add_companion", { name: "Seren", class: "rogue", gender: "Female", personality: "Quiet.", kind: "party" });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "rogue", sex: "Female", personality: "Quiet.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const row = npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
   const agenda = companionAgenda(row.id);

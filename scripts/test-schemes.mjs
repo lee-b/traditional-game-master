@@ -104,15 +104,16 @@ test("seeing through an act adds each character once; a reveal is for everyone",
 
 // ---- who may run one on whom ----
 
-const mira = { name: "Mira", kind: "npc", status: "active", gender: "Female", attraction: { genders: ["Male"], note: "" }, actToward: null };
-const kael = { name: "Kael", gender: "Male", attraction: { genders: [], note: "" }, open: true, isCompanion: false };
+const mira = { name: "Mira", kind: "npc", status: "active", sex: "Female", actToward: null };
+const kael = { name: "Kael", sex: "Male", open: true, isCompanion: false };
 
-test("only toward a character open to advances, by an NPC drawn to them and they to the NPC", () => {
+test("only toward a character open to advances, by an NPC of the opposite sex", () => {
   assert.equal(scheme.schemeStartProblem(mira, kael, null), null);
   assert.match(scheme.schemeStartProblem(mira, { ...kael, open: false }, null), /has not opened Kael to advances/);
-  assert.match(scheme.schemeStartProblem(mira, { ...kael, gender: "Female" }, null), /not drawn to each other/);
-  assert.match(scheme.schemeStartProblem(mira, { ...kael, attraction: { genders: ["Male"], note: "" } }, null), /not drawn to each other/, "both ways");
-  assert.equal(scheme.schemeStartProblem({ ...mira, attraction: null }, kael, null), null, "an NPC left blank is open to anyone");
+  assert.match(scheme.schemeStartProblem(mira, { ...kael, sex: "Female" }, null), /same sex/);
+  assert.match(scheme.schemeStartProblem({ ...mira, sex: "Male" }, kael, null), /same sex/, "both ways");
+  assert.equal(scheme.schemeStartProblem({ ...mira, sex: "" }, kael, null), null, "a sex the story has not shown never blocks");
+  assert.equal(scheme.schemeStartProblem(mira, { ...kael, sex: "" }, null), null);
 });
 
 test("no act toward a companion, by a companion, after the end, while apart, or two at once", () => {

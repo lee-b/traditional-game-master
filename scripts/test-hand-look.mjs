@@ -47,7 +47,7 @@ function test(name, fn) {
 function sheet(overrides = {}) {
   return {
     id: "s1", campaignId: "c1", userId: "u1", libraryCharacterId: null,
-    name: "Kael", race: "human", class: "fighter", subclass: "", background: "", alignment: "", gender: "",
+    name: "Kael", race: "human", class: "fighter", subclass: "", background: "", alignment: "", sex: "",
     level: 5, xp: 0,
     abilities: { str: 16, dex: 14, con: 14, int: 10, wis: 12, cha: 10 },
     maxHp: 44, currentHp: 44, tempHp: 0, ac: 16, acOverride: false, speed: 30,

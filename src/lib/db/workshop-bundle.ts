@@ -19,7 +19,6 @@ import { normalizeAmbience } from "@/lib/battlemap/scene";
 import { MAP_THEMES } from "@/lib/battlemap/generate";
 import { sceneIds } from "@/lib/ambience/catalog";
 import { normalizeNpcVoice } from "@/lib/npcs/forge";
-import { attractionJson, normalizeAttraction } from "@/lib/attraction";
 import { textKey } from "@/lib/language/text-logic";
 import {
   EXTRAS_LIMITS,
@@ -374,10 +373,10 @@ function writeBundleRows(
       const voice = npc.voice ? normalizeNpcVoice(npc.voice) : null;
       db.prepare(
         `INSERT INTO npcs
-           (id, campaign_id, name, attitude, trait, location, role, gender, attraction_json, last_shift_turn,
+           (id, campaign_id, name, attitude, trait, location, role, sex, last_shift_turn,
             aliases_json, personality_json, goals_json, relations_json, bonds_json,
             pressure_json, arc_cast_id, portrait_url, voice_json, stat_block, archived, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, ?, ?, '[]', '', '', ?, ?, ?, 0, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, ?, ?, '[]', '', '', ?, ?, ?, 0, ?, ?)`,
       ).run(
         id,
         workshop.id,
@@ -386,8 +385,7 @@ function writeBundleRows(
         npc.trait,
         npc.location,
         npc.role,
-        npc.gender,
-        attractionJson(normalizeAttraction(npc.attraction)),
+        npc.sex,
         JSON.stringify(npc.aliases),
         npc.personality,
         npc.goals,

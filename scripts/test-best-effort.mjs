@@ -46,7 +46,7 @@ await test("A Tome of Beasts block nobody corrected is best effort; a hand-writt
 
 const wizard = {
   id: "s1", campaignId: "c1", userId: "u1", libraryCharacterId: null,
-  name: "Lys", race: "human", class: "wizard", subclass: "", background: "", alignment: "", gender: "",
+  name: "Lys", race: "human", class: "wizard", subclass: "", background: "", alignment: "", sex: "",
   level: 5, xp: 0,
   abilities: { str: 8, dex: 14, con: 12, int: 18, wis: 12, cha: 10 },
   maxHp: 27, currentHp: 27, tempHp: 0, ac: 12, acOverride: false, speed: 30,

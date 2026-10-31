@@ -39,7 +39,7 @@ const scenario = {
     check(apart, `the companion label clears the standing chip (${JSON.stringify({ label, chip })})`);
     await t.shot("long-name");
 
-    await call("add_companion", { name: "Seren Dawnmere", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+    await call("add_companion", { name: "Seren Dawnmere", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
     await eventually(() => rows("Seren Dawnmere").count().then((count) => count === 2), { timeoutMs: 20_000, label: "the companion under both characters" });
     await call("set_npc", { name: "Mira Vell", attitude: "friendly" });
     await eventually(() => rows("Mira Vell").count().then((count) => count === 2), { timeoutMs: 20_000, label: "the patron under both characters once met" });

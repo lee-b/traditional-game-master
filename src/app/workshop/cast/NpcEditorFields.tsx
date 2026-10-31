@@ -18,8 +18,7 @@ import {
   type RelationGraph,
 } from "@/lib/npcs/forge";
 import { npcRoleOptions } from "@/lib/placeholders";
-import { GENDERS, type Gender } from "@/lib/gender";
-import { AttractionPicker, NPC_ATTRACTION_HINT } from "@/components/AttractionPicker";
+import { SEXES, type Sex } from "@/lib/sex";
 import {
   GOAL_FIELDS,
   PersonalitySliders,
@@ -119,23 +118,15 @@ export function NpcEditorFields({
           />
           </span>
           <span className="w-full sm:w-40">
-          <Select<Gender>
-            label="Gender"
-            value={draft.gender}
-            onChange={(gender) => onChange({ ...draft, gender })}
-            options={[{ value: "", label: "Unspecified" }, ...GENDERS.map((gender) => ({ value: gender, label: gender }))]}
+          <Select<Sex>
+            label="Sex"
+            value={draft.sex}
+            onChange={(sex) => onChange({ ...draft, sex })}
+            options={[{ value: "", label: "Unspecified" }, ...SEXES.map((sex) => ({ value: sex, label: sex }))]}
           />
           </span>
         </div>
 
-        {/* Who they are drawn to, beside the gender (issue 501): identity,
-            so the DM never writes it by guesswork. */}
-        <AttractionPicker
-          value={draft.attraction ?? { genders: [], note: "" }}
-          onChange={(attraction) => onChange({ ...draft, attraction })}
-          hint={NPC_ATTRACTION_HINT}
-          className="sm:max-w-md"
-        />
 
         <input
           value={draft.location}

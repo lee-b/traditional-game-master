@@ -38,7 +38,7 @@ export function BuildMathPanel({
   race,
   races,
   raceGroups,
-  gender,
+  sex,
 }: {
   derived: BuilderDerived;
   scores: Record<Ability, number | null>;
@@ -47,7 +47,7 @@ export function BuildMathPanel({
   race: RaceOption | undefined;
   races: RaceOption[];
   raceGroups: PickerGroup[];
-  gender: BuilderState["gender"];
+  sex: BuilderState["sex"];
 }) {
   const headingId = useId();
   const bodyId = useId();
@@ -184,7 +184,7 @@ export function BuildMathPanel({
             race={race}
             races={races}
             raceGroups={raceGroups}
-            gender={gender}
+            sex={sex}
           />
         )}
       </div>
@@ -204,19 +204,19 @@ function PicksSoFar({
   race,
   races,
   raceGroups,
-  gender,
+  sex,
 }: {
   known: BuildMathRow[];
   klass: ClassOption | undefined;
   race: RaceOption | undefined;
   races: RaceOption[];
   raceGroups: PickerGroup[];
-  gender: BuilderState["gender"];
+  sex: BuilderState["sex"];
 }) {
   const headingId = useId();
   const slide = useMemo(
-    () => (race ? lineageSlidesFor(raceGroups, races, gender).find((entry) => entry.id === race.id) : undefined),
-    [race, races, raceGroups, gender],
+    () => (race ? lineageSlidesFor(raceGroups, races, sex).find((entry) => entry.id === race.id) : undefined),
+    [race, races, raceGroups, sex],
   );
   const cell = "border-t border-stone-800 px-2 py-1.5 align-top text-base";
   const title = "mt-4 mb-2 font-display text-base font-semibold text-amber-200/90";

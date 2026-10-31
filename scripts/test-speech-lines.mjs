@@ -20,7 +20,7 @@ const { mergeLines } = await import("../src/lib/dm/speech.ts");
 const { runRenarrate, selectRenarrateVariant } = await import("../src/lib/dm/renarrate.ts");
 
 const kara = world.addHero({ name: "Kara", class: "fighter", level: 3 });
-const marla = npcs.upsertNpc({ campaignId: world.campaignId, name: "Marla Venn", gender: "Female" });
+const marla = npcs.upsertNpc({ campaignId: world.campaignId, name: "Marla Venn", sex: "Female" });
 const said = (message) => message.speech.map((entry) => `${entry.speaker.name}: ${entry.line}`);
 
 const model = await fakeModel();
@@ -66,7 +66,7 @@ await test("The structural reading never gives a model's line to a party charact
 
 await test("An NPC the same reply registers speaks their first line under their new row.", async () => {
   model.script([
-    reply({ text: "Bruno apre la porta. «Benvenuti alla forgia.»", calls: [call("set_npc", { name: "Bruno", gender: "Male" })] }),
+    reply({ text: "Bruno apre la porta. «Benvenuti alla forgia.»", calls: [call("set_npc", { name: "Bruno", sex: "Male" })] }),
     reply({ text: "Il fuoco crepita." }),
   ]);
   model.claims([[{ kind: "speaker", ref: "new:Bruno", quote: "Benvenuti alla forgia" }]]);
@@ -82,7 +82,7 @@ await test("A person's prose is read from its words: structure at every table, p
   assert.deepEqual(personLines(world.campaign(), "«Sedetevi», dice Marla."), [
     { line: "Sedetevi", speaker: { kind: "npc", id: marla.id, name: "Marla Venn" } },
   ]);
-  const venn = npcs.upsertNpc({ campaignId: english.campaignId, name: "Marla Venn", gender: "Female" });
+  const venn = npcs.upsertNpc({ campaignId: english.campaignId, name: "Marla Venn", sex: "Female" });
   assert.deepEqual(personLines(english.campaign(), text), [{ line: "Sit.", speaker: { kind: "npc", id: venn.id, name: "Marla Venn" } }]);
   assert.deepEqual(personLines(english.campaign(), "No one speaks."), []);
 });

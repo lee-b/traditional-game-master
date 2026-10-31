@@ -207,7 +207,7 @@ export function BattleMapPanel({
   const faces = useMemo(() => {
     const byRef = new Map<string, string>();
     for (const sheet of sheets) {
-      byRef.set(sheet.id, characterPlaceholder({ race: sheet.race, class: sheet.class, gender: sheet.gender }));
+      byRef.set(sheet.id, characterPlaceholder({ race: sheet.race, class: sheet.class, sex: sheet.sex }));
     }
     for (const enemy of encounter?.enemies ?? []) {
       byRef.set(enemy.id, monsterPlaceholder(enemy.type, { cr: enemy.cr, genre, seed: enemy.name, slug: enemy.slug, name: enemy.name }));
@@ -241,7 +241,7 @@ export function BattleMapPanel({
   // the view drew each figure, so the plate and the action ring sit on it.
   const looks = useMemo(() => {
     const byRef = new Map<string, BoardLook>();
-    for (const sheet of sheets) byRef.set(sheet.id, { character: { race: sheet.race, class: sheet.class, gender: sheet.gender } });
+    for (const sheet of sheets) byRef.set(sheet.id, { character: { race: sheet.race, class: sheet.class, sex: sheet.sex } });
     for (const enemy of encounter?.enemies ?? []) byRef.set(enemy.id, { creature: { type: enemy.type, slug: enemy.slug ?? "", cr: enemy.cr } });
     return byRef;
   }, [sheets, encounter?.enemies]);

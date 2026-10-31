@@ -3,7 +3,7 @@ import type { OptionField } from "@/lib/addons/manifest";
 import type { FxEvent } from "@/lib/battlemap/fx-plan";
 import type { TokenIntent } from "@/lib/battlemap/intent";
 import type { PlayerMapView } from "@/lib/battlemap/view-types";
-import type { Gender } from "@/lib/gender";
+import type { Sex } from "@/lib/sex";
 import type { Ruler } from "@/lib/battlemap/board-move";
 
 // The board view contract: what the table page posts into an addon's
@@ -51,7 +51,7 @@ export type BoardSnapshotToken = {
   // stat block and challenge rating, or a character's lineage and class.
   // Null when it is neither (a prop, a bystander the DM put down by hand).
   creature: { type: string; slug: string; cr: number } | null;
-  character: { race: string; class: string; gender?: Gender } | null;
+  character: { race: string; class: string; sex?: Sex } | null;
   // Auras around it, by reach in feet and what they do.
   auras: Array<{ radiusFeet: number; tone: string }>;
 };

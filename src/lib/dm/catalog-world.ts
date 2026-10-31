@@ -8,7 +8,7 @@ import type { CatalogEntry } from "@/lib/dm/catalog-types";
 import { cueOptions, sceneOptions } from "@/lib/ambience/catalog";
 import { RELATIONSHIP_BEAT_NAMES } from "@/lib/dm/relationship-logic";
 import { NOTE_LIMIT_WORDS } from "@/lib/dm/relationship-note";
-import { TOLD_GENDERS } from "@/lib/gender";
+import { TOLD_SEXES } from "@/lib/sex";
 import {
   ABILITY_OPTIONS as ABILITIES,
   DIFFICULTY_OPTIONS as DIFFICULTIES,
@@ -48,21 +48,11 @@ const SCENE_FIELD = {
   help: "Sets the place's sound, battle map and picture. Blank keeps what it was.",
 } as const;
 
-export const GENDER_FIELD = {
-  name: "gender",
-  label: "Gender",
+export const SEX_FIELD = {
+  name: "sex",
+  label: "Sex",
   kind: "select",
-  options: TOLD_GENDERS.map((gender) => ({ value: gender, label: gender })),
-} as const;
-
-// Who an NPC or companion could fall for (issue 501), the words the DM's
-// tools take; written once and kept.
-export const DRAWN_TO_FIELD = {
-  name: "drawnTo",
-  label: "Drawn to",
-  kind: "list",
-  placeholder: "women, men, nonbinary people",
-  help: "Who they could fall for, once the story shows it. Set once and kept.",
+  options: TOLD_SEXES.map((sex) => ({ value: sex, label: sex })),
 } as const;
 
 export const WORLD_ADJUDICATIONS: CatalogEntry[] = [
@@ -407,8 +397,7 @@ export const SOCIAL_ADJUDICATIONS: CatalogEntry[] = [
       },
       { name: "trait", label: "Trait", kind: "text" },
       { name: "location", label: "Found at", kind: "text" },
-      GENDER_FIELD,
-      DRAWN_TO_FIELD,
+      SEX_FIELD,
       { name: "goal", label: "Wants", kind: "text" },
       { name: "ambition", label: "Long game", kind: "text" },
     ],
@@ -423,7 +412,7 @@ export const SOCIAL_ADJUDICATIONS: CatalogEntry[] = [
       { name: "modifier", label: "Modifier", kind: "number", min: -10, max: 10 },
       { name: "trait", label: "Trait", kind: "text" },
       { name: "location", label: "Found at", kind: "text" },
-      { ...GENDER_FIELD, required: true },
+      { ...SEX_FIELD, required: true },
     ],
   },
   {

@@ -4,8 +4,8 @@ import { listSheets } from "@/lib/db/sheets";
 import { listCampaignVoices, setCampaignVoice } from "@/lib/db/voices";
 import { publishCast } from "@/lib/dm/cast";
 import type { NpcVoice } from "@/lib/npcs/forge";
-import { castingPool, pickVoice, type VoiceGender } from "@/lib/tts-cast";
-import { genderMark } from "@/lib/gender";
+import { castingPool, pickVoice, type VoiceSex } from "@/lib/tts-cast";
+import { sexMark } from "@/lib/sex";
 import { baseCreatureName } from "@/lib/tts-segments";
 import { serverVoices, ttsBackend, type TtsBackend } from "@/lib/tts-backend";
 import { textKey } from "@/lib/language/text-logic";
@@ -28,7 +28,7 @@ export type RosterEntry = {
   // Whose character this is; "" for everyone the DM plays.
   ownerUserId: string;
   // What their own record says, for casting; "" when it says nothing.
-  gender: VoiceGender;
+  sex: VoiceSex;
   voice: NpcVoice | null;
 };
 
@@ -52,7 +52,7 @@ export function voiceRoster(campaignId: string): RosterEntry[] {
       aliases: [],
       portraitUrl: sheet.portrait?.url ?? "",
       ownerUserId: sheet.isCompanion ? "" : sheet.userId,
-      gender: genderMark(sheet.gender),
+      sex: sexMark(sheet.sex),
       voice: saved.get(key)?.voice ?? null,
     });
   }
@@ -68,7 +68,7 @@ export function voiceRoster(campaignId: string): RosterEntry[] {
       aliases: npc.aliases,
       portraitUrl: npc.portraitUrl,
       ownerUserId: "",
-      gender: genderMark(npc.gender),
+      sex: sexMark(npc.sex),
       voice: npc.voice,
     });
   }
@@ -88,7 +88,7 @@ export function voiceRoster(campaignId: string): RosterEntry[] {
     }
   }
   for (const [key, name] of monsters) {
-    roster.push({ key, kind: "monster", name, aliases: [], portraitUrl: "", ownerUserId: "", gender: "", voice: saved.get(key)?.voice ?? null });
+    roster.push({ key, kind: "monster", name, aliases: [], portraitUrl: "", ownerUserId: "", sex: "", voice: saved.get(key)?.voice ?? null });
   }
   return roster;
 }
@@ -124,7 +124,7 @@ export async function castUnvoiced(
   let cast = 0;
   let npcChanged = false;
   for (const entry of waiting) {
-    const voiceId = pickVoice(entry.name, entry.gender, pool, taken);
+    const voiceId = pickVoice(entry.name, entry.sex, pool, taken);
     if (!voiceId) {
       break;
     }

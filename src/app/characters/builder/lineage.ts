@@ -4,8 +4,8 @@
 // scripts/test-lineage-cards.mjs drives every rule here
 // (docs/visual-overhaul-plan.md 7.3 and 7.5).
 
-import { GENDERS } from "@/lib/gender";
-import { characterPlaceholder, normalizeGender, raceFamily } from "@/lib/placeholders";
+import { SEXES } from "@/lib/sex";
+import { characterPlaceholder, normalizeSex, raceFamily } from "@/lib/placeholders";
 import type { Ability } from "@/lib/schemas/sheet";
 import { canonicalRaceId, srdRaceFor } from "@/lib/content/race-options";
 import { textKey } from "@/lib/language/text-logic";
@@ -142,15 +142,15 @@ export function lineageFamily(raceId: string, name = ""): string | null {
   return FAMILY_WORDS.find(([pattern]) => pattern.test(haystack))?.[1] ?? null;
 }
 
-// The plate a lineage card shows, in the gender the player chose on the
-// class step, or a preview look while they have not (previewGender).
-export function lineageArt(raceId: string, name = "", gender?: string | null): string {
-  const look = previewGender(raceId, gender);
+// The plate a lineage card shows, in the sex the player chose on the
+// class step, or a preview look while they have not (previewSex).
+export function lineageArt(raceId: string, name = "", sex?: string | null): string {
+  const look = previewSex(raceId, sex);
   const family = lineageFamily(raceId, name);
   if (!family) {
-    return characterPlaceholder({ gender: look });
+    return characterPlaceholder({ sex: look });
   }
-  return `${BASE}/character-race/${family}-${normalizeGender(look)}.webp`;
+  return `${BASE}/character-race/${family}-${normalizeSex(look)}.webp`;
 }
 
 function stableHash(value: string): number {
@@ -161,22 +161,22 @@ function stableHash(value: string): number {
   return acc;
 }
 
-// Until the player chooses a gender, a card is a picture of the option
+// Until the player chooses a sex, a card is a picture of the option
 // rather than of this character. Every card in one look made the grid a
 // wall of the same hooded face, and the choice that would fix it came on
 // the last step (backlog F4, pull request 513), so each card takes a look of its
 // own, picked by its id among the three every plate is painted in: the same
 // one on every render and every reload. It is only what the card shows;
-// the gender the sheet saves stays the player's, unset until they choose.
-// scripts/test-builder-gender-first.mjs checks each pick's plate exists.
-export function previewGender(optionId: string, gender?: string | null): string {
-  return gender || GENDERS[stableHash(optionId) % GENDERS.length];
+// the sex the sheet saves stays the player's, unset until they choose.
+// scripts/test-builder-sex-first.mjs checks each pick's plate exists.
+export function previewSex(optionId: string, sex?: string | null): string {
+  return sex || SEXES[stableHash(optionId) % SEXES.length];
 }
 
-// The plate a class card shows: the class in the chosen gender, or in its
+// The plate a class card shows: the class in the chosen sex, or in its
 // preview look.
-export function classArt(classId: string, gender?: string | null): string {
-  return characterPlaceholder({ class: classId, gender: previewGender(classId, gender) });
+export function classArt(classId: string, sex?: string | null): string {
+  return characterPlaceholder({ class: classId, sex: previewSex(classId, sex) });
 }
 
 // A lineage's two-word character, read off whichever ability it favours.

@@ -1,7 +1,7 @@
 import { allocateSeq, campaignSeats, type Campaign } from "@/lib/db/campaigns";
 import { getSheetById } from "@/lib/db/sheets";
 import { getNpcByName, type Npc } from "@/lib/db/npcs";
-import { companionAttraction, companionNpcFor } from "@/lib/db/companion-npcs";
+import { companionNpcFor } from "@/lib/db/companion-npcs";
 import { getRelationshipById, listRelationships, patchRelationship, type Relationship } from "@/lib/db/relationships";
 import { insertItemProposal, resolveItemProposal, type ItemProposal } from "@/lib/db/item-proposals";
 import { insertCampaignMessage } from "@/lib/db/messages";
@@ -67,7 +67,7 @@ export function suitorContext(campaignId: string): SuitorContext {
 export function suitorFrom(
   context: SuitorContext,
   relationship: Relationship,
-  who: Pick<Suitor, "kind" | "name" | "gender" | "attraction" | "warmth" | "present"> & { companionKind?: Suitor["companionKind"] },
+  who: Pick<Suitor, "kind" | "name" | "sex" | "warmth" | "present"> & { companionKind?: Suitor["companionKind"] },
 ): Suitor {
   const key = textKey(who.name);
   const others = context.relationships.filter((entry) => textKey(entry.subjectName) === key && entry.id !== relationship.id);
@@ -90,8 +90,7 @@ export function suitorFrom(
 export function targetFrom(context: SuitorContext, sheet: CharacterSheet, except?: Relationship): AdvanceTarget {
   return {
     name: sheet.name,
-    gender: sheet.gender,
-    attraction: sheet.attraction ?? null,
+    sex: sheet.sex,
     open: Boolean(sheet.openToAdvances),
     isCompanion: sheet.isCompanion,
     awaiting:
@@ -111,24 +110,22 @@ export function suitorIdentity(campaign: Campaign, subject: Subject, sheets: rea
     return {
       kind: "companion" as const,
       name: companion.name,
-      gender: companion.gender,
-      attraction: companionAttraction(companion, row),
+      sex: companion.sex,
       warmth: row?.agency.personality?.warmth ?? 0,
       companionKind: companion.companionKind,
       portraitUrl: companion.portrait?.url ?? "",
-      look: { gender: String(companion.gender ?? ""), race: companion.race, class: companion.class } as Record<string, string>,
+      look: { sex: String(companion.sex ?? ""), race: companion.race, class: companion.class } as Record<string, string>,
     };
   }
   const npc: Npc | null = subject.npc ?? getNpcByName(campaign.id, subject.name);
   return {
     kind: subject.kind,
     name: subject.name,
-    gender: npc?.gender ?? "",
-    attraction: npc?.attraction ?? null,
+    sex: npc?.sex ?? "",
     warmth: subject.personality?.warmth ?? 0,
     companionKind: null,
     portraitUrl: npc?.portraitUrl ?? "",
-    look: { gender: String(npc?.gender ?? ""), role: npc?.role ?? "" } as Record<string, string>,
+    look: { sex: String(npc?.sex ?? ""), role: npc?.role ?? "" } as Record<string, string>,
   };
 }
 

@@ -60,7 +60,7 @@ function context(sheet, overrides = {}) {
 // scores are a 27 point buy with the human's +1 on each.
 const TOUGH_FIGHTER = {
   name: "Brakka", race: "human", class: "fighter", subclass: "Champion", background: "soldier",
-  alignment: "N", gender: "", appearance: "",
+  alignment: "N", sex: "", appearance: "",
   abilities: { str: 16, dex: 15, con: 14, int: 13, wis: 11, cha: 9 },
   maxHp: 1, ac: 18, acOverride: false, speed: 30,
   hitDice: { die: "d10", total: 5, spent: 0 }, classes: [], hitDicePools: null,

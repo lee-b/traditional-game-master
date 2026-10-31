@@ -25,8 +25,7 @@
 // never asked to be courted.
 
 import { APPROVAL_MAX, APPROVAL_MIN, friendshipTier, REPEAT_FACTOR, TIER_LABEL, type FriendshipTier } from "./relationship-logic.ts";
-import { attractionFits, type Attraction } from "../attraction.ts";
-import type { Gender } from "../gender.ts";
+import { sameKnownSex, type Sex } from "../sex.ts";
 
 // ---- the pretense ----
 
@@ -146,8 +145,7 @@ export type Schemer = {
   name: string;
   kind: "npc" | "companion";
   status: "active" | "parted" | "ended";
-  gender: Gender;
-  attraction: Attraction | null;
+  sex: Sex;
   // An act this NPC is already keeping up, toward this character or another
   // (that character's name), or null.
   actToward: string | null;
@@ -155,8 +153,7 @@ export type Schemer = {
 
 export type Mark = {
   name: string;
-  gender: Gender;
-  attraction: Attraction | null;
+  sex: Sex;
   open: boolean;
   isCompanion: boolean;
 };
@@ -186,8 +183,8 @@ export function schemeStartProblem(schemer: Schemer, mark: Mark, safety: string 
   if (schemer.actToward) {
     return `${schemer.name} is already keeping up an act toward ${schemer.actToward}. One at a time: reveal that one first.`;
   }
-  if (!attractionFits(schemer, mark)) {
-    return `${schemer.name} and ${mark.name} are not drawn to each other's gender, so a romantic act would not fit either of them.`;
+  if (sameKnownSex(schemer.sex, mark.sex)) {
+    return `${schemer.name} and ${mark.name} are of the same sex, so a romantic act would not fit either of them.`;
   }
   return null;
 }

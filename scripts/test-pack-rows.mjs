@@ -252,7 +252,7 @@ test("a pack-only race saves its trait names, and a level-up regrant keeps them"
   const catfolk = race("catfolk");
   const result = buildBuilderResult({
     state: {
-      name: "Mira", subclass: "", alignment: "N", gender: "", appearance: "", acOverride: null, portrait: null,
+      name: "Mira", subclass: "", alignment: "N", sex: "", appearance: "", acOverride: null, portrait: null,
       gold: 15, feats: [], stylePicks: [], optionPicks: [], racialAsi: [], racialSkills: [], racialTool: "",
       racialCantrips: [], backgroundSkills: ["insight"], backstory: "", spells: [], spellWarningAck: true,
     },

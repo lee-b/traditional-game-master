@@ -24,7 +24,7 @@ const liar = world.addHero({ name: "Bram", class: "bard", level: 5, abilities: {
 
 async function stage(extra) {
   await kit.endFight();
-  const joined = await world.invoke("add_companion", { gender: "Unknown", name: "Sable", class: "rogue", race: "human", level: 11, personality: "Quiet.", kind: "guest" });
+  const joined = await world.invoke("add_companion", { sex: "Unknown", name: "Sable", class: "rogue", race: "human", level: 11, personality: "Quiet.", kind: "guest" });
   assert.equal(joined.ok, true, joined.error);
   const turncoat = joined.result.characterId;
   world.patch(turncoat, {

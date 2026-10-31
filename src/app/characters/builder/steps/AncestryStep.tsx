@@ -76,11 +76,11 @@ export function AncestryStep({
   // learns two more), which used to be loaded and never asked for.
   const languageCount = bonusLanguageCount(race, background);
   const [detailIndex, setDetailIndex] = useState<number | null>(null);
-  const { gender } = state;
+  const { sex } = state;
 
   // One slide per picker row, in the picker's order, so the carousel walks
   // exactly what the grid shows.
-  const slides = useMemo(() => lineageSlidesFor(raceGroups, races, gender), [raceGroups, races, gender]);
+  const slides = useMemo(() => lineageSlidesFor(raceGroups, races, sex), [raceGroups, races, sex]);
 
   const cardGroups = useMemo<OptionCardGroup[]>(
     () =>
@@ -333,7 +333,7 @@ function speciesWords(id: string): string {
 export function lineageSlidesFor(
   raceGroups: PickerGroup[],
   races: Array<Reskinned<RaceOption>>,
-  gender: BuilderState["gender"],
+  sex: BuilderState["sex"],
 ): LineageSlide[] {
   return flattenGroups(raceGroups).flatMap(({ option, group, recommended }) => {
     const entry = races.find((candidate) => candidate.id === option.id);
@@ -343,7 +343,7 @@ export function lineageSlidesFor(
     return [
       {
         ...entry,
-        art: lineageArt(entry.id, `${option.meta ?? ""} ${entry.name}`, gender),
+        art: lineageArt(entry.id, `${option.meta ?? ""} ${entry.name}`, sex),
         canonical: option.meta,
         // Named on the card only where the group heading is not the book.
         sourceOnCard: option.source,

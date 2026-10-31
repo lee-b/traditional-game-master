@@ -72,7 +72,7 @@ export function EncounterPanel({
       if (sheet) {
         return [
           sheet.portrait?.url,
-          characterPlaceholder({ race: sheet.race, class: sheet.class, gender: sheet.gender }),
+          characterPlaceholder({ race: sheet.race, class: sheet.class, sex: sheet.sex }),
           familyIconPath(`class-${sheet.class}`),
         ];
       }

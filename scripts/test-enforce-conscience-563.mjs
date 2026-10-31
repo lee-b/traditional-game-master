@@ -37,11 +37,11 @@ const { departedLinesForPrompt } = await import("../src/lib/dm/companion-revenge
 
 async function table({ gameSettings = {}, axes = {}, heroes = 1, level = 1, companion = {} } = {}) {
   const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings } });
-  const party = [world.addHero({ name: "Kael", gender: "Male", level })];
+  const party = [world.addHero({ name: "Kael", sex: "Male", level })];
   for (let index = 1; index < heroes; index += 1) {
     party.push(world.addHero({ name: `Hero ${index + 1}`, level }));
   }
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern and devout.", kind: "party", ...companion });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern and devout.", kind: "party", ...companion });
   assert.equal(added.ok, true, added.error);
   const sheet = world.sheets().find((entry) => entry.name === "Seren");
   const row = () => npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
@@ -158,7 +158,7 @@ await test("the party's own who stood by bear a third of the cost; one who objec
 
 await test("a companion weighs its odds against the party that would fight it: a loyal companion counts, the dead do not", async () => {
   const { world, sheet } = await table({ level: 3 });
-  const added = await world.invoke("add_companion", { name: "Bram", class: "fighter", gender: "Male", personality: "Steady.", kind: "party" });
+  const added = await world.invoke("add_companion", { name: "Bram", class: "fighter", sex: "Male", personality: "Steady.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const bram = world.sheets().find((entry) => entry.name === "Bram");
   const rank = ["trivial", "easy", "medium", "hard", "deadly", "beyond_deadly"];
@@ -200,7 +200,7 @@ await test("a devoted companion heals her dying friend first; a wary one will no
   const kit = await combatKit(world);
   const kael = world.addHero({ name: "Kael", level: 3, maxHp: 30, proficiencies: TRAINED });
   const tobin = world.addHero({ name: "Tobin", level: 3, maxHp: 30 });
-  const added = await world.invoke("add_companion", { name: "Seren", class: "cleric", gender: "Female", personality: "Watchful.", kind: "party", level: 3, spells: ["Cure Wounds"] });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "cleric", sex: "Female", personality: "Watchful.", kind: "party", level: 3, spells: ["Cure Wounds"] });
   assert.equal(added.ok, true, added.error);
   const seren = world.sheets().find((entry) => entry.name === "Seren");
   const standing = (who, approval) => {

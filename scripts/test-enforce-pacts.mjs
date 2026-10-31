@@ -46,10 +46,10 @@ const PACT = /A pact:|to turn Thorne|Deception, keeping|mean to (leave|weaken|tu
 // took the dice queued for the pact's own rolls.
 async function table({ gameSettings = {}, thorne = {}, kael = {}, brin = {} } = {}) {
   const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings } });
-  const kaelSheet = world.addHero({ name: "Kael", gender: "Male", ...kael });
+  const kaelSheet = world.addHero({ name: "Kael", sex: "Male", ...kael });
   const brinUser = world.addUser("brin");
-  const brinSheet = world.addHero({ user: brinUser, name: "Brin", gender: "Female", ...brin });
-  for (const [name, args] of [["Seren", { class: "paladin", alignment: "LG", gender: "Female" }], ["Thorne", { class: "rogue", gender: "Male", ...thorne }]]) {
+  const brinSheet = world.addHero({ user: brinUser, name: "Brin", sex: "Female", ...brin });
+  for (const [name, args] of [["Seren", { class: "paladin", alignment: "LG", sex: "Female" }], ["Thorne", { class: "rogue", sex: "Male", ...thorne }]]) {
     const added = await world.invoke("add_companion", { name, personality: "Quiet.", kind: "party", ...args });
     assert.equal(added.ok, true, added.error);
   }
@@ -225,7 +225,7 @@ await test("at a table a person runs, that person reads the pact and its dice", 
   const lead = world.addUser("lead");
   world.addHero({ user: lead, name: "Kael" });
   for (const name of ["Seren", "Thorne"]) {
-    const added = await world.invoke("add_companion", { name, class: "fighter", gender: "Female", personality: "Quiet.", kind: "party" });
+    const added = await world.invoke("add_companion", { name, class: "fighter", sex: "Female", personality: "Quiet.", kind: "party" });
     assert.equal(added.ok, true, added.error);
   }
   const seren = npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");

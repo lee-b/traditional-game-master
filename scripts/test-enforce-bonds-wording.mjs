@@ -17,9 +17,9 @@ const { setOpenToAdvances } = await import("../src/lib/db/sheets.ts");
 
 const world = await openWorld({ gameSettings: { dmMode: "human" } });
 const player = world.addUser("tamsin");
-const tamsin = world.addHero({ user: player, name: "Tamsin", gender: "Female", attraction: { genders: ["Male"], note: "" } });
-await world.invoke("set_npc", { name: "Hollis", gender: "Male", attitude: "friendly", drawnTo: ["women"] });
-await world.invoke("set_npc", { name: "Lucan", gender: "Male", attitude: "friendly", drawnTo: ["women"] });
+const tamsin = world.addHero({ user: player, name: "Tamsin", sex: "Female" });
+await world.invoke("set_npc", { name: "Hollis", sex: "Male", attitude: "friendly" });
+await world.invoke("set_npc", { name: "Lucan", sex: "Male", attitude: "friendly" });
 
 function bond(subject, patch) {
   const row = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: tamsin.id, characterName: "Tamsin", subjectKind: "npc", subjectName: subject });

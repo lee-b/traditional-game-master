@@ -430,7 +430,7 @@ await test("choices only the player makes are asked for: a Channel Divinity opti
   world.patch(kara.id, { currentHp: 0, deathSaves: { successes: 0, failures: 0, stable: false, dead: false } });
   expect(await ai(world, "stabilize", { healerId: mira.id, characterId: kara.id, method: "kit" }), "retry", /Ask the player whether to try it/);
   // The companion limit.
-  const companion = { class: "rogue", gender: "Unknown", personality: "wry", kind: "party" };
+  const companion = { class: "rogue", sex: "Unknown", personality: "wry", kind: "party" };
   assert.equal(kindOf(await ai(world, "add_companion", { ...companion, name: "Pip" })), "ok");
   expect(await ai(world, "add_companion", { ...companion, name: "Tam" }), "retry", /Ask the players which/);
   await fightDummies(world, 1, { heroFaces: { [cleric.id]: 20 } });

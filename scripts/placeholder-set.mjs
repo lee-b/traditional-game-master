@@ -171,17 +171,17 @@ function paletteForId(id) {
 // Three variants per race and class rather than a full cross product: the
 // caller knows a race or a class or neither, and 22 x 13 x 3 renders would
 // buy nothing a silhouette can actually show.
-const GENDERS = {
+const SEXES = {
   masculine: { build: "a broad-shouldered masculine", hair: "short hair", beard: "a full beard" },
   feminine: { build: "a feminine", hair: "long braided hair", beard: "long braided hair" },
   neutral: { build: "an androgynous", hair: "shoulder-length hair", beard: "shoulder-length hair" },
 };
 
-export const GENDER_IDS = Object.keys(GENDERS);
+export const SEX_IDS = Object.keys(SEXES);
 
 // `traits` are the outline cues that survive being reduced to a black shape:
 // ear points, horns, tails, snouts, build. Anything that only reads as colour
-// or texture is left out on purpose. `facial` swaps on gender where a beard
+// or texture is left out on purpose. `facial` swaps on sex where a beard
 // would otherwise be put on every dwarf alive.
 const RACES = [
   { id: "human", name: "Human", traits: "an ordinary travelling cloak", facial: true },
@@ -443,9 +443,9 @@ const MISC_TILES = [
 // the app already uses, so a lookup needs no translation table.
 //
 // Three variants each, like the SRD twelve: the painted portraits gave every
-// genre class a neutral plate of its own, so a nonbinary or unstated Netrunner
+// genre class a neutral plate of its own, so an unstated Netrunner
 // no longer falls through to the genre lead.
-export const CLASS_GENDER_IDS = ["masculine", "feminine", "neutral"];
+export const CLASS_SEX_IDS = ["masculine", "feminine", "neutral"];
 
 // Content-pack classes from other 5e books, keyed by the pack's class slug.
 const PACK_CLASSES = [
@@ -796,14 +796,14 @@ const GENRE_NPCS = [
 
 // ---- assembly ----
 
-function raceSubject(race, genderId) {
-  const gender = GENDERS[genderId];
-  const traits = race.facial ? `${race.traits} and ${gender.beard}` : `${race.traits} and ${gender.hair}`;
-  return `${gender.build} ${race.name.toLowerCase()} adventurer with ${traits}`;
+function raceSubject(race, sexId) {
+  const sex = SEXES[sexId];
+  const traits = race.facial ? `${race.traits} and ${sex.beard}` : `${race.traits} and ${sex.hair}`;
+  return `${sex.build} ${race.name.toLowerCase()} adventurer with ${traits}`;
 }
 
-function classSubject(klass, genderId) {
-  return `${GENDERS[genderId].build} ${klass.name.toLowerCase()} carrying ${klass.traits}`;
+function classSubject(klass, sexId) {
+  return `${SEXES[sexId].build} ${klass.name.toLowerCase()} carrying ${klass.traits}`;
 }
 
 // One flat list of jobs. `group` is the directory, `id` the file stem, and
@@ -819,23 +819,23 @@ export function placeholderJobs() {
   };
 
   for (const race of RACES) {
-    for (const genderId of GENDER_IDS) {
-      portrait("character-race", `${race.id}-${genderId}`, raceSubject(race, genderId));
+    for (const sexId of SEX_IDS) {
+      portrait("character-race", `${race.id}-${sexId}`, raceSubject(race, sexId));
     }
   }
 
   for (const klass of CLASSES) {
-    for (const genderId of GENDER_IDS) {
-      portrait("character-class", `${klass.id}-${genderId}`, classSubject(klass, genderId));
+    for (const sexId of SEX_IDS) {
+      portrait("character-class", `${klass.id}-${sexId}`, classSubject(klass, sexId));
     }
   }
 
   // The fallback when neither race nor class is known.
-  for (const genderId of GENDER_IDS) {
+  for (const sexId of SEX_IDS) {
     portrait(
       "character",
-      genderId,
-      `${GENDERS[genderId].build} adventurer in a hooded travelling cloak with a pack and a sheathed sword`,
+      sexId,
+      `${SEXES[sexId].build} adventurer in a hooded travelling cloak with a pack and a sheathed sword`,
     );
   }
 
@@ -843,33 +843,33 @@ export function placeholderJobs() {
   // Black Flag's Mechanist): the two cards that fell to the hooded stranger
   // (issue #116). Same treatment as the genre classes.
   for (const klass of PACK_CLASSES) {
-    for (const genderId of CLASS_GENDER_IDS) {
-      portrait("character-class", `${klass.id}-${genderId}`, classSubject(klass, genderId));
+    for (const sexId of CLASS_SEX_IDS) {
+      portrait("character-class", `${klass.id}-${sexId}`, classSubject(klass, sexId));
     }
   }
 
   // Genre classes share the character-class group: the ids never collide with
   // the SRD twelve, so one lookup by class id serves both.
   for (const klass of GENRE_CLASSES) {
-    for (const genderId of CLASS_GENDER_IDS) {
+    for (const sexId of CLASS_SEX_IDS) {
       portrait(
         "character-class",
-        `${klass.id}-${genderId}`,
-        classSubject(klass, genderId),
+        `${klass.id}-${sexId}`,
+        classSubject(klass, sexId),
         "bust",
         klass.palette ?? "default",
       );
     }
   }
 
-  // Genre known, class not. Three genders here rather than the classes' two,
-  // because this is the tile a blank gender field falls back to.
+  // Genre known, class not. Three sexes here rather than the classes' two,
+  // because this is the tile a blank sex field falls back to.
   for (const lead of GENRE_LEADS) {
-    for (const genderId of GENDER_IDS) {
+    for (const sexId of SEX_IDS) {
       portrait(
         "character-genre",
-        `${lead.id}-${genderId}`,
-        `${GENDERS[genderId].build} ${lead.subject}`,
+        `${lead.id}-${sexId}`,
+        `${SEXES[sexId].build} ${lead.subject}`,
       );
     }
   }

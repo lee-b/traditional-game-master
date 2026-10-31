@@ -10,7 +10,7 @@ import { portraitPhase, portraitReadyLine, type PortraitSubject } from "@/app/ch
 // the painter is doing, and the page's toast when one is done. Styles:
 // styles/moments.css, "portrait arrival".
 
-type RosterSubject = PortraitSubject & { race: string; class: string; sheet?: PortraitSubject["sheet"] & { gender?: string } };
+type RosterSubject = PortraitSubject & { race: string; class: string; sheet?: PortraitSubject["sheet"] & { sex?: string } };
 
 // The picture. A portrait that has just finished fades in, briefly, unless
 // this device is still (low effects or reduced motion): then it is simply
@@ -52,7 +52,7 @@ export function RosterPortraitSlot({
   }
   return (
     <CharacterPortrait
-      look={{ race: character.race, class: character.class, gender: character.sheet?.gender }}
+      look={{ race: character.race, class: character.class, sex: character.sheet?.sex }}
       alt={character.name}
       size="size-12"
       className="border-amber-500/30 shadow-glow-gold"

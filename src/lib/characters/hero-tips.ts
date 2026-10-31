@@ -79,7 +79,7 @@ export function freshPlaySheet(hero: LibraryHero): CharacterSheet {
     subclass: sheet.subclass,
     background: sheet.background,
     alignment: sheet.alignment,
-    gender: sheet.gender,
+    sex: sheet.sex,
     level,
     xp: 0,
     abilities: sheet.abilities,
