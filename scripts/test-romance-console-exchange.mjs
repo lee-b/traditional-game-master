@@ -105,7 +105,7 @@ await test("at the console an NPC's first move turned down is not made again unt
   const table = await openWorld({ gameSettings: { dmMode: "human" } });
   const player = table.addUser("lio");
   const hero = table.addHero({ user: player, name: "Lio", sex: "Male" });
-  const set = await table.invoke("set_npc", { name: "Senna", sex: "Female", drawnTo: ["men"] });
+  const set = await table.invoke("set_npc", { name: "Senna", sex: "Female" });
   assert.equal(set.ok, true, set.error);
   const row = relationships.ensureRelationship({ campaignId: table.campaignId, characterId: hero.id, characterName: "Lio", subjectKind: "npc", subjectName: "Senna" });
   relationships.patchRelationship(row.id, { approval: 70 });

@@ -222,7 +222,6 @@ const setNpcSchema = z.object({
   trait: z.string().max(300).optional(),
   location: z.string().max(120).optional(),
   sex: z.enum(TOLD_SEXES).optional(),
-  drawnTo: z.array(z.string().max(40)).max(6).optional(),
   goal: z.string().max(300).optional(),
   ambition: z.string().max(300).optional(),
 });

@@ -95,7 +95,7 @@ await test("round trip: import writes a fresh file and rewires the sheet", async
   assert.equal(unpacked.sheet.portrait.id, "fresh");
   assert.equal(unpacked.sheet.backstory, "Grew up picking locks.");
   assert.equal(unpacked.sheet.abilities.dex, 17);
-  // Who they are drawn to is identity and travels with them (issue 501).
+  // Who they are is identity and travels with them.
 });
 
 await test("a bundle without a portrait imports with none and asks for a painting", async () => {
