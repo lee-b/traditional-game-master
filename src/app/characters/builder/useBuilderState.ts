@@ -318,7 +318,6 @@ export function useBuilderState({
   const [backstory, setBackstory] = useState(initial?.backstory ?? "");
   const [hopes, setHopes] = useState(initial?.hopes ?? "");
   const [sex, setSex] = useState<Sex>(initial?.sex ?? "");
-  // Who they are drawn to (issue 501), kept through an edit like the sex.
   const [appearance, setAppearance] = useState(initial?.appearance ?? "");
   // An uploaded photo here means the creation routes skip the ComfyUI render
   // entirely (they only queue one when the sheet arrives without a portrait).

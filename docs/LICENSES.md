@@ -213,3 +213,14 @@ is small. Two rules for pack authors:
 Dungeons & Dragons and D&D are trademarks of Wizards of the Coast LLC. This
 project is not affiliated with, endorsed, or sponsored by Wizards of the
 Coast.
+
+## Stand-in character portraits
+
+The default adventurer plates `public/assets/placeholders/character/
+masculine.webp` and `feminine.webp` are two portraits from "200 Free
+Lorestrome Portraits" by Hyptosis, published on OpenGameArt.org at
+https://opengameart.org/content/200-free-lorestrome-portraits and released
+there under CC0 1.0 (a public-domain dedication; no attribution required).
+The crop, resize and encoding settings are recorded in
+[docs/art/portrait-provenance.md](art/portrait-provenance.md). The previous
+in-house plates remain available at `public/assets/character-plates/`.

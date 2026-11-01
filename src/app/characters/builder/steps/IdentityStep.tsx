@@ -1,6 +1,8 @@
 "use client";
 
 import { Camera, Dices, UserRound } from "lucide-react";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { normalizeSex } from "@/lib/placeholders";
 import { useId } from "react";
 import { InfoButton } from "@/components/ui/InfoDialog";
 import { LengthNote } from "@/components/ui/LengthNote";
@@ -20,10 +22,22 @@ import { Field, StepPanel, inputClass } from "./shared";
 const BACKSTORY_MAX = 2000;
 const HOPES_MAX = 500;
 
+// The stand-in plates the defaults replaced (docs/art/portrait-provenance.md),
+// shipped as real files so a player who liked them keeps them: picking one
+// saves it as the hero's own portrait, which every surface then shows.
+const ALT_PLATE_URL = /^\/assets\/character-plates\//;
+function altPlateAttachment(sex: string) {
+  return {
+    url: `/assets/character-plates/${normalizeSex(sex)}.webp`,
+    name: "Stand-in plate",
+    type: "image/webp",
+  };
+}
+
 // The last step before the summary (backlog F4): who the hero is, once the
 // player knows what they made. The name (its dice roll a name that fits the
-// lineage already chosen), who they are drawn to (issue 501), alignment, the
-// portrait and how they look, and their story. None of it changes a number
+// lineage already chosen), alignment, the portrait and how they look, and
+// their story. None of it changes a number
 // on the sheet, so nothing before this step waits on it. How they play, the
 // sex, the level and the background are asked on the steps before; the
 // sex is said here beside the rest of who they are, with the way back to
@@ -151,6 +165,27 @@ export function IdentityStep({
             </span>
           )}
           <div className="min-w-0">
+            <SegmentedControl
+              size="sm"
+              label="Stand-in art"
+              value={portrait?.url && ALT_PLATE_URL.test(portrait.url) ? "varied" : "classic"}
+              onChange={(pick) => {
+                if (pick === "varied") {
+                  setPortrait(altPlateAttachment(state.sex));
+                } else if (portrait?.url && ALT_PLATE_URL.test(portrait.url)) {
+                  // Back to the default plate: the portrait slot empties, so
+                  // the stand-in resolves the usual way again.
+                  setPortrait(null);
+                }
+              }}
+              options={[
+                { value: "classic", label: "Classic" },
+                { value: "varied", label: "Varied" },
+              ]}
+            />
+            <p className="mt-1.5 text-xs text-stone-500">
+              The varied plates are the stand-in art the defaults replaced; picking one saves it as the hero&apos;s portrait.
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               {/* The upload is offered everywhere, whether or not a painter
                   exists: a photo is always a way to give a hero a face. */}

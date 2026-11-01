@@ -266,8 +266,10 @@ export const sheetFeatureSchema = z.object({
 });
 export type SheetFeature = z.infer<typeof sheetFeatureSchema>;
 
-// Uploaded portrait/avatar reference; restricted to local uploads so a
-// sheet can never point the party's browsers at an external host.
+// Uploaded portrait/avatar reference; restricted to local uploads and the
+// shipped stand-in plates (the builder's picker saves one of those as the
+// portrait), so a sheet can never point the party's browsers at an external
+// host.
 export const attachmentSchema = z.object({
   id: z.string().max(80).optional(),
   // The uploaded file's own name, which nothing caps: clipped, not refused.
@@ -277,7 +279,7 @@ export const attachmentSchema = z.object({
     .transform((value) => value.slice(0, 120))
     .optional(),
   type: z.string().max(60).optional(),
-  url: z.string().max(300).startsWith("/uploads/"),
+  url: z.string().max(300).regex(/^\/(uploads\/|assets\/character-plates\/)/),
 });
 export type SheetAttachment = z.infer<typeof attachmentSchema>;
 
