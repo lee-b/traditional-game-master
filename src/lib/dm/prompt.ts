@@ -331,7 +331,7 @@ export type DmGameState = {
     aliases?: string[];
     witnessNote?: string;
     statBlock?: string;
-    // Their gender, and at a romance table who they are drawn to.
+    // Their sex, and at a romance table who they are drawn to.
     identity?: string;
     // From the table's WorldForge: hidden truth, ties, secrets kept.
     world?: string;
@@ -886,11 +886,11 @@ export function describeSheet(
   if (sheet.background || sheet.alignment) {
     lines.push(`  Background: ${backgroundWords(sheet) || "unknown"} | Alignment: ${sheet.alignment || "unstated"}`);
   }
-  // Who they are (issue 501): the gender always, and at a romance table who
+  // Who they are (issue 501): the sex always, and at a romance table who
   // they are drawn to and whether their player opened them to advances.
   const drawn = options.romance ? attractionWords(sheet.attraction) : "";
   const identity = [
-    sheet.gender ? `Gender: ${sheet.gender}` : "",
+    sheet.sex ? `Sex: ${sheet.sex}` : "",
     drawn ? `Drawn to: ${drawn}` : "",
     // Romance is exclusive unless they are open to more (issue 642).
     options.romance && openToMore(sheet.attraction) ? "Open to more than one partner" : "",

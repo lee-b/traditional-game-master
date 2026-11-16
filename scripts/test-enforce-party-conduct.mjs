@@ -25,7 +25,7 @@ async function table({ gameSettings = {}, companion = {} } = {}) {
   const kit = await combatKit(world);
   const kael = world.addHero({ name: "Kael", level: 3, maxHp: 30, proficiencies: TRAINED });
   const added = await world.invoke("add_companion", {
-    name: "Seren", class: "cleric", gender: "Female", personality: "Watchful.", kind: "party", level: 3, spells: ["Cure Wounds", "Bless"], ...companion,
+    name: "Seren", class: "cleric", sex: "Female", personality: "Watchful.", kind: "party", level: 3, spells: ["Cure Wounds", "Bless"], ...companion,
   });
   assert.equal(added.ok, true, added.error);
   const seren = world.sheets().find((entry) => entry.name === "Seren");

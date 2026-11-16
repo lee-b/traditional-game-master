@@ -18,7 +18,7 @@ import {
   type RelationGraph,
 } from "@/lib/npcs/forge";
 import { npcRoleOptions } from "@/lib/placeholders";
-import { GENDERS, type Gender } from "@/lib/gender";
+import { SEXES, type Sex } from "@/lib/sex";
 import { NPC_RACE_OPTIONS } from "@/lib/npc-race";
 import { hostOffers, useCapabilities } from "@/lib/use-capabilities";
 import { AttractionPicker, NPC_ATTRACTION_HINT } from "@/components/AttractionPicker";
@@ -142,14 +142,14 @@ export function NpcEditorFields({
           />
           </span>
           <span className="w-full sm:w-40">
-          <Select<Gender>
-            label="Gender"
-            value={draft.gender}
-            onChange={(gender) => onChange({ ...draft, gender })}
-            options={[{ value: "", label: "Unspecified" }, ...GENDERS.map((gender) => ({ value: gender, label: gender }))]}
+          <Select<Sex>
+            label="Sex"
+            value={draft.sex}
+            onChange={(sex) => onChange({ ...draft, sex })}
+            options={[{ value: "", label: "Unspecified" }, ...SEXES.map((sex) => ({ value: sex, label: sex }))]}
           />
           </span>
-          {/* Beside the gender because the two pick the stand-in face
+          {/* Beside the sex because the two pick the stand-in face
               together: an elf bandit draws the elf bandit, not a human one.
               An older host drops the race unsaved, so it waits for one that
               keeps it (the apps can open an older server). */}
@@ -165,10 +165,10 @@ export function NpcEditorFields({
           ) : null}
         </div>
 
-        {/* Who they are drawn to, beside the gender (issue 501): identity,
+        {/* Who they are drawn to, beside the sex (issue 501): identity,
             so the DM never writes it by guesswork. */}
         <AttractionPicker
-          value={draft.attraction ?? { genders: [], note: "" }}
+          value={draft.attraction ?? { sexes: [], note: "" }}
           onChange={(attraction) => onChange({ ...draft, attraction })}
           hint={NPC_ATTRACTION_HINT}
           className="sm:max-w-md"

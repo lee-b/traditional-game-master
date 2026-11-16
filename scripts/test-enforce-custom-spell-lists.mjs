@@ -325,7 +325,7 @@ await test("a level-up adds a spell on the list and refuses one off it", async (
 });
 
 await test("an AI companion of the class takes its spells from the class's own list", async () => {
-  const out = await world.invoke("add_companion", { name: "Pell", class: runeId, level: 3, race: "human", gender: "Female", personality: "Patient and exact.", kind: "party" });
+  const out = await world.invoke("add_companion", { name: "Pell", class: runeId, level: 3, race: "human", sex: "Female", personality: "Patient and exact.", kind: "party" });
   assert.equal(out.ok, true, JSON.stringify(out));
   const companion = world.sheets().find((sheet) => sheet.name === "Pell");
   const names = [...(companion.spellcasting?.cantrips ?? []), ...(companion.spellcasting?.prepared ?? []), ...(companion.spellcasting?.known ?? [])];

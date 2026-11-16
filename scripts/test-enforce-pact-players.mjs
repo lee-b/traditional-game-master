@@ -37,10 +37,10 @@ const { fieldedSheets } = await import("../src/lib/dm/roster.ts");
 // Seren, a lasting companion who wavers.
 async function table({ gameSettings = {}, solo = false, brin = {} } = {}) {
   const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings } });
-  const kael = world.addHero({ name: "Kael", gender: "Male", equipment: [{ name: "Spyglass", qty: 1 }] });
+  const kael = world.addHero({ name: "Kael", sex: "Male", equipment: [{ name: "Spyglass", qty: 1 }] });
   const brinUser = solo ? null : world.addUser("brin");
-  const brinSheet = solo ? null : world.addHero({ user: brinUser, name: "Brin", gender: "Female", ...brin });
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", alignment: "LG", gender: "Female", personality: "Quiet.", kind: "party" });
+  const brinSheet = solo ? null : world.addHero({ user: brinUser, name: "Brin", sex: "Female", ...brin });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", alignment: "LG", sex: "Female", personality: "Quiet.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const row = () => npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
   npcs.patchNpcAgency(row().id, { personality: { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 0 } });

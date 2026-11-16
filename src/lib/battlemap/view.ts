@@ -69,7 +69,7 @@ import { undoableMove, undoOffer } from "@/lib/battlemap/move-undo";
 import type { AuraTone, PlayerMapView } from "@/lib/battlemap/view-types";
 import { ENEMY_TURN_NAME, turnOwner } from "@/lib/dm/turn-owner";
 import { holdsFeature } from "@/lib/srd/feature-names";
-import { foeLook, pickedGender, storedSex, type Sex } from "@/lib/actor-sex-logic";
+import { foeLook, pickedSex, storedSex, type Sex } from "@/lib/actor-sex-logic";
 import { castLookup, npcFace } from "@/lib/db/npc-faces";
 import { enemiesAhead, ownTurnOf } from "@/lib/dm/held-turn";
 import { soleSurvivorSpeed } from "@/lib/dm/genre-a-horror-party";
@@ -371,17 +371,17 @@ export function buildPlayerMapView(
   // (src/lib/actor-sex-logic.ts). A foe: its Cast NPC's record, else its
   // own row's look. A figure the GM placed: the Cast NPC of that name, with
   // their face, else a stranger with a pick from its own ref (its flat face
-  // stays the one by name, which has no gender to disagree with).
+  // stays the one by name, which has no sex to disagree with).
   const cast = castLookup(campaignId);
   const lookOf = (token: (typeof tokens)[number]): { face?: string; sex?: Sex } => {
     if (token.kind === "enemy") {
       const enemy = enemiesById.get(token.refId);
-      const sex = enemy ? storedSex(foeLook(enemy, cast.byId(enemy.npcId)).gender) : undefined;
+      const sex = enemy ? storedSex(foeLook(enemy, cast.byId(enemy.npcId)).sex) : undefined;
       return sex ? { sex } : {};
     }
     if (token.kind === "npc") {
       const npc = cast.byId(token.refId) ?? cast.byName(token.name);
-      const sex = storedSex(npc ? npc.gender : pickedGender(token.refId));
+      const sex = storedSex(npc ? npc.sex : pickedSex(token.refId));
       return { ...(npc ? { face: npcFace(npc) } : {}), ...(sex ? { sex } : {}) };
     }
     return {};

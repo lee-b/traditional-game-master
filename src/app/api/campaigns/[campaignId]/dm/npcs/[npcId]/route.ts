@@ -88,7 +88,7 @@ export async function PATCH(
       // The saved row: an older app sends no race, and the row kept its own.
       queueNpcPortrait(context.campaign, {
         id: npcId,
-        gender: saved.gender,
+        sex: saved.sex,
         race: saved.race,
         role: saved.role,
         trait: outcome.draft.trait,

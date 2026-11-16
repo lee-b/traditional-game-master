@@ -17,7 +17,7 @@ function runsTheTable(context: MemberContext): boolean {
   return steersStory(context) || isDm(context);
 }
 
-function visibleRoster(context: MemberContext): Array<Omit<RosterEntry, "gender" | "aliases" | "ownerUserId"> & { mine: boolean }> {
+function visibleRoster(context: MemberContext): Array<Omit<RosterEntry, "sex" | "aliases" | "ownerUserId"> & { mine: boolean }> {
   const all = runsTheTable(context);
   return voiceRoster(context.campaign.id)
     .filter((entry) => all || entry.ownerUserId === context.user.id)

@@ -43,7 +43,7 @@ import { startingKitFor } from "@/lib/srd/starting-kit";
 import { legalCompanionSheet } from "@/lib/dm/companion-level";
 import { portraitStatus, queueCompanionPortrait } from "@/lib/portrait";
 import { settingClassIds } from "@/lib/classes";
-import { TOLD_GENDER_HELP, TOLD_GENDERS, toldGender } from "@/lib/gender";
+import { TOLD_SEX_HELP, TOLD_SEXES, toldSex } from "@/lib/sex";
 import { attractionFromTold, TOLD_ATTRACTION } from "@/lib/attraction";
 import { companionNpcFor, lastingCompanion, rememberDepartingSheet } from "@/lib/db/companion-npcs";
 import { getNpcByName, type Npc } from "@/lib/db/npcs";
@@ -192,7 +192,7 @@ function companionToolDefs(campaign: Campaign): ToolDef[] {
               description: "A dragonborn's draconic ancestry, when the story names one. Omit it and the server rolls one.",
             },
             class: { type: "string", description: classDescription },
-            gender: { type: "string", enum: [...TOLD_GENDERS], description: TOLD_GENDER_HELP },
+            sex: { type: "string", enum: [...TOLD_SEXES], description: TOLD_SEX_HELP },
             drawnTo: {
               type: "array",
               items: { type: "string", enum: TOLD_ATTRACTION },
@@ -228,7 +228,7 @@ function companionToolDefs(campaign: Campaign): ToolDef[] {
               description: "Party only, a secret from every player: who secretly employs them and what they want of the party. The server brings the order in time.",
             },
           },
-          required: ["name", "class", "gender", "personality", "kind"],
+          required: ["name", "class", "sex", "personality", "kind"],
         },
       },
     },
@@ -257,7 +257,7 @@ const addArgsSchema = z.object({
   race: z.string().trim().max(60).optional(),
   ancestry: z.string().trim().max(40).optional(),
   class: z.string().trim().min(1).max(60),
-  gender: z.enum(TOLD_GENDERS),
+  sex: z.enum(TOLD_SEXES),
   drawnTo: z.array(z.string().max(40)).max(6).optional(),
   level: z.number().int().min(1).max(20).optional(),
   personality: fittedLine(500),
@@ -310,7 +310,7 @@ export function handleAddCompanion(
   try {
     args = addArgsSchema.parse(JSON.parse(rawArguments || "{}"));
   } catch (error) {
-    return badArguments("Invalid arguments: add_companion needs name, class, gender (Female, Male, Nonbinary or Unknown), personality, and kind ('party' or 'guest').", error, rawArguments);
+    return badArguments("Invalid arguments: add_companion needs name, class, sex (Female, Male or Unknown), personality, and kind ('party' or 'guest').", error, rawArguments);
   }
   if (args.values?.some((held) => held.value === "faction_loyalty" && !held.faction)) {
     return { error: "A faction_loyalty value names its faction: send faction with it, or leave that value out. Nothing was added.", retry: true };
@@ -494,8 +494,8 @@ export function handleAddCompanion(
     background: background?.id ?? "",
     // What they hold to starts from it (src/lib/dm/companion-values-logic.ts).
     alignment: args.alignment ?? "",
-    gender: toldGender(args.gender) ?? "",
-    attraction: attractionFromTold(args.drawnTo) ?? { genders: [], note: "" },
+    sex: toldSex(args.sex) ?? "",
+    attraction: attractionFromTold(args.drawnTo) ?? { sexes: [], note: "" },
     abilities,
     // A figure to start from; the legality check derives the real one by
     // the table's hit point method, and the armor engine the armor class.

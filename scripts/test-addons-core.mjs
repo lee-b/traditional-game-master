@@ -604,20 +604,20 @@ await test("the optional cosmetic scenery goes to board views without competing 
   assert.equal(boardSnapshot(ordinary, "hello-dungeon", { ...options, scenery: undefined }).scenery, undefined);
 });
 
-await test("character gender is optional and only travels with projected figures", () => {
+await test("character sex is optional and only travels with projected figures", () => {
   const appearance = { theme: "night", reducedMotion: false };
-  for (const gender of ["Female", "Male", "Nonbinary", ""]) {
+  for (const sex of ["Female", "Male", "Nonbinary", ""]) {
     const looks = new Map([
-      ["c1", { character: { race: "elf", class: "wizard", gender } }],
-      ["unseen", { character: { race: "human", class: "fighter", gender: "Male" } }],
+      ["c1", { character: { race: "elf", class: "wizard", sex } }],
+      ["unseen", { character: { race: "human", class: "fighter", sex: "Male" } }],
     ]);
     const snapshot = boardSnapshot(view, "hello-dungeon", { canDirect: false, appearance, looks });
-    assert.equal(snapshot.tokens[0].character.gender, gender);
+    assert.equal(snapshot.tokens[0].character.sex, sex);
     assert.equal(snapshot.tokens.length, view.tokens.length, "extra looks never reveal unprojected figures");
     assert.equal(snapshot.tokens.some(token => token.character?.class === "fighter"), false);
   }
   const looks = new Map([["c1", { character: { race: "elf", class: "wizard" } }]]);
-  assert.equal(boardSnapshot(view, "hello-dungeon", { canDirect: false, appearance, looks }).tokens[0].character.gender, undefined);
+  assert.equal(boardSnapshot(view, "hello-dungeon", { canDirect: false, appearance, looks }).tokens[0].character.sex, undefined);
 });
 
 await test("sex is optional, enum-checked and copied only from projected tokens", () => {

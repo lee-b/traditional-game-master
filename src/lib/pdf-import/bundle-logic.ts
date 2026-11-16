@@ -162,8 +162,8 @@ export function draftToBundle(draft: Draft, fileName: string, picture: PictureLo
       trait: cut(trait, 500),
       location: cut(str(record.data.location), 120),
       role: cut(str(record.data.role), 40),
-      // The Cast's own words for it (src/lib/gender.ts).
-      gender: ({ male: "Male", female: "Female", nonbinary: "Nonbinary" } as Record<string, string>)[str(record.data.gender)] ?? "",
+      // The Cast's own words for it (src/lib/sex.ts).
+      sex: ({ male: "Male", female: "Female" } as Record<string, string>)[str(record.data.sex)] ?? "",
       race: cut(str(record.data.race).toLowerCase(), 40),
       personality: "",
       goals: goals ? JSON.stringify({ ambition: cut(goals, 200) }) : "",

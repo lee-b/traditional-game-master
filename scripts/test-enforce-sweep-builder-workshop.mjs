@@ -183,12 +183,12 @@ await rows.row(`${prefix}:tool:grant_item`, async () => {
   assert.equal(line.gear?.def?.weapon?.bonus, 1, `the line lost the item's +1: ${JSON.stringify(line)}`);
 });
 await rows.row(`${prefix}:tool:add_companion`, async () => {
-  const out = await world.invoke("add_companion", { name: "Sable", class: made.classId, race: "human", gender: "female", level: 3, kind: "party", personality: "Dry and watchful." });
+  const out = await world.invoke("add_companion", { name: "Sable", class: made.classId, race: "human", sex: "female", level: 3, kind: "party", personality: "Dry and watchful." });
   assert.ok(out.ok && !out.result?.error, `add_companion of the workshop class: ${JSON.stringify(out).slice(0, 300)}`);
 });
 await rows.row(`${prefix}:tool:add_companion-by-name`, async () => {
   // What a GM types, and what a model writes: the class as the table calls it.
-  const out = await world.invoke("add_companion", { name: "Wren", class: "Spellblade", race: "human", gender: "male", level: 3, kind: "party", personality: "Quick to laugh." });
+  const out = await world.invoke("add_companion", { name: "Wren", class: "Spellblade", race: "human", sex: "male", level: 3, kind: "party", personality: "Quick to laugh." });
   assert.ok(out.ok && !out.result?.error, `add_companion class "Spellblade": ${JSON.stringify(out).slice(0, 300)}`);
 });
 

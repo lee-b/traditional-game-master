@@ -11,7 +11,7 @@ const CHIP =
   "inline-flex h-10 items-center rounded-full border border-stone-700/70 bg-stone-950/60 px-3 text-xs text-stone-300 transition-colors duration-150 hover:border-amber-500/40 hover:text-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50 aria-pressed:border-rose-400/60 aria-pressed:bg-rose-500/10 aria-pressed:text-rose-100 motion-press";
 
 // "Drawn to" (issue 501): who a character or an NPC could fall for, as
-// chips beside their gender and a short note. One tap picks or drops a
+// chips beside their sex and a short note. One tap picks or drops a
 // chip; nothing picked means unspecified. A real group with a visible label,
 // each chip a pressed-or-not button at the kit's 40px, so it reads and works
 // the same by keyboard, by finger and to a screen reader.
@@ -41,19 +41,19 @@ export function AttractionPicker({
       </span>
       <span className="flex flex-wrap gap-1.5">
         {ATTRACTION_CHOICES.map((choice) => {
-          const on = value.genders.includes(choice.gender);
+          const on = value.sexes.includes(choice.sex);
           return (
             <button
-              key={choice.gender}
+              key={choice.sex}
               type="button"
               aria-pressed={on}
               onClick={() =>
                 onChange({
                   ...value,
-                  genders: on
-                    ? value.genders.filter((gender) => gender !== choice.gender)
-                    : ATTRACTION_CHOICES.map((entry) => entry.gender).filter(
-                        (gender) => gender === choice.gender || value.genders.includes(gender),
+                  sexes: on
+                    ? value.sexes.filter((sex) => sex !== choice.sex)
+                    : ATTRACTION_CHOICES.map((entry) => entry.sex).filter(
+                        (sex) => sex === choice.sex || value.sexes.includes(sex),
                       ),
                 })
               }
@@ -77,7 +77,7 @@ export function AttractionPicker({
           <button
             type="button"
             aria-pressed={open}
-            onClick={() => onChange({ genders: value.genders, note: value.note, ...(open ? {} : { open: true }) })}
+            onClick={() => onChange({ sexes: value.sexes, note: value.note, ...(open ? {} : { open: true }) })}
             className={CHIP}
             data-open-relationship
           >

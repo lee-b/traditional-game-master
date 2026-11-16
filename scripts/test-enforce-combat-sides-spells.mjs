@@ -32,7 +32,7 @@ async function stage() {
   await kit.endFight();
   world.patch(mage.id, { concentratingOn: null, conditions: [], conditionMeta: {}, spellcasting: { ...world.sheet(mage.id).spellcasting, slots: SLOTS } });
   world.patch(friend.id, { conditions: [], conditionMeta: {}, wildShape: null });
-  const joined = await world.invoke("add_companion", { gender: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest" });
+  const joined = await world.invoke("add_companion", { sex: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest" });
   assert.equal(joined.ok, true, joined.error);
   const turncoat = joined.result.characterId;
   world.patch(turncoat, { abilities: BODY, proficiencies: TRAINED, maxHp: 30, currentHp: 30, ac: 12, acOverride: true, conditions: [], conditionMeta: {} });

@@ -1,7 +1,7 @@
 // Backlog F4: the builder asks how you want to play first and the name
 // last. The class step leads with the playstyle question, "Help me build",
-// the setting's notices, the gender the cards' art follows
-// (scripts/test-builder-gender-first.mjs) and the level; the background
+// the setting's notices, the sex the cards' art follows
+// (scripts/test-builder-sex-first.mjs) and the level; the background
 // sits beside the ancestry with every open tool grant; the name, alignment,
 // looks and story are the last step before the summary, and nothing before
 // it waits on a name. A draft kept on the device under the old order resumes

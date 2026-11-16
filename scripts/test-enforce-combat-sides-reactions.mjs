@@ -38,7 +38,7 @@ async function stage() {
   }
   world.patch(wizard.id, { spellcasting: { ...world.sheet(wizard.id).spellcasting, slots: { 1: { max: 4, used: 0 } } } });
   const joined = await world.invoke("add_companion", {
-    gender: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest",
+    sex: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest",
   });
   assert.equal(joined.ok, true, joined.error);
   const turncoat = joined.result.characterId;

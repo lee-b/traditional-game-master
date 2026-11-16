@@ -10,7 +10,7 @@
   ],
   "encoding": "As supplied: cwebp -q 70 -sharp_yuv, 256x256. The three centaur plates were re-encoded once after a crop (entries carry the edit).",
   "subjectBasis": "Lineage names from ODM's bundled races (src/lib/srd/races.json): kobold, hobgoblin, satyr and centaur are SRD 5.1 monsters; the rest are ODM's generic-named lineages with restated mechanics. Every plate is an original painting; none reproduces a published illustration. Serpentfolk was checked against the yuan-ti on the SRD 5.1 OGL Product Identity list (see species notes).",
-  "review": "Every plate inspected at full size and in a round crop at 96px and 40px on dark and light surrounds, 2026-11-13. Ten of the eleven pass as supplied; the centaur plates were re-cropped. The previews are species-portraits-2026-11-13.webp: one row per species (96px dark, 40px dark, 40px light for each gender), then the centaur plates as supplied and as shipped.",
+  "review": "Every plate inspected at full size and in a round crop at 96px and 40px on dark and light surrounds, 2026-11-13. Ten of the eleven pass as supplied; the centaur plates were re-cropped. The previews are species-portraits-2026-11-13.webp: one row per species (96px dark, 40px dark, 40px light for each sex), then the centaur plates as supplied and as shipped.",
   "addedBytes": 320192,
   "species": {
     "triton": {

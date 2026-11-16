@@ -64,7 +64,7 @@ export type PublicEncounter = {
     name: string;
     hidden: boolean;
     // An "npc" entry the Cast knows: their portrait or the plate their
-    // role, race and gender pick (src/lib/db/npc-faces.ts).
+    // role, race and sex pick (src/lib/db/npc-faces.ts).
     face?: string;
     // DM view only, like the enemy numbers below.
     initiative?: number;
@@ -90,11 +90,11 @@ export type PublicEncounter = {
     // to an older server still renders.
     slug?: string;
     // Who a humanoid foe is, for the face (enemyNpcPlaceholder): an SRD
-    // race id and a gender. A Cast NPC's come from their record, so an edit
+    // race id and a sex. A Cast NPC's come from their record, so an edit
     // there shows at once; a nameless foe's from start_encounter. Absent
     // when unrecorded, and nothing a player could not already see.
     race?: string;
-    gender?: string;
+    sex?: string;
     // Kept off the players' board and tracker by the DM. Only ever true in
     // the DM's own projection: a hidden enemy is absent from a player's.
     hidden: boolean;
@@ -351,9 +351,9 @@ function entryFace(cast: CastLookup, npcId: string, name: string): { face?: stri
 // Who a foe is, for its face: a Cast NPC's own record, read live so an edit
 // there shows in a running fight, else its row's look, the one a 3D board
 // view's model reads too (src/lib/actor-sex-logic.ts).
-function lookOf(cast: CastLookup, enemy: EncounterEnemy): { race?: string; gender?: string } {
-  const { race, gender } = foeLook(enemy, cast.byId(enemy.npcId));
-  return { ...(race ? { race } : {}), ...(gender ? { gender } : {}) };
+function lookOf(cast: CastLookup, enemy: EncounterEnemy): { race?: string; sex?: string } {
+  const { race, sex } = foeLook(enemy, cast.byId(enemy.npcId));
+  return { ...(race ? { race } : {}), ...(sex ? { sex } : {}) };
 }
 
 // How far an enemy may still walk this turn, for the person running it: the

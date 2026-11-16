@@ -21,7 +21,7 @@ import { settleAttunement, type Wearer } from "@/lib/srd/magic-items";
 import { itemWeightByName, repairedWeight } from "@/lib/content";
 import { homebrewLabel, homebrewRaceLabel, hydrateHomebrewGear } from "@/lib/db/homebrew";
 import { subclassExtrasForTable } from "@/lib/db/subclass-extras";
-import { storedGender } from "@/lib/gender";
+import { storedSex } from "@/lib/sex";
 import { attractionJson, normalizeAttraction } from "@/lib/attraction";
 import { backgroundFeatureFor } from "@/lib/backgrounds";
 import { registerSpeciesReader } from "@/lib/srd/race-id";
@@ -60,7 +60,7 @@ type SheetRow = {
   subclass: string;
   background: string;
   alignment: string;
-  gender: string | null;
+  sex: string | null;
   level: number;
   xp: number;
   abilities_json: string;
@@ -147,7 +147,7 @@ function mapSheet(row: SheetRow): CharacterSheet {
     background: row.background,
     ...(backgroundLabel ? { backgroundLabel } : {}),
     alignment: row.alignment,
-    gender: storedGender(row.gender),
+    sex: storedSex(row.sex),
     attraction: normalizeAttraction(row.attraction_json ?? ""),
     ...formerSheetIdsOf(row.former_sheet_ids_json),
     openToAdvances: row.open_to_advances === 1,
@@ -246,7 +246,7 @@ export function setHandLayout(sheetId: string, layout: HandLayout | null): Chara
 
 const SHEET_COLUMNS = `
   id, campaign_id, user_id, library_character_id, name, race, class, subclass,
-  background, alignment, gender, level, xp,
+  background, alignment, sex, level, xp,
   abilities_json, max_hp, current_hp, temp_hp, ac, ac_override, speed, hit_dice_json,
   classes_json, hit_dice_pools_json,
   proficiencies_json, equipment_json, gold, copper, feats_json, features_json,
@@ -569,7 +569,7 @@ export function createSheet(
     `
       INSERT INTO character_sheets (
         id, campaign_id, user_id, library_character_id, name, race, class,
-        subclass, background, alignment, gender,
+        subclass, background, alignment, sex,
         level, xp, abilities_json, max_hp, current_hp, temp_hp, ac, ac_override, speed,
         hit_dice_json, classes_json, hit_dice_pools_json, proficiencies_json, equipment_json, gold, copper, feats_json,
         features_json, resources_json, spellcasting_json, conditions_json, portrait_json,
@@ -589,7 +589,7 @@ export function createSheet(
     input.background,
     input.alignment,
     // Older library sheet_json blobs and companion drafts predate the field.
-    input.gender ?? "",
+    input.sex ?? "",
     level,
     xp,
     JSON.stringify(input.abilities),

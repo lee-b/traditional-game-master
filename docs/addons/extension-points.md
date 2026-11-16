@@ -541,7 +541,7 @@ latest state when `active` becomes true. Older views may ignore the hint.
   tokens: [{
     id, kind: "pc" | "enemy" | "npc" | "prop", name, x, y, size, mine, down, hidden, elevation, health, conditions, stamp,
     creature,       // a monster's { type: "undead", slug: "ghoul", cr: 1 }, or null
-    character,      // a character's { race: "elf", class: "wizard", gender?: "Female" | "Male" | "Nonbinary" | "" }, or null
+    character,      // a character's { race: "elf", class: "wizard", sex?: "Female" | "Male" | "" }, or null
     auras,          // [{ radiusFeet, tone: "ward" | "harm" | "bless" | "neutral" }]
   }],
   lights: [{ x, y, radius }],
@@ -574,9 +574,9 @@ silence. These fields grant no session, file or gameplay authority.
 
 `creature` and `character` are for a view that draws figures by kind: a
 skeleton model for `undead`, a sprite by `slug`, a robe for a `wizard`.
-`character.gender` is optional: `Female`, `Male`, `Nonbinary`, or `""` when
+`character.sex` is optional: `Female`, `Male`, or `""` when
 unspecified. Older hosts omit it. It comes from the character sheet already
-available to this viewer; ordinary encounter monsters have no gender field.
+available to this viewer; ordinary encounter monsters have no sex field.
 Use a default model when it is missing or unspecified; do not infer it from a
 name or portrait. No hidden figures or additional character-sheet fields are
 included. A
@@ -648,10 +648,10 @@ kind. Both fields are additive and can be absent on older hosts.
 
 ### Enemy and NPC sex
 
-Visible enemy and NPC tokens may include `sex: "Female" | "Male"`, supplied by the server's viewer projection after its normal visibility filtering. It is the same gender the flat board's face for that figure reads (`src/lib/actor-sex-logic.ts`), so a view's model and the plate on the tracker never disagree.
+Visible enemy and NPC tokens may include `sex: "Female" | "Male"`, supplied by the server's viewer projection after its normal visibility filtering. It is the same sex the flat board's face for that figure reads (`src/lib/actor-sex-logic.ts`), so a view's model and the plate on the tracker never disagree.
 
-- A Cast NPC, as an enemy or as a figure the GM placed by hand (linked by NPC id, else by whole name or alias, as `start_encounter` links one), has the gender the Cast records, read live: a gender the story records later changes the model at once. A Cast NPC recorded as Nonbinary, or not yet recorded, has no `sex`.
-- A nameless enemy has the `gender` its `start_encounter`/`add_enemies` entry was told (Female, Male or Nonbinary), else a stable Female or Male picked once from its own saved row id when it arrived. Renaming, damage, a new form and a return in a later fight never change it, and two enemies with one name are picked separately. One told Nonbinary has no `sex`.
+- A Cast NPC, as an enemy or as a figure the GM placed by hand (linked by NPC id, else by whole name or alias, as `start_encounter` links one), has the sex the Cast records, read live: a sex the story records later changes the model at once. A Cast NPC whose sex is not recorded — or one carrying a value the choice held before it was dropped — has no `sex`.
+- A nameless enemy has the `sex` its `start_encounter`/`add_enemies` entry was told (Female or Male), else a stable Female or Male picked once from its own saved row id when it arrived. Renaming, damage, a new form and a return in a later fight never change it, and two enemies with one name are picked separately. A value the choice held before it was dropped reads as told nothing: the pick from its row id.
 - A figure the GM placed by hand that the Cast does not know has a stable pick from its token's ref.
 
-No `sex` means a view keeps its ordinary model. PCs keep `character.gender`; props have none. Older hosts omit `sex`, so views should keep their ordinary model fallback: for example, select `monsters.bandit:Female` when a visible bandit's `sex` is `"Female"`, falling back to `monsters.bandit` when that variant or the field is absent. Hidden and fogged figures never enter a player's snapshot. The host sends no model paths or NPC records with this field. This optional addition keeps bridge version 1.
+No `sex` means a view keeps its ordinary model. PCs keep `character.sex`; props have none. Older hosts omit `sex`, so views should keep their ordinary model fallback: for example, select `monsters.bandit:Female` when a visible bandit's `sex` is `"Female"`, falling back to `monsters.bandit` when that variant or the field is absent. Hidden and fogged figures never enter a player's snapshot. The host sends no model paths or NPC records with this field. This optional addition keeps bridge version 1.

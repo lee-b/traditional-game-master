@@ -27,8 +27,8 @@ const logic = await import("../src/lib/dm/romance-held-logic.ts");
 // "together" asked of him is a certain yes once it is answered.
 async function table({ gameSettings = {} } = {}) {
   const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings } });
-  const hero = world.addHero({ name: "Vex", gender: "Female" });
-  const joined = await world.invoke("add_companion", { name: "Hollis", class: "paladin", gender: "Male", personality: "Keeps his word.", kind: "party" });
+  const hero = world.addHero({ name: "Vex", sex: "Female" });
+  const joined = await world.invoke("add_companion", { name: "Hollis", class: "paladin", sex: "Male", personality: "Keeps his word.", kind: "party" });
   assert.equal(joined.ok, true, joined.error);
   const bond = () => relationships.getRelationship(world.campaignId, hero.id, "Hollis");
   relationships.patchRelationship(bond().id, { romance: "courting", approval: 80 });
@@ -109,7 +109,7 @@ await test("a skipped rung asked mid-fight is refused as it always was, and noth
 
 await test("a step romance's exclusivity refuses is refused mid-fight too, not held to be refused after it (issue 642)", async () => {
   const { world, hero, bond, ask } = await table();
-  await world.invoke("set_npc", { name: "Mira", gender: "Female" });
+  await world.invoke("set_npc", { name: "Mira", sex: "Female" });
   const other = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: hero.id, characterName: "Vex", subjectKind: "npc", subjectName: "Mira" });
   relationships.patchRelationship(other.id, { approval: 80, romance: "together" });
   await world.beginFight([{ monster: "goblin" }]);

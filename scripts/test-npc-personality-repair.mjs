@@ -52,10 +52,10 @@ const db = getDatabase();
 const save = (id, personality) => db.prepare(`UPDATE npcs SET personality_json = ? WHERE id = ?`).run(JSON.stringify(personality), id);
 const saved = (id) => JSON.parse(db.prepare(`SELECT personality_json FROM npcs WHERE id = ?`).get(id).personality_json);
 
-const hero = world.addHero({ name: "Kael", gender: "Male" });
+const hero = world.addHero({ name: "Kael", sex: "Male" });
 
 await test("helping a friendly NPC raises their regard, whatever their name (the issue's case)", async () => {
-  const registered = await world.invoke("set_npc", { name: "Daran Edermath", gender: "Male", attitude: "friendly" });
+  const registered = await world.invoke("set_npc", { name: "Daran Edermath", sex: "Male", attitude: "friendly" });
   assert.ok(registered.ok, registered.error);
   const daran = getNpcByName(world.campaignId, "Daran Edermath");
   assert.deepEqual(daran.agency.personality, derivePersonality("Daran Edermath", "friendly", ""), "registration saves the corrected spread");
@@ -66,8 +66,8 @@ await test("helping a friendly NPC raises their regard, whatever their name (the
 });
 
 await test("a row saved from the skewed hash moves onto the corrected spread; a hand-set one stays", async () => {
-  await world.invoke("set_npc", { name: "Halia Thornton", gender: "Female", attitude: "indifferent", trait: "guild agent" });
-  await world.invoke("set_npc", { name: "Toblen Stonehill", gender: "Male", attitude: "friendly" });
+  await world.invoke("set_npc", { name: "Halia Thornton", sex: "Female", attitude: "indifferent", trait: "guild agent" });
+  await world.invoke("set_npc", { name: "Toblen Stonehill", sex: "Male", attitude: "friendly" });
   const halia = getNpcByName(world.campaignId, "Halia Thornton");
   const toblen = getNpcByName(world.campaignId, "Toblen Stonehill");
   save(halia.id, skewed("Daran Edermath", "indifferent"));
@@ -85,7 +85,7 @@ await test("a row saved from the skewed hash moves onto the corrected spread; a 
 
 await test("a lasting companion's row, seeded from the sheet's name and personality text, is repaired too", async () => {
   const personality = "Dry wit, quick to forgive, slow to trust strangers who talk too much.";
-  const added = await world.invoke("add_companion", { name: "Linene Graywind", class: "fighter", gender: "Male", personality, kind: "party" });
+  const added = await world.invoke("add_companion", { name: "Linene Graywind", class: "fighter", sex: "Male", personality, kind: "party" });
   assert.ok(added.ok, added.error);
   const row = db.prepare(`SELECT id FROM npcs WHERE campaign_id = ? AND companion_sheet_id != ''`).get(world.campaignId);
   assert.ok(row, "the companion has a row behind it");
@@ -97,7 +97,7 @@ await test("a lasting companion's row, seeded from the sheet's name and personal
 });
 
 await test("a rewind to a chapter saved before the fix repairs what it brings back", async () => {
-  await world.invoke("set_npc", { name: "Sildar Hallwinter", gender: "Male", attitude: "friendly" });
+  await world.invoke("set_npc", { name: "Sildar Hallwinter", sex: "Male", attitude: "friendly" });
   const sildar = getNpcByName(world.campaignId, "Sildar Hallwinter");
   save(sildar.id, skewed("Sildar Hallwinter", "friendly"));
   const rows = db.prepare(`SELECT * FROM npcs WHERE campaign_id = ?`).all(world.campaignId);
@@ -107,7 +107,7 @@ await test("a rewind to a chapter saved before the fix repairs what it brings ba
 
 await test("a row whose note the story rewrote after it was seeded is found by the note it was seeded from", async () => {
   // Registered with no note, so the name alone seeded who she is.
-  await world.invoke("set_npc", { name: "Agatha Holt", gender: "Female", attitude: "friendly" });
+  await world.invoke("set_npc", { name: "Agatha Holt", sex: "Female", attitude: "friendly" });
   const agatha = getNpcByName(world.campaignId, "Agatha Holt");
   save(agatha.id, skewed("Agatha Holt", "friendly"));
   // A later set_npc writes the note the seed never saw (set_npc's trait is
@@ -118,7 +118,7 @@ await test("a row whose note the story rewrote after it was seeded is found by t
   const call = (id, args) => ({ id, type: "function", function: { name: "set_npc", arguments: JSON.stringify(args) } });
   const conversation = [
     { role: "user", content: "We knock at the farmhouse." },
-    { role: "assistant", content: "", tool_calls: [call("a", { name: "Agatha Holt", gender: "Female", attitude: "friendly" })] },
+    { role: "assistant", content: "", tool_calls: [call("a", { name: "Agatha Holt", sex: "Female", attitude: "friendly" })] },
     { role: "tool", tool_call_id: "a", content: "{\"ok\":true}" },
     { role: "assistant", content: "", tool_calls: [call("b", { name: "agatha holt", trait: "owes the party a favour" })] },
   ];
@@ -130,7 +130,7 @@ await test("a row whose note the story rewrote after it was seeded is found by t
 });
 
 await test("a person the GM renamed in their people panel is found by the name a rewind point kept", async () => {
-  await world.invoke("set_npc", { name: "Kell Graywind", gender: "Male", attitude: "friendly" });
+  await world.invoke("set_npc", { name: "Kell Graywind", sex: "Male", attitude: "friendly" });
   const kell = getNpcByName(world.campaignId, "Kell Graywind");
   save(kell.id, skewed("Kell Graywind", "friendly"));
   // A chapter opens, and its rewind point keeps the table as it stood.
@@ -151,7 +151,7 @@ await test("a module exported before the fix lands with its NPCs repaired", asyn
     kind: "odm.workshop",
     version: 1,
     manifest: { name: "Old export", blurb: "sample", inspiredBy: "none" },
-    npcs: [{ name: "Daran Edermath", attitude: "friendly", gender: "Male", personality: JSON.stringify(skewed("Daran Edermath", "friendly")) }],
+    npcs: [{ name: "Daran Edermath", attitude: "friendly", sex: "Male", personality: JSON.stringify(skewed("Daran Edermath", "friendly")) }],
   });
   const landed = importWorkshopBundle(world.owner.id, bundle);
   assert.ok(!("error" in landed), landed.error);

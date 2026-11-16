@@ -26,7 +26,7 @@
 
 import { APPROVAL_MAX, APPROVAL_MIN, friendshipTier, REPEAT_FACTOR, TIER_LABEL, type FriendshipTier } from "./relationship-logic.ts";
 import { attractionFits, type Attraction } from "../attraction.ts";
-import type { Gender } from "../gender.ts";
+import { sameKnownSex, type Sex } from "../sex.ts";
 
 // ---- the pretense ----
 
@@ -146,7 +146,7 @@ export type Schemer = {
   name: string;
   kind: "npc" | "companion";
   status: "active" | "parted" | "ended";
-  gender: Gender;
+  sex: Sex;
   attraction: Attraction | null;
   // An act this NPC is already keeping up, toward this character or another
   // (that character's name), or null.
@@ -155,7 +155,7 @@ export type Schemer = {
 
 export type Mark = {
   name: string;
-  gender: Gender;
+  sex: Sex;
   attraction: Attraction | null;
   open: boolean;
   isCompanion: boolean;
@@ -186,8 +186,14 @@ export function schemeStartProblem(schemer: Schemer, mark: Mark, safety: string 
   if (schemer.actToward) {
     return `${schemer.name} is already keeping up an act toward ${schemer.actToward}. One at a time: reveal that one first.`;
   }
+  // Romance follows a traditional table's rule: opposite-sex pairs only. A
+  // same-sex pair is refused outright; an unknown sex never blocks, so the
+  // story never stalls on a field nobody set.
+  if (sameKnownSex(schemer.sex, mark.sex)) {
+    return `${schemer.name} and ${mark.name} are of the same sex, so a romantic act would not fit either of them.`;
+  }
   if (!attractionFits(schemer, mark)) {
-    return `${schemer.name} and ${mark.name} are not drawn to each other's gender, so a romantic act would not fit either of them.`;
+    return `${schemer.name} and ${mark.name} are not drawn to each other's sex, so a romantic act would not fit either of them.`;
   }
   return null;
 }

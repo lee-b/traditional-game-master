@@ -172,7 +172,7 @@ await test("a reaction roll and a relationship beat each tell the open seats who
   npc("Daran Edermath");
   await settled();
   const rolled = await castsSent(world, kara, async () => {
-    const out = await world.invoke("npc_reaction", { name: "Iarno Albrek", gender: "Male" });
+    const out = await world.invoke("npc_reaction", { name: "Iarno Albrek", sex: "Male" });
     assert.ok(out.ok, out.error);
   });
   assert.deepEqual(rolled.at(-1), ["Iarno Albrek"]);
@@ -286,7 +286,7 @@ await test("a face painted for the workshop's cast tells the workshop's tools to
     world.signIn(world.owner);
     const route = await world.route("campaigns/[campaignId]/dm/npcs");
     const response = await route.POST(
-      new Request("http://test/api", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ draft: { name: "Mira Fenn", gender: "Female" }, portrait: true }) }),
+      new Request("http://test/api", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ draft: { name: "Mira Fenn", sex: "Female" }, portrait: true }) }),
       { params: Promise.resolve({ campaignId: workshopId }) },
     );
     assert.equal(response.status, 201);

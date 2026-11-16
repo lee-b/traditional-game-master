@@ -27,7 +27,7 @@ import type { CharacterSheet } from "@/lib/schemas/sheet";
 // row like the axes; and Phase 0.4 the sheet they left with, written as they
 // are dismissed, so a return brings back the same person.
 
-type CompanionLike = Pick<CharacterSheet, "id" | "campaignId" | "name" | "isCompanion" | "companionKind" | "personality" | "gender"> & {
+type CompanionLike = Pick<CharacterSheet, "id" | "campaignId" | "name" | "isCompanion" | "companionKind" | "personality" | "sex"> & {
   attraction?: Attraction;
   summon?: CharacterSheet["summon"];
   class?: string;
@@ -64,7 +64,7 @@ function linkedRow(sheet: CompanionLike): Npc | null {
   if (named) {
     db.prepare(
       `UPDATE npcs SET companion_sheet_id = ?, attitude = 'friendly',
-         gender = CASE WHEN gender = '' THEN ? ELSE gender END,
+         sex = CASE WHEN sex = '' THEN ? ELSE sex END,
          attraction_json = CASE WHEN attraction_json = '' THEN ? ELSE attraction_json END,
          personality_json = CASE WHEN personality_json = '' THEN ? ELSE personality_json END,
          met_at = CASE WHEN met_at = '' THEN ? ELSE met_at END,
@@ -72,7 +72,7 @@ function linkedRow(sheet: CompanionLike): Npc | null {
        WHERE id = ?`,
     ).run(
       sheet.id,
-      sheet.gender ?? "",
+      sheet.sex ?? "",
       attractionJson(sheet.attraction),
       JSON.stringify(derivePersonality(sheet.name, "friendly", sheet.personality ?? "")),
       // Travelling with the party is meeting them (Npc.metAt).
@@ -87,7 +87,7 @@ function linkedRow(sheet: CompanionLike): Npc | null {
   const id = crypto.randomUUID();
   db.prepare(
     `INSERT INTO npcs
-       (id, campaign_id, name, attitude, trait, location, gender, attraction_json, personality_json,
+       (id, campaign_id, name, attitude, trait, location, sex, attraction_json, personality_json,
         companion_sheet_id, last_shift_turn, met_at, created_at, updated_at)
      VALUES (?, ?, ?, 'friendly', ?, '', ?, ?, ?, ?, '', ?, ?, ?)`,
   ).run(
@@ -95,7 +95,7 @@ function linkedRow(sheet: CompanionLike): Npc | null {
     sheet.campaignId,
     sheet.name.trim(),
     (sheet.personality ?? "").trim().slice(0, 200),
-    sheet.gender ?? "",
+    sheet.sex ?? "",
     attractionJson(sheet.attraction),
     JSON.stringify(derivePersonality(sheet.name, "friendly", sheet.personality ?? "")),
     sheet.id,
@@ -178,7 +178,7 @@ export type GoneCompanion = {
   portraitUrl: string;
   race: string;
   class: string;
-  gender: string;
+  sex: string;
   // The characters they still cared for as they went (issue 563).
   caresFor: string[];
   // The sheets they held before an earlier return, so the story log finds
@@ -201,7 +201,7 @@ export function goneCompanions(campaignId: string): GoneCompanion[] {
     if (!departed) {
       continue;
     }
-    const sheet = departed.sheet as { portrait?: { url?: unknown }; race?: unknown; class?: unknown; gender?: unknown; deathSaves?: { dead?: unknown }; formerSheetIds?: unknown };
+    const sheet = departed.sheet as { portrait?: { url?: unknown }; race?: unknown; class?: unknown; sex?: unknown; deathSaves?: { dead?: unknown }; formerSheetIds?: unknown };
     const record = companionDeparture(npc.id).gone;
     const how = record?.how ?? (sheet.deathSaves?.dead === true ? "Fell" : "Left the party");
     gone.push({
@@ -212,7 +212,7 @@ export function goneCompanions(campaignId: string): GoneCompanion[] {
       portraitUrl: typeof sheet.portrait?.url === "string" ? sheet.portrait.url : "",
       race: typeof sheet.race === "string" ? sheet.race : "",
       class: typeof sheet.class === "string" ? sheet.class : "",
-      gender: typeof sheet.gender === "string" ? sheet.gender : "",
+      sex: typeof sheet.sex === "string" ? sheet.sex : "",
       caresFor: record?.caresFor ?? [],
       formerSheetIds: Array.isArray(sheet.formerSheetIds) ? sheet.formerSheetIds.filter((id): id is string => typeof id === "string" && id !== npc.companionSheetId) : [],
     });

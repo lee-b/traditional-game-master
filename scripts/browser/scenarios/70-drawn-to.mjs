@@ -1,6 +1,5 @@
-// Issue 501: "Drawn to", beside the Gender line in the builder's Identity step and in
-// the NPC editor's "On the surface": three chips (Women, Men, Nonbinary
-// people), a short note, and (issue 642) "Open to more than one partner". A labelled group, each chip a pressed-or-not
+// Issue 501: "Drawn to", beside the Sex line in the builder's Identity step and in
+// the NPC editor's "On the surface": two chips (Women, Men), a short note, and (issue 642) "Open to more than one partner". A labelled group, each chip a pressed-or-not
 // button at a finger's size that works by keyboard, legible by night and by
 // day, and clean under axe.
 import { axeViolations, check, eventually, untilStill } from "../lib.mjs";
@@ -12,7 +11,7 @@ async function checkPicker(t, where) {
   check((await picker.getAttribute("role")) === "group", "a group");
   const women = picker.getByRole("button", { name: /^women$/i });
   const men = picker.getByRole("button", { name: /^men$/i });
-  check(await picker.getByRole("button", { name: /^nonbinary people$/i }).count(), "all three chips");
+  check(!(await picker.getByRole("button", { name: /^nonbinary people$/i }).count()), "no third chip");
   // The kit's own control height: 40px under a finger, as compact on a desk
   // as the selects beside it.
   for (const chip of [women, men]) {

@@ -20,12 +20,12 @@
 // It reads structure, so it reads every table language alike, with English
 // pronouns as the one exception (src/lib/dm/speech-prose.ts). Pure.
 
-import { genderMark, type Gender, type GenderMark } from "@/lib/gender";
+import { sexMark, type Sex, type SexMark } from "@/lib/sex";
 import { commonWords, textKey, words } from "@/lib/language/text-logic";
 import {
   aboutSubject,
-  genderOf,
-  gendersIn,
+  sexOf,
+  sexesIn,
   keyOf,
   LEAD,
   opensSentence,
@@ -46,14 +46,14 @@ import {
 
 // `pc` is a character at the table (a player's, or an AI companion), and
 // `monster` a creature of the fight. `aliases` are other names the same
-// person answers to, and `gender` the field the English pronouns are
+// person answers to, and `sex` the field the English pronouns are
 // matched against; neither is stored with a line.
 export type Speaker = {
   kind: "narrator" | "npc" | "monster" | "pc";
   id: string;
   name: string;
   aliases?: string[];
-  gender?: Gender;
+  sex?: Sex;
 };
 
 export type SpeechSegment = { kind: "prose"; text: string } | { kind: "speech"; text: string; speaker: Speaker };
@@ -92,8 +92,8 @@ function leadIn(sentence: string, reading: Reading): Named | null {
 
 type Context = {
   reading: Reading;
-  // Each known person's gender field, by keyOf, for the English pronouns.
-  genders: Map<string, GenderMark>;
+  // Each known person's sex field, by keyOf, for the English pronouns.
+  sexes: Map<string, SexMark>;
 };
 
 // Who the prose before a line is about: the person its last sentence
@@ -113,7 +113,7 @@ function lookBack(
   told: Pointer | null,
   oneVoice = false,
 ): Speaker | null {
-  const { reading, genders } = context;
+  const { reading, sexes } = context;
   const sentences = sentencesOf(before);
   const last = sentences[sentences.length - 1];
   if (!told && last) {
@@ -124,9 +124,9 @@ function lookBack(
   }
   // Every way the line's tag and the sentences followed back call the
   // speaker: two different ways is two people.
-  const said = new Set<GenderMark>(told ? gendersIn(aboutSubject(told).text, reading) : []);
+  const said = new Set<SexMark>(told ? sexesIn(aboutSubject(told).text, reading) : []);
   const agrees = (speaker: Speaker) => {
-    const known = genders.get(keyOf(speaker)) ?? "";
+    const known = sexes.get(keyOf(speaker)) ?? "";
     return !known || !said.size || said.has(known);
   };
   let chained = told !== null;
@@ -155,8 +155,8 @@ function lookBack(
       return null;
     }
     const about = aboutSubject(subject);
-    const gender = genderOf(about.text, reading);
-    for (const named of gendersIn(about.text, reading)) {
+    const sex = sexOf(about.text, reading);
+    for (const named of sexesIn(about.text, reading)) {
       said.add(named);
     }
     if (said.size > 1) {
@@ -167,8 +167,8 @@ function lookBack(
         // Somebody else is named here too, so "she" could be them. It is
         // settled when the passage calls this person "she" as well, or calls
         // the other one "he" ("Marla turns to Pike, his face grim.").
-        const known = genders.get(keyOf(subject.speaker)) || gender;
-        const others = gendersIn(about.rest, reading);
+        const known = sexes.get(keyOf(subject.speaker)) || sex;
+        const others = sexesIn(about.rest, reading);
         const ruledOut = said.size === 1 && others.length === 1 && !said.has(others[0]);
         if (!agrees(subject.speaker) || (!about.whole && !(known && said.has(known)) && !ruledOut)) {
           return null;
@@ -273,10 +273,10 @@ export function attributeSpeech(
     common: new Set([...(options.common ?? []), ...commonWords([text])]),
     englishPronouns: options.englishPronouns,
   };
-  const genders = new Map<string, GenderMark>(
-    speakers.map((speaker) => [keyOf(speaker), genderMark(speaker.gender)]),
+  const sexes = new Map<string, SexMark>(
+    speakers.map((speaker) => [keyOf(speaker), sexMark(speaker.sex)]),
   );
-  const context: Context = { reading, genders };
+  const context: Context = { reading, sexes };
   // Where the prose before the next line starts: the end of the last line
   // put on someone, and the end of the last line at all.
   let last = 0;

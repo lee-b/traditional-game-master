@@ -3,7 +3,7 @@
 // recorded, and nothing recorded one: NPCs had no race and a foe from
 // start_encounter had none either, so every bandit stayed the one bandit.
 // An NPC now has a race (set_npc, the console, the NPC form, bundles), a
-// nameless foe takes a race and a gender from start_encounter, a Cast NPC
+// nameless foe takes a race and a sex from start_encounter, a Cast NPC
 // fighting draws from their own record, and an ally the GM puts on the
 // board or into the order draws the face the Cast gives them.
 import assert from "node:assert/strict";
@@ -69,16 +69,16 @@ await test("a race is stored as its SRD id, read from an id, a name or the plain
 
 await test("an NPC's face reads their role, then their race and presentation, and keeps the old faces otherwise", () => {
   assert.equal(npcPlaceholder("merchant", "Ana", { race: "high_elf" }), `${BASE}/npc/merchant.webp`, "a role plate still wins");
-  assert.equal(npcPlaceholder("bandit", "Ana", { race: "wood_elf", gender: "Female" }), `${BASE}/enemy-npc/bandit-elf-feminine.webp`);
-  assert.equal(npcPlaceholder("archer", "Ana", { race: "hill_dwarf", gender: "Male" }), `${BASE}/enemy-npc/archer-dwarf-masculine.webp`);
+  assert.equal(npcPlaceholder("bandit", "Ana", { race: "wood_elf", sex: "Female" }), `${BASE}/enemy-npc/bandit-elf-feminine.webp`);
+  assert.equal(npcPlaceholder("archer", "Ana", { race: "hill_dwarf", sex: "Male" }), `${BASE}/enemy-npc/archer-dwarf-masculine.webp`);
   assert.equal(npcPlaceholder("bandit", "Ana"), `${BASE}/monster/bandit.webp`, "no race: the role token, as before");
-  assert.equal(npcPlaceholder("", "Ana", { race: "half_orc", gender: "Female" }), `${BASE}/character-race/half-orc-feminine.webp`);
+  assert.equal(npcPlaceholder("", "Ana", { race: "half_orc", sex: "Female" }), `${BASE}/character-race/half-orc-feminine.webp`);
   assert.equal(npcPlaceholder("", "Ana"), npcPlaceholder(null, "Ana"), "nothing recorded: the face by name, as before");
 });
 
-await test("a console fight line carries a race and a gender, and a monster's own name is left whole", () => {
+await test("a console fight line carries a race and a sex, and a monster's own name is left whole", () => {
   const reads = (words) => Boolean(storedRace(words));
-  assert.deepEqual(parseFightRoster("bandit race elf gender female x4", reads), [{ monster: "bandit", count: 4, race: "elf", gender: "female" }]);
+  assert.deepEqual(parseFightRoster("bandit race elf sex female x4", reads), [{ monster: "bandit", count: 4, race: "elf", sex: "female" }]);
   assert.deepEqual(parseFightRoster("bandit as Raider race half-orc", reads), [{ monster: "bandit", count: 1, name: "Raider", race: "half-orc" }]);
   assert.deepEqual(parseFightRoster("Race Car Golem x2", reads), [{ monster: "Race Car Golem", count: 2 }]);
   // Two words, the longest reading first.
@@ -112,8 +112,8 @@ await test("a band of a people reads as one of them", () => {
   assert.equal(storedRace("Warrior"), "");
 });
 
-await test("the fight view's race and gender pick the bandit plate for that race", () => {
-  const look = { slug: "bandit", name: "Bandit", race: "half_orc", gender: "Nonbinary" };
+await test("the fight view's race and sex pick the bandit plate for that race", () => {
+  const look = { slug: "bandit", name: "Bandit", race: "half_orc", sex: "Nonbinary" };
   assert.equal(monsterPlaceholder("humanoid", look), `${BASE}/enemy-npc/bandit-half-orc-neutral.webp`);
 });
 
@@ -122,7 +122,7 @@ world.addHero({ class: "fighter", level: 3, maxHp: 28 });
 const npc = (name) => listNpcs(world.campaignId).find((entry) => entry.name === name);
 
 await test("set_npc records a race, keeps it when a later call leaves it out, and says so when it cannot read one", async () => {
-  const written = await world.invoke("set_npc", { name: "Brakka", gender: "Female", race: "Half-Orc" });
+  const written = await world.invoke("set_npc", { name: "Brakka", sex: "Female", race: "Half-Orc" });
   assert.equal(written.ok, true, written.error);
   assert.equal(npc("Brakka").race, "half_orc");
   await world.invoke("set_npc", { name: "Brakka", attitude: "friendly", race: "Unknown" });
@@ -133,7 +133,7 @@ await test("set_npc records a race, keeps it when a later call leaves it out, an
   assert.equal(raceWords("wood_elf"), "Wood Elf");
   // The AI GM's own call, which a free word reaches; the console's Race is a
   // select, and refuses a value outside it as every select does.
-  const odd = handleSetNpc(world.campaign(), JSON.stringify({ name: "Sss'thar", gender: "Male", race: "lizard-man" }));
+  const odd = handleSetNpc(world.campaign(), JSON.stringify({ name: "Sss'thar", sex: "Male", race: "lizard-man" }));
   assert.equal(odd.ok, true, "an unreadable race never refuses the NPC");
   assert.match(odd.note, /not a race the server knows/);
   assert.equal(npc("Sss'thar").race, "");
@@ -150,19 +150,19 @@ await test("the NPC form's draft carries the race, and one the server does not k
   assert.equal(odd.draft.race, "");
 });
 
-await test("start_encounter gives nameless foes the race and gender it was told, and the fight view carries them", async () => {
+await test("start_encounter gives nameless foes the race and sex it was told, and the fight view carries them", async () => {
   // The console's lines, as a human GM types them.
-  const opened = await world.invoke("start_encounter", { enemies: "bandit race elves gender female x2" });
+  const opened = await world.invoke("start_encounter", { enemies: "bandit race elves sex female x2" });
   assert.equal(opened.ok, true, opened.error);
   const added = await world.invoke("add_enemies", { enemies: [{ monster: "bandit", race: "somebody" }] });
   assert.equal(added.ok, true, added.error);
   const rows = world.enemies();
   assert.equal(rows.length, 3);
-  assert.deepEqual(rows.slice(0, 2).map((row) => [row.race, row.gender]), [["high_elf", "Female"], ["high_elf", "Female"]]);
+  assert.deepEqual(rows.slice(0, 2).map((row) => [row.race, row.sex]), [["high_elf", "Female"], ["high_elf", "Female"]]);
   assert.equal(rows[2].race, undefined, "a race the server cannot read leaves the face as it was, never the fight refused");
   const shown = activePublicEncounter(world.campaignId).enemies;
-  assert.deepEqual([shown[0].race, shown[0].gender], ["high_elf", "Female"]);
-  assert.equal(monsterPlaceholder(shown[0].type, { slug: shown[0].slug, name: shown[0].name, race: shown[0].race, gender: shown[0].gender }), `${BASE}/enemy-npc/bandit-elf-feminine.webp`);
+  assert.deepEqual([shown[0].race, shown[0].sex], ["high_elf", "Female"]);
+  assert.equal(monsterPlaceholder(shown[0].type, { slug: shown[0].slug, name: shown[0].name, race: shown[0].race, sex: shown[0].sex }), `${BASE}/enemy-npc/bandit-elf-feminine.webp`);
   assert.equal(shown[2].race, undefined);
 });
 
@@ -182,7 +182,7 @@ await test("an ally the GM puts on the board draws the face the Cast gives them;
 
 await test("a workshop bundle carries an NPC's race out and back in, and one this server does not know reads as unrecorded", () => {
   const shop = createWorkshop(world.owner.id, { title: "Race round trip" }).id;
-  createNpcFromDraft(shop, normalizeNpcDraft({ name: "Tamsin", race: "wood_elf", role: "archer", gender: "Female" }).draft);
+  createNpcFromDraft(shop, normalizeNpcDraft({ name: "Tamsin", race: "wood_elf", role: "archer", sex: "Female" }).draft);
   const out = exportWorkshopBundle(shop, { name: "Race round trip", blurb: "One elf.", inspiredBy: "Original work" });
   assert.ok(out.bundle, out.error);
   assert.equal(out.bundle.npcs.find((entry) => entry.name === "Tamsin").race, "wood_elf");
@@ -196,28 +196,28 @@ await test("a workshop bundle carries an NPC's race out and back in, and one thi
   assert.equal(odd.bundle.npcs.find((entry) => entry.name === "Tamsin").race, "");
 });
 
-await test("a weak model's flat call keeps the race and gender, for a start and for reinforcements", async () => {
+await test("a weak model's flat call keeps the race and sex, for a start and for reinforcements", async () => {
   await world.invoke("end_encounter", { summary: "The bandits scatter." });
   const campaign = world.campaign();
   const sheets = world.sheets();
   const turn = createDmTurn(world.campaignId, [], "ai");
-  const started = applyEncounterCall(campaign, turn, "start_encounter", JSON.stringify({ monster: "bandit", race: "dwarf", gender: "Male" }), sheets, new Map(sheets.map((sheet) => [sheet.id, sheet])), { realDiceUserIds: new Set(), toolCallId: null });
+  const started = applyEncounterCall(campaign, turn, "start_encounter", JSON.stringify({ monster: "bandit", race: "dwarf", sex: "Male" }), sheets, new Map(sheets.map((sheet) => [sheet.id, sheet])), { realDiceUserIds: new Set(), toolCallId: null });
   assert.equal(started.result.error, undefined, started.result.error);
-  assert.deepEqual([world.enemies()[0].race, world.enemies()[0].gender], ["hill_dwarf", "Male"]);
-  const added = handleAddEnemies(campaign, JSON.stringify({ monster: "bandit", name: "Lookout", race: "half-orc", gender: "Female" }), sheets);
+  assert.deepEqual([world.enemies()[0].race, world.enemies()[0].sex], ["hill_dwarf", "Male"]);
+  const added = handleAddEnemies(campaign, JSON.stringify({ monster: "bandit", name: "Lookout", race: "half-orc", sex: "Female" }), sheets);
   assert.equal(added.error, undefined, added.error);
   const lookout = world.enemies().find((enemy) => enemy.displayName === "Lookout");
-  assert.deepEqual([lookout.race, lookout.gender], ["half_orc", "Female"]);
+  assert.deepEqual([lookout.race, lookout.sex], ["half_orc", "Female"]);
 });
 
 await test("a Cast NPC fighting draws from their own record, so an edit there shows at once", async () => {
   await world.invoke("end_encounter", { summary: "The bandits scatter." });
-  const made = normalizeNpcDraft({ name: "Grell", role: "bandit", gender: "Male", race: "hill_dwarf", statBlock: "bandit" });
+  const made = normalizeNpcDraft({ name: "Grell", role: "bandit", sex: "Male", race: "hill_dwarf", statBlock: "bandit" });
   createNpcFromDraft(world.campaignId, made.draft);
   const opened = await world.invoke("start_encounter", { enemies: [{ monster: "Grell", race: "elf" }] });
   assert.equal(opened.ok, true, opened.error);
   const shown = activePublicEncounter(world.campaignId).enemies.find((enemy) => enemy.name === "Grell");
-  assert.deepEqual([shown.race, shown.gender], ["hill_dwarf", "Male"], "the record wins over the call");
+  assert.deepEqual([shown.race, shown.sex], ["hill_dwarf", "Male"], "the record wins over the call");
   await world.invoke("set_npc", { name: "Grell", race: "Half-Orc" });
   const again = activePublicEncounter(world.campaignId).enemies.find((enemy) => enemy.name === "Grell");
   assert.equal(again.race, "half_orc", "a race the story corrects shows on the foe in the running fight");
@@ -227,12 +227,12 @@ await test("a Cast NPC fighting draws from their own record, so an edit there sh
 // race at all: that is the race left as it was, not one cleared, or every
 // edit from an older app would wipe the face the race picked.
 await test("a people-panel save with no race keeps the race, and an empty one clears it", () => {
-  const made = normalizeNpcDraft({ name: "Maelis", race: "high_elf", role: "archer", gender: "Female" });
+  const made = normalizeNpcDraft({ name: "Maelis", race: "high_elf", role: "archer", sex: "Female" });
   const row = createNpcFromDraft(world.campaignId, made.draft);
-  const older = normalizeNpcDraft({ name: "Maelis", role: "archer", gender: "Female", trait: "keeps the north gate" });
+  const older = normalizeNpcDraft({ name: "Maelis", role: "archer", sex: "Female", trait: "keeps the north gate" });
   assert.equal("error" in older, false);
   assert.equal(updateNpcFromDraft(world.campaignId, row.id, older.draft).race, "high_elf", "an older app's save kept the race");
-  const cleared = normalizeNpcDraft({ name: "Maelis", role: "archer", gender: "Female", race: "" });
+  const cleared = normalizeNpcDraft({ name: "Maelis", role: "archer", sex: "Female", race: "" });
   assert.equal(updateNpcFromDraft(world.campaignId, row.id, cleared.draft).race, "", "a picked blank race clears it");
 });
 

@@ -34,7 +34,7 @@ import {
 import { outwardApproval } from "@/lib/dm/scheme-logic";
 import { publishRelationshipsUpdated } from "@/lib/dm/relationship-tools";
 import type { DmTurn } from "@/lib/db/dm-turns";
-import { TOLD_GENDER_HELP, TOLD_GENDERS, toldGender } from "@/lib/gender";
+import { TOLD_SEX_HELP, TOLD_SEXES, toldSex } from "@/lib/sex";
 import { TOLD_RACE_HELP, raceWords, storedRace, unreadRace } from "@/lib/npc-race";
 import { rollExpression } from "@/lib/dice";
 import { publishWithSeq } from "@/lib/events";
@@ -98,10 +98,10 @@ export const socialTools: ToolDef[] = [
             description: "A short note on their personality or bond, for your own recall.",
           },
           location: { type: "string", description: "Where they are usually found." },
-          gender: {
+          sex: {
             type: "string",
-            enum: [...TOLD_GENDERS],
-            description: `${TOLD_GENDER_HELP} Give it when you register someone new; omit it on later calls.`,
+            enum: [...TOLD_SEXES],
+            description: `${TOLD_SEX_HELP} Give it when you register someone new; omit it on later calls.`,
           },
           race: { type: "string", description: TOLD_RACE_HELP },
           drawnTo: {
@@ -144,9 +144,9 @@ export const socialTools: ToolDef[] = [
           },
           trait: { type: "string", description: "Short personality note." },
           location: { type: "string", description: "Where they are found." },
-          gender: { type: "string", enum: [...TOLD_GENDERS], description: TOLD_GENDER_HELP },
+          sex: { type: "string", enum: [...TOLD_SEXES], description: TOLD_SEX_HELP },
         },
-        required: ["name", "gender"],
+        required: ["name", "sex"],
       },
     },
   },
@@ -235,7 +235,7 @@ const setNpcSchema = z.object({
   attitude: z.enum(["hostile", "indifferent", "friendly"]).optional(),
   trait: fittedText(300).optional(),
   location: z.string().max(120).optional(),
-  gender: z.enum(TOLD_GENDERS).optional(),
+  sex: z.enum(TOLD_SEXES).optional(),
   race: z.string().max(40).optional(),
   drawnTo: z.array(z.string().max(40)).max(6).optional(),
   goal: fittedText(300).optional(),
@@ -249,10 +249,10 @@ export function handleSetNpc(campaign: Campaign, rawArguments: string): ToolResu
   } catch (error) {
     return badArguments("Invalid arguments: set_npc needs at least a name.", error, rawArguments);
   }
-  // gender is optional so an update need not restate it, which leaves a
+  // sex is optional so an update need not restate it, which leaves a
   // registration free to forget it: the result then asks, never refuses.
   const before = getNpcByName(campaign.id, args.name);
-  const untold = !args.gender && !before;
+  const untold = !args.sex && !before;
   // A race the SRD list does not have is left unrecorded and said so, never
   // refused: registering the NPC matters more than their face.
   const unknownRace = unreadRace(args.race);
@@ -264,7 +264,7 @@ export function handleSetNpc(campaign: Campaign, rawArguments: string): ToolResu
       attitude: args.attitude,
       trait: args.trait,
       location: args.location,
-      gender: toldGender(args.gender),
+      sex: toldSex(args.sex),
       race: storedRace(args.race),
       // Written once (upsertNpc): the first answer is who they are.
       attraction: attractionFromTold(args.drawnTo),
@@ -294,7 +294,7 @@ export function handleSetNpc(campaign: Campaign, rawArguments: string): ToolResu
     ...(npc.agency.goals.session ? { goal: npc.agency.goals.session.text } : {}),
     note: `${npc.name} is tracked as ${npc.attitude}. Their attitude persists until the story or a social_check changes it.${
       shifted ? ` The party has met them now, and how ${npc.name} feels about each character is tracked from here.` : ""
-    }${untold ? " Their gender is not recorded: pass gender on a set_npc for them (Unknown if the story has not shown it)." : ""}${
+    }${untold ? " Their sex is not recorded: pass sex on a set_npc for them (Unknown if the story has not shown it)." : ""}${
       unknownRace ? ` "${args.race}" is not a race the server knows, so none is recorded; give one of the SRD races (human, elf, dwarf, half-orc...) or omit it.` : ""
     }`,
   };
@@ -307,7 +307,7 @@ const reactionSchema = z.object({
   modifier: z.coerce.number().int().min(-10).max(10).optional(),
   trait: fittedText(300).optional(),
   location: z.string().max(120).optional(),
-  gender: z.enum(TOLD_GENDERS),
+  sex: z.enum(TOLD_SEXES),
 });
 
 export function handleNpcReaction(
@@ -319,7 +319,7 @@ export function handleNpcReaction(
   try {
     args = reactionSchema.parse(JSON.parse(rawArguments || "{}"));
   } catch (error) {
-    return badArguments("Invalid arguments: npc_reaction needs a name and a gender (Female, Male, Nonbinary or Unknown).", error, rawArguments);
+    return badArguments("Invalid arguments: npc_reaction needs a name and a sex (Female, Male or Unknown).", error, rawArguments);
   }
   // A reaction roll decides how a stranger takes the party, once. Someone
   // the party has dealt with keeps the attitude play gave them, and so does
@@ -331,7 +331,7 @@ export function handleNpcReaction(
   if (known && (known.metAt || known.attitude !== "indifferent")) {
     const met = meetNpc(
       campaign,
-      upsertNpc({ campaignId: campaign.id, name: args.name, trait: args.trait, location: args.location, gender: toldGender(args.gender) }),
+      upsertNpc({ campaignId: campaign.id, name: args.name, trait: args.trait, location: args.location, sex: toldSex(args.sex) }),
     );
     if (met.opened) {
       publishRelationshipsUpdated(campaign.id);
@@ -369,7 +369,7 @@ export function handleNpcReaction(
     attitude,
     trait: args.trait,
     location: args.location,
-    gender: toldGender(args.gender),
+    sex: toldSex(args.sex),
   });
   // The roll is the meeting, and every character's bond with them opens.
   const met = meetNpc(campaign, registered);
@@ -626,7 +626,7 @@ export function npcRosterForPrompt(campaignId: string, options: { romance?: bool
     witnessNote: renderWitnessNote(npc.name, facts),
     // The stat block they fight with (start_encounter takes their name).
     statBlock: npc.statBlock,
-    // Their gender and their people, and at a romance table who they are
+    // Their sex and their people, and at a romance table who they are
     // drawn to (issue 501), so romance follows who people are and the
     // narration does not call the elf whose face the board draws a human.
     // Blank says nothing.
@@ -638,7 +638,7 @@ function npcIdentity(npc: Npc, romance: boolean): string {
   const drawn = romance ? attractionWords(npc.attraction) : "";
   // Romance is exclusive unless someone is open to more (issue 642).
   const open = romance && openToMore(npc.attraction) ? "open to more than one partner" : "";
-  return [npc.gender, raceWords(npc.race), drawn ? `drawn to ${drawn}` : "", open].filter(Boolean).join(", ");
+  return [npc.sex, raceWords(npc.race), drawn ? `drawn to ${drawn}` : "", open].filter(Boolean).join(", ");
 }
 
 const ATTITUDE_LADDER = ["hostile", "indifferent", "friendly"] as const;

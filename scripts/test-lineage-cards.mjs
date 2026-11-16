@@ -202,10 +202,10 @@ test("a list with groups keeps its leading group whole; a single list folds by c
 
 // ---- the plates ----
 
-test("every bundled race resolves to its own family plate, in all three genders", () => {
+test("every bundled race resolves to its own family plate, in all three sexes", () => {
   for (const race of SRD_RACES) {
-    for (const gender of ["", "Male", "Female"]) {
-      const art = lineageArt(race.id, race.name, gender);
+    for (const sex of ["", "Male", "Female"]) {
+      const art = lineageArt(race.id, race.name, sex);
       assert.match(art, /\/character-race\//, race.id);
       assert.ok(exists(art), `${art} exists`);
     }
@@ -221,15 +221,16 @@ const PAINTED_2026_11_13 = [
   "fairy", "owlfolk", "centaur", "rabbitfolk", "shifter",
 ];
 
-test("the eleven lineages painted 2026-11-13 each draw their own plate in all three genders", () => {
+test("the eleven lineages painted 2026-11-13 each draw their own plate in all three sexes", () => {
   for (const id of PAINTED_2026_11_13) {
     assert.ok(SRD_RACES.some((race) => race.id === id), `${id} is a bundled race`);
     assert.equal(lineageFamily(id), id, id);
     const name = id[0].toUpperCase() + id.slice(1);
     assert.equal(lineageFamily("x", name), id, `by name ${name}`);
-    for (const [gender, look] of [["Male", "masculine"], ["Female", "feminine"], ["Nonbinary", "neutral"]]) {
-      const art = lineageArt(id, name, gender);
-      assert.equal(art, `/assets/placeholders/character-race/${id}-${look}.webp`, `${id}/${gender}`);
+    // "Nonbinary" degrades to the neutral plate (the value the choice held before it was dropped).
+      for (const [sex, look] of [["Male", "masculine"], ["Female", "feminine"], ["Nonbinary", "neutral"]]) {
+      const art = lineageArt(id, name, sex);
+      assert.equal(art, `/assets/placeholders/character-race/${id}-${look}.webp`, `${id}/${sex}`);
       assert.ok(exists(art), `${art} exists`);
     }
   }
@@ -290,8 +291,8 @@ test("every Tome of Heroes row has its own plate, by v1 slug and v2 key", () => 
   for (const [slug, family] of Object.entries(TOH)) {
     assert.equal(lineageFamily(slug), family, slug);
     assert.equal(lineageFamily(`toh_${slug}`), family, `toh_${slug}`);
-    for (const gender of ["", "Male", "Female"]) {
-      assert.ok(exists(lineageArt(`toh_${slug}`, "", gender)), `${slug}/${gender} exists`);
+    for (const sex of ["", "Male", "Female"]) {
+      assert.ok(exists(lineageArt(`toh_${slug}`, "", sex)), `${slug}/${sex} exists`);
     }
   }
   assert.equal(lineageFamily("toh_drow"), "drow");
@@ -337,10 +338,10 @@ test("every class card has a plate that exists, and a neutral look still shows t
   const ids = [...SRD_CLASSES.map((klass) => klass.id), ...CUSTOM_CLASSES.map((klass) => klass.id)];
   assert.ok(ids.length > 40);
   for (const id of ids) {
-    for (const gender of ["", "Male", "Female"]) {
-      const art = classArt(id, gender);
+    for (const sex of ["", "Male", "Female"]) {
+      const art = classArt(id, sex);
       assert.ok(exists(art), `${art} exists`);
-      assert.match(art, /\/character-class\//, `${id} (${gender || "neutral"}) shows its class`);
+      assert.match(art, /\/character-class\//, `${id} (${sex || "neutral"}) shows its class`);
     }
   }
   // A pack class nobody painted falls back to the adventurer, not a 404.

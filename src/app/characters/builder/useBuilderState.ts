@@ -1,8 +1,8 @@
 "use client";
 
-import { asiPickAmount } from "@/lib/srd/race-asi";
-import type { Gender } from "@/lib/gender";
+import type { Sex } from "@/lib/sex";
 import { normalizeAttraction, type Attraction } from "@/lib/attraction";
+import { asiPickAmount } from "@/lib/srd/race-asi";
 import { authoredFeatDesc } from "@/lib/srd/feat-effects";
 import { toolChoiceOf } from "@/lib/srd/tool-choices";
 import { EMPTY_PERSONA } from "@/lib/backgrounds/persona-logic";
@@ -128,7 +128,7 @@ export type BuilderDraftFields = {
   // Optional only for a state written before the field (a saved draft, a
   // test's double).
   persona?: Persona;
-  gender: Gender;
+  sex: Sex;
   attraction: Attraction;
   appearance: string;
   portrait: SheetAttachment | null;
@@ -349,8 +349,8 @@ export function useBuilderState({
   const [backstory, setBackstory] = useState(initial?.backstory ?? "");
   const [hopes, setHopes] = useState(initial?.hopes ?? "");
   const [persona, setPersona] = useState<Persona>(initial?.persona ?? EMPTY_PERSONA);
-  const [gender, setGender] = useState<Gender>(initial?.gender ?? "");
-  // Who they are drawn to (issue 501), kept through an edit like the gender.
+  const [sex, setSex] = useState<Sex>(initial?.sex ?? "");
+  // Who they are drawn to (issue 501), kept through an edit like the sex.
   const [attraction, setAttraction] = useState<Attraction>(() => normalizeAttraction(initial?.attraction));
   const [appearance, setAppearance] = useState(initial?.appearance ?? "");
   // An uploaded photo here means the creation routes skip the ComfyUI render
@@ -988,7 +988,7 @@ export function useBuilderState({
     backstory: setBackstory,
     hopes: setHopes,
     persona: (value) => setPersona(value ?? EMPTY_PERSONA),
-    gender: setGender,
+    sex: setSex,
     attraction: setAttraction,
     appearance: setAppearance,
     portrait: setPortrait,
@@ -1078,7 +1078,7 @@ export function useBuilderState({
     backstory,
     hopes,
     persona,
-    gender,
+    sex,
     attraction,
     appearance,
     portrait,
@@ -1164,7 +1164,7 @@ export function useBuilderState({
     backstory, setBackstory,
     hopes, setHopes,
     persona, setPersona,
-    gender, setGender,
+    sex, setSex,
     attraction, setAttraction,
     appearance, setAppearance,
     portrait, setPortrait,

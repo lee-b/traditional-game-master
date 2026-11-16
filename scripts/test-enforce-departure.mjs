@@ -49,14 +49,14 @@ const { storytellerLinesForPrompt } = await import("../src/lib/dm/scheme-tools.t
 async function table({ gameSettings = {}, axes = {}, heroes = 1, level = 1, companion = {} } = {}) {
   // Lasting companions at any size of table, as a lead may set it.
   const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings } });
-  const party = [world.addHero({ name: "Kael", gender: "Male", level })];
+  const party = [world.addHero({ name: "Kael", sex: "Male", level })];
   for (let index = 1; index < heroes; index += 1) {
     party.push(world.addHero({ name: `Hero ${index + 1}`, level }));
   }
   const added = await world.invoke("add_companion", {
     name: "Seren",
     class: "paladin",
-    gender: "Female",
+    sex: "Female",
     alignment: "LG",
     personality: "Stern and devout.",
     kind: "party",
@@ -184,7 +184,7 @@ await test("a companion who leaves and comes back keeps the lines from before sh
   const done = await atrocity();
   assert.equal(done.result.departed, "Walked out on the party");
   assert.equal(world.sheet(sheet.id), null, "her sheet left the party");
-  const back = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Home.", kind: "party" });
+  const back = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Home.", kind: "party" });
   assert.equal(back.ok, true, back.error);
   assert.equal(back.result.returned, true);
   const live = world.sheets().find((entry) => entry.name === "Seren");
@@ -478,7 +478,7 @@ await test("a companion whose standing has climbed back comes to parley, and rej
   assert.equal(departure().gone.cued, "parley");
   assert.equal(departure().gone.templateId, "", "no fight is prepared");
   assert.match(returnDirectorNotes(world.campaign()).join(" "), /seeks them out to talk, not to fight/);
-  const back = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Home.", kind: "party", level: 1 });
+  const back = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Home.", kind: "party", level: 1 });
   assert.equal(back.ok, true, back.error);
   assert.equal(back.result.returned, true);
   const now = world.sheets().find((entry) => entry.name === "Seren");
@@ -657,8 +657,8 @@ await test("nor does a lore check the lead runs on her hand the checker the plan
 await test("at a table a person runs, that person reads the plan on the Bonds tab", async () => {
   const world = await openWorld({ gameSettings: { dmMode: "human" } });
   const leadUser = world.addUser("lead");
-  const pc = world.addHero({ user: leadUser, name: "Kael", gender: "Male" });
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
+  const pc = world.addHero({ user: leadUser, name: "Kael", sex: "Male" });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const row = npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
   npcs.patchNpcAgency(row.id, { personality: { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 2 } });
@@ -847,9 +847,9 @@ await test("armour put on at a table a person runs moves the clock past an ultim
   const setup = async (gameSettings) => {
     const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings } });
     const player = world.addUser("player");
-    const pc = world.addHero({ user: player, name: "Kael", gender: "Male" });
+    const pc = world.addHero({ user: player, name: "Kael", sex: "Male" });
     world.patch(pc.id, { equipment: [{ name: "Chain Mail", qty: 1, equipped: false }] });
-    const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
+    const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
     assert.equal(added.ok, true, added.error);
     const row = npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
     npcs.patchNpcAgency(row.id, { personality: { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 0 } });
@@ -884,8 +884,8 @@ await test("armour put on at a table a person runs moves the clock past an ultim
 await test("at a table a person runs, moving the clock past an ultimatum settles the departure then and says so", async () => {
   const world = await openWorld({ gameSettings: { dmMode: "human", companions: "full" } });
   const player = world.addUser("player");
-  const pc = world.addHero({ user: player, name: "Kael", gender: "Male" });
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
+  const pc = world.addHero({ user: player, name: "Kael", sex: "Male" });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const row = npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
   npcs.patchNpcAgency(row.id, { personality: { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 0 } });

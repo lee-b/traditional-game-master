@@ -77,7 +77,7 @@ function PactOfferCard({
   const hintBase = useId();
   const from = proposal.from;
   const who = from?.name || "Someone";
-  const face = characterPlaceholder({ race: from?.look.race || "human", class: from?.look.class || "fighter", gender: from?.look.gender || "" });
+  const face = characterPlaceholder({ race: from?.look.race || "human", class: from?.look.class || "fighter", sex: from?.look.sex || "" });
   const characterName = character?.name ?? "a character";
   const choices = proposal.choices ?? [];
 

@@ -17,7 +17,7 @@ import type { Binding } from "@/lib/worldforge/model";
 import { normalizeStock } from "@/lib/db/shops";
 import { clampMarkup } from "@/lib/dm/shop-logic";
 import { storedSheetSchema } from "@/lib/schemas/sheet";
-import { storedGender } from "@/lib/gender";
+import { storedSex } from "@/lib/sex";
 import { storedRace } from "@/lib/npc-race";
 import { normalizeAttraction } from "@/lib/attraction";
 import { parseKnownBefore } from "@/lib/dm/known-before-logic";
@@ -149,7 +149,7 @@ export const BUNDLE_COLUMNS: Record<string, { carried: string[]; left: Record<st
     left: { ...IDENTITY, visited: "play", is_current: "play", map_image_json: "a legacy column nothing reads" },
   },
   npcs: {
-    carried: ["name", "attitude", "trait", "location", "role", "gender", "race", "attraction_json", "aliases_json", "personality_json", "goals_json", "relations_json", "portrait_url", "voice_json", "faction_id", "stat_block", "known_before_json"],
+    carried: ["name", "attitude", "trait", "location", "role", "sex", "race", "attraction_json", "aliases_json", "personality_json", "goals_json", "relations_json", "portrait_url", "voice_json", "faction_id", "stat_block", "known_before_json"],
     left: {
       ...IDENTITY,
       last_shift_turn: "the source table's clock",
@@ -396,7 +396,7 @@ export function exportWorkshopBundle(
       trait: str(row.trait),
       location: str(row.location),
       role: str(row.role),
-      gender: storedGender(row.gender),
+      sex: storedSex(row.sex),
       race: storedRace(row.race),
       attraction: normalizeAttraction(str(row.attraction_json)),
       aliases: parseJson<string[]>(str(row.aliases_json, "[]"), []),

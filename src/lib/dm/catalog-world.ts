@@ -10,7 +10,7 @@ import { MEAL_FIELD, type CatalogEntry } from "@/lib/dm/catalog-types";
 import { cueOptions, sceneOptions } from "@/lib/ambience/catalog";
 import { RELATIONSHIP_BEAT_NAMES } from "@/lib/dm/relationship-logic";
 import { NOTE_LIMIT_WORDS } from "@/lib/dm/relationship-note";
-import { TOLD_GENDERS } from "@/lib/gender";
+import { TOLD_SEXES } from "@/lib/sex";
 import { NPC_RACE_OPTIONS } from "@/lib/npc-race";
 import {
   ABILITY_OPTIONS as ABILITIES,
@@ -60,11 +60,11 @@ const SCENE_FIELD = {
   help: "Sets the place's sound, battle map, picture and light. Blank keeps what it was.",
 } as const;
 
-export const GENDER_FIELD = {
-  name: "gender",
-  label: "Gender",
+export const SEX_FIELD = {
+  name: "sex",
+  label: "Sex",
   kind: "select",
-  options: TOLD_GENDERS.map((gender) => ({ value: gender, label: gender })),
+  options: TOLD_SEXES.map((sex) => ({ value: sex, label: sex })),
 } as const;
 
 // Which race's face an NPC or a foe draws (src/lib/npc-race.ts).
@@ -82,7 +82,7 @@ export const DRAWN_TO_FIELD = {
   name: "drawnTo",
   label: "Drawn to",
   kind: "list",
-  placeholder: "women, men, nonbinary people, open relationships",
+  placeholder: "women, men, open relationships",
   help: "Who they could fall for, once the story shows it. Set once and kept. Add open relationships if they keep more than one partner; that can be added later.",
 } as const;
 
@@ -438,7 +438,7 @@ export const SOCIAL_ADJUDICATIONS: CatalogEntry[] = [
       },
       { name: "trait", label: "Trait", kind: "text" },
       { name: "location", label: "Found at", kind: "text" },
-      GENDER_FIELD,
+      SEX_FIELD,
       RACE_FIELD,
       DRAWN_TO_FIELD,
       { name: "goal", label: "Wants", kind: "text" },
@@ -455,7 +455,7 @@ export const SOCIAL_ADJUDICATIONS: CatalogEntry[] = [
       { name: "modifier", label: "Modifier", kind: "number", min: -10, max: 10 },
       { name: "trait", label: "Trait", kind: "text" },
       { name: "location", label: "Found at", kind: "text" },
-      { ...GENDER_FIELD, required: true },
+      { ...SEX_FIELD, required: true },
     ],
   },
   {

@@ -22,7 +22,7 @@ const hero = world.addHero({
 
 async function recruit(name, kind) {
   const joined = await world.invoke("add_companion", {
-    gender: "Male", name, class: "fighter", race: "human", level: 3, personality: "Steady.", kind,
+    sex: "Male", name, class: "fighter", race: "human", level: 3, personality: "Steady.", kind,
   });
   assert.equal(joined.ok, true, joined.error);
   const id = joined.result.characterId;

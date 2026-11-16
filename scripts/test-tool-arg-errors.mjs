@@ -62,7 +62,7 @@ await test("A descriptive line past its length is fitted at a word, and the call
   assert.equal(fittedText(200).parse("  short reason  "), "short reason");
   assert.throws(() => fittedLine(200).parse("   "));
   assert.throws(() => fittedText(200).parse(text(4001)));
-  const npc = await world.invoke("set_npc", { name: "Orla", gender: "Female", trait: words(80), goal: words(80), ambition: words(80) });
+  const npc = await world.invoke("set_npc", { name: "Orla", sex: "Female", trait: words(80), goal: words(80), ambition: words(80) });
   assert.equal(npc.error, undefined, npc.error);
 });
 

@@ -200,10 +200,10 @@ const RECIPES = {
     { variant: "short", stage: "calm", before: (c) => c.world.patch(c.hero.id, { currentHp: 10 }), args: (c) => ({ kind: "short", spend: [{ characterId: c.hero.id, dice: 1 }] }), dice: [5] },
     { variant: "long", stage: "calm", before: (c) => c.world.patch(c.hero.id, { currentHp: 10 }), args: () => ({ kind: "long" }) },
   ],
-  add_companion: one("calm", () => ({ name: "Dorn", class: "fighter", race: "human", gender: "male", level: 3, kind: "party", personality: "Gruff and loyal." })),
+  add_companion: one("calm", () => ({ name: "Dorn", class: "fighter", race: "human", sex: "male", level: 3, kind: "party", personality: "Gruff and loyal." })),
   dismiss_companion: one("calm", (c) => ({ characterId: c.companionId, reason: "paid off" }), {
     before: async (c) => {
-      const out = await must(c, "add_companion", { name: "Dorn", class: "fighter", race: "human", gender: "male", level: 3, kind: "party", personality: "Gruff and loyal." });
+      const out = await must(c, "add_companion", { name: "Dorn", class: "fighter", race: "human", sex: "male", level: 3, kind: "party", personality: "Gruff and loyal." });
       c.companionId = out.result?.characterId ?? out.result?.id ?? c.world.sheets().find((sheet) => sheet.name === "Dorn")?.id;
     },
   }),
@@ -226,24 +226,24 @@ const RECIPES = {
   damage_object: one("calm", (c) => ({ name: "Oak door", material: "wood", size: "medium", characterId: c.hero.id, weapon: "Longsword" }), { dice: [15, 5] }),
   group_check: one("calm", (c) => ({ skill: "stealth", difficulty: "moderate", characterIds: [c.hero.id, c.mage.id] }), { dice: [12, 12] }),
   check_notice: one("calm", (c) => ({ difficulty: "moderate", characterIds: [c.hero.id, c.mage.id] })),
-  set_npc: one("calm", () => ({ name: "Old Marta", attitude: "friendly", trait: "hums while she works", gender: "female" })),
-  npc_reaction: one("calm", () => ({ name: "Gate Sergeant", gender: "male" }), { dice: [4, 4] }),
+  set_npc: one("calm", () => ({ name: "Old Marta", attitude: "friendly", trait: "hums while she works", sex: "female" })),
+  npc_reaction: one("calm", () => ({ name: "Gate Sergeant", sex: "male" }), { dice: [4, 4] }),
   social_check: one("calm", (c) => ({ characterId: c.hero.id, npc: "Old Marta", approach: "persuade" }), {
-    before: (c) => must(c, "set_npc", { name: "Old Marta", attitude: "indifferent", trait: "hums while she works", gender: "female" }),
+    before: (c) => must(c, "set_npc", { name: "Old Marta", attitude: "indifferent", trait: "hums while she works", sex: "female" }),
     dice: [15],
   }),
   relationship_beat: one("calm", (c) => ({ characterId: c.hero.id, subject: "Old Marta", beat: "helped", note: "Carried her water." }), {
-    before: (c) => must(c, "set_npc", { name: "Old Marta", attitude: "indifferent", trait: "hums while she works", gender: "female" }),
+    before: (c) => must(c, "set_npc", { name: "Old Marta", attitude: "indifferent", trait: "hums while she works", sex: "female" }),
   }),
   // Refused on purpose ("They barely know them"): the property is that the
   // refusal left nothing (LC-REV-10), so a refusal here is the row walked.
   romance_advance: one("calm", (c) => ({ characterId: c.hero.id, subject: "Old Marta", to: "interested" }), {
-    before: (c) => must(c, "set_npc", { name: "Old Marta", attitude: "friendly", trait: "hums while she works", gender: "female" }),
+    before: (c) => must(c, "set_npc", { name: "Old Marta", attitude: "friendly", trait: "hums while she works", sex: "female" }),
     refuses: true,
   }),
   relationship_end: one("calm", (c) => ({ characterId: c.hero.id, subject: "Old Marta", reason: "parting" }), {
     before: async (c) => {
-      await must(c, "set_npc", { name: "Old Marta", attitude: "friendly", trait: "hums while she works", gender: "female" });
+      await must(c, "set_npc", { name: "Old Marta", attitude: "friendly", trait: "hums while she works", sex: "female" });
       await must(c, "relationship_beat", { characterId: c.hero.id, subject: "Old Marta", beat: "helped", note: "Carried her water." });
     },
   }),

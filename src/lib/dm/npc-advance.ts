@@ -72,7 +72,7 @@ export function suitorContext(campaignId: string): SuitorContext {
 export function suitorFrom(
   context: SuitorContext,
   relationship: Relationship,
-  who: Pick<Suitor, "kind" | "name" | "gender" | "attraction" | "warmth" | "present"> & { companionKind?: Suitor["companionKind"] },
+  who: Pick<Suitor, "kind" | "name" | "sex" | "attraction" | "warmth" | "present"> & { companionKind?: Suitor["companionKind"] },
 ): Suitor {
   const key = textKey(who.name);
   const others = context.relationships.filter((entry) => textKey(entry.subjectName) === key && entry.id !== relationship.id);
@@ -101,7 +101,7 @@ export function suitorFrom(
 export function targetFrom(context: SuitorContext, sheet: CharacterSheet, except?: Relationship): AdvanceTarget {
   return {
     name: sheet.name,
-    gender: sheet.gender,
+    sex: sheet.sex,
     attraction: sheet.attraction ?? null,
     open: Boolean(sheet.openToAdvances),
     isCompanion: sheet.isCompanion,
@@ -122,24 +122,24 @@ export function suitorIdentity(campaign: Campaign, subject: Subject, sheets: rea
     return {
       kind: "companion" as const,
       name: companion.name,
-      gender: companion.gender,
+      sex: companion.sex,
       attraction: companionAttraction(companion, row),
       warmth: row?.agency.personality?.warmth ?? 0,
       companionKind: companion.companionKind,
       portraitUrl: companion.portrait?.url ?? "",
-      look: { gender: String(companion.gender ?? ""), race: companion.race, class: companion.class } as Record<string, string>,
+      look: { sex: String(companion.sex ?? ""), race: companion.race, class: companion.class } as Record<string, string>,
     };
   }
   const npc: Npc | null = subject.npc ?? getNpcByName(campaign.id, subject.name);
   return {
     kind: subject.kind,
     name: subject.name,
-    gender: npc?.gender ?? "",
+    sex: npc?.sex ?? "",
     attraction: npc?.attraction ?? null,
     warmth: subject.personality?.warmth ?? 0,
     companionKind: null,
     portraitUrl: npc?.portraitUrl ?? "",
-    look: { gender: String(npc?.gender ?? ""), role: npc?.role ?? "", race: npc?.race ?? "" } as Record<string, string>,
+    look: { sex: String(npc?.sex ?? ""), role: npc?.role ?? "", race: npc?.race ?? "" } as Record<string, string>,
   };
 }
 

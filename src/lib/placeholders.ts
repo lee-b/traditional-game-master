@@ -27,16 +27,16 @@ function hash(value: string): number {
 }
 
 
-// ---- gender ----
+// ---- sex ----
 
-// The sheet's gender is one of the builder's choices (src/lib/gender.ts),
+// The sheet's sex is one of the builder's choices (src/lib/sex.ts),
 // compared as written rather than read as words, so it means the same at
 // every table. "neutral" is a real answer rather than a failure: it is what
-// an unspecified gender and a nonbinary one both correctly land on.
-export type PlaceholderGender = "masculine" | "feminine" | "neutral";
+// an unspecified sex, and a value the choice once held, land on.
+export type PlaceholderSex = "masculine" | "feminine" | "neutral";
 
-export function normalizeGender(gender: string | null | undefined): PlaceholderGender {
-  return gender === "Male" ? "masculine" : gender === "Female" ? "feminine" : "neutral";
+export function normalizeSex(sex: string | null | undefined): PlaceholderSex {
+  return sex === "Male" ? "masculine" : sex === "Female" ? "feminine" : "neutral";
 }
 
 // ---- races ----
@@ -203,7 +203,7 @@ export function raceFamily(raceId: string | null | undefined): string | null {
 // ---- classes ----
 
 // The SRD twelve plus the artificer and the six-per-genre original classes
-// are all painted in three genders, so a neutral character in a genre class
+// are all painted in three sexes, so a neutral character in a genre class
 // draws its own neutral plate rather than falling through to the genre lead.
 const SRD_CLASS_IDS = new Set([
   "artificer",
@@ -221,7 +221,7 @@ const SRD_CLASS_IDS = new Set([
   "wizard",
 ]);
 
-// Three-gender plates like the genre classes': the content pack's classes from
+// Three-sex plates like the genre classes': the content pack's classes from
 // other books (Level Up's Marshal, Black Flag's Mechanist), painted so their
 // cards no longer fall to the hooded stranger (issue #116).
 const GENRE_CLASS_IDS = new Set([
@@ -234,13 +234,13 @@ const GENRE_CLASS_IDS = new Set([
   "witch_hunter", "plague_doctor", "grave_knight", "penitent", "dirgesinger", "vermin_lord",
 ]);
 
-function classPlate(classId: string, gender: PlaceholderGender): string | null {
+function classPlate(classId: string, sex: PlaceholderSex): string | null {
   const id = String(classId ?? "").trim().toLowerCase().replace(/[\s-]/g, "_");
   if (SRD_CLASS_IDS.has(id)) {
-    return `${id}-${gender}`;
+    return `${id}-${sex}`;
   }
   if (GENRE_CLASS_IDS.has(id)) {
-    return `${id}-${gender}`;
+    return `${id}-${sex}`;
   }
   return null;
 }
@@ -262,7 +262,7 @@ const GENRE_LEADS = new Set(["mystery", "horror", "cyberpunk", "post-apocalyptic
 
 // ---- the resolvers ----
 
-// `gender` is here because the creation payload has it (createSheetSchema)
+// `sex` is here because the creation payload has it (createSheetSchema)
 // and the portrait prompt uses it, but a saved CharacterSheet does not carry
 // it and no table stores it - so in practice every sheet resolves neutral
 // today. Persisting it is what would make the masculine and feminine plates
@@ -270,7 +270,7 @@ const GENRE_LEADS = new Set(["mystery", "horror", "cyberpunk", "post-apocalyptic
 export type CharacterLook = {
   race?: string | null;
   class?: string | null;
-  gender?: string | null;
+  sex?: string | null;
   genre?: string | null;
 };
 
@@ -302,10 +302,10 @@ export function raceShowsOwnFace(raceId: string | null | undefined): boolean {
 // (OWN_FACE_FAMILIES) is the exception: a minotaur reads as a minotaur at any
 // size, and as a human in the class plate.
 export function characterPlaceholder(look: CharacterLook): string {
-  const gender = normalizeGender(look.gender);
+  const sex = normalizeSex(look.sex);
   const family = raceFamily(look.race);
 
-  const byClass = look.class && !raceShowsOwnFace(look.race) ? classPlate(look.class, gender) : null;
+  const byClass = look.class && !raceShowsOwnFace(look.race) ? classPlate(look.class, sex) : null;
   if (byClass) {
     return `${BASE}/character-class/${byClass}.webp`;
   }
@@ -315,17 +315,17 @@ export function characterPlaceholder(look: CharacterLook): string {
   // and a fantasy half-orc is the wrong picture for that; it has a lead of
   // its own.
   if (family === "half-orc" && slug === "post-apocalyptic") {
-    return `${BASE}/character-genre/post-apocalyptic-mutant-${gender}.webp`;
+    return `${BASE}/character-genre/post-apocalyptic-mutant-${sex}.webp`;
   }
   if (family) {
-    return `${BASE}/character-race/${family}-${gender}.webp`;
+    return `${BASE}/character-race/${family}-${sex}.webp`;
   }
 
   if (GENRE_LEADS.has(slug)) {
-    return `${BASE}/character-genre/${slug}-${gender}.webp`;
+    return `${BASE}/character-genre/${slug}-${sex}.webp`;
   }
 
-  return `${BASE}/character/${gender}.webp`;
+  return `${BASE}/character/${sex}.webp`;
 }
 
 // ---- NPC roles ----
@@ -429,7 +429,7 @@ export function npcPlaceholder(
   }
   const family = raceFamily(recordedRace(look.race));
   if (family) {
-    return `${BASE}/character-race/${family}-${normalizePresentation(look.presentation, look.gender)}.webp`;
+    return `${BASE}/character-race/${family}-${normalizePresentation(look.presentation, look.sex)}.webp`;
   }
   if (seed) {
     return `${BASE}/npc/${GENERIC_NPC_ROLES[hash(seed) % GENERIC_NPC_ROLES.length].id}.webp`;
@@ -477,34 +477,34 @@ function raceKey(race: string | null | undefined): string {
 }
 
 // A race the table actually recorded. Blank and "unknown" (the AI DM's word
-// for unspecified, as with gender) mean none.
+// for unspecified, as with sex) mean none.
 function recordedRace(race: string | null | undefined): string | null {
   const key = raceKey(race);
   return key && key !== "unknown" ? key : null;
 }
 
-// How someone looks, which is not always their gender: an explicit
+// How someone looks, which is not always their sex: an explicit
 // presentation wins, else the same mapping the character plates use
-// (normalizeGender), so Male draws masculine, Female feminine, anything else
+// (normalizeSex), so Male draws masculine, Female feminine, anything else
 // neutral.
 export function normalizePresentation(
   presentation: string | null | undefined,
-  gender?: string | null,
-): PlaceholderGender {
+  sex?: string | null,
+): PlaceholderSex {
   const value = String(presentation ?? "").trim().toLowerCase();
   if (value === "masculine" || value === "feminine" || value === "neutral") {
     return value;
   }
-  return normalizeGender(gender);
+  return normalizeSex(sex);
 }
 
 export type EnemyNpcLook = {
   // The NPC's recorded race, never one guessed from a name.
   race?: string | null;
-  // masculine / feminine / neutral, when recorded apart from gender.
+  // masculine / feminine / neutral, when recorded apart from sex.
   presentation?: string | null;
-  // The sheet's gender (src/lib/gender.ts), used when presentation is blank.
-  gender?: string | null;
+  // The sheet's sex (src/lib/sex.ts), used when presentation is blank.
+  sex?: string | null;
 };
 
 // The plate for an enemy NPC role, given what is recorded about who they are.
@@ -524,7 +524,7 @@ export function enemyNpcPlaceholder(
   }
   const race = recordedRace(look.race);
   if (race) {
-    const presentation = normalizePresentation(look.presentation, look.gender);
+    const presentation = normalizePresentation(look.presentation, look.sex);
     const column = ENEMY_NPC_RACE[race];
     if (column && ENEMY_NPC_VARIANT_ROLE_SET.has(id)) {
       return `${BASE}/enemy-npc/${id}-${column}-${presentation}.webp`;

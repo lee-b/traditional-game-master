@@ -170,7 +170,7 @@ await test("the DM's correction moves a level by one, and cannot set experience 
 
 async function recruit(table, classId) {
   const joined = await table.invoke("add_companion", {
-    gender: "Unknown",
+    sex: "Unknown",
     name: `The ${classId}`,
     class: classId,
     race: "human",

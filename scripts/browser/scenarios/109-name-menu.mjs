@@ -148,7 +148,7 @@ const scenario = {
     await narrate.fill("");
     await t.tap(narrate);
     const rolled = await api.post(`${base}/api/campaigns/${ids.nameTables[`${viewport}Gm`]}/dm/invoke`, {
-      data: { name: "npc_reaction", args: { name: "Iarno Albrek", gender: "Male" } },
+      data: { name: "npc_reaction", args: { name: "Iarno Albrek", sex: "Male" } },
     });
     check(rolled.ok(), `the GM's reaction roll for Iarno ran (${rolled.status()})`);
     await narrate.pressSequentially("@ia");

@@ -77,17 +77,17 @@ export function parseRoster(value: unknown): TemplateEnemy[] {
 // parseRoster: a saved roster names monsters, and an enemyId goes stale.
 //
 // A foe's look rides the same way, so the console fields the elf bandit the
-// AI GM can ("bandit race elf gender female x4", "race wood elf"). Never at
+// AI GM can ("bandit race elf sex female x4", "race wood elf"). Never at
 // the start of the line, which is the monster's own name, and only a race
 // `readsRace` reads (the caller passes src/lib/npc-race.ts, which this
 // module cannot import): a homebrew "Serpent Race Warrior" keeps its whole
 // name instead of fielding a "Serpent" told to be of the race "Warrior".
-export type FightRequest = TemplateEnemy & { cr?: number; name?: string; returning?: string; race?: string; gender?: string };
+export type FightRequest = TemplateEnemy & { cr?: number; name?: string; returning?: string; race?: string; sex?: string };
 
 const CR_IN_LINE = /(?:^|\s|,|\()cr\s*[:=]?\s*(\d{1,2}\s*\/\s*\d{1,2}|\d{1,2}(?:\.\d+)?)\)?/i;
 const NAMED_AS = /^(.+?)\s+as\s+(.+)$/i;
 const RACE_IN_LINE = /(?:\s|,)race\s*[:=]?\s*([a-z][\w'-]*)(\s+[a-z][\w'-]*)?/i;
-const GENDER_IN_LINE = /(?:\s|,)gender\s*[:=]?\s*(female|male|nonbinary)\b/i;
+const SEX_IN_LINE = /(?:\s|,)sex\s*[:=]?\s*(female|male)\b/i;
 
 // The text without the part `found` matched, tidied the way the cr strip is.
 function without(text: string, found: RegExpExecArray): string {
@@ -134,11 +134,11 @@ function fightLine(row: TemplateEnemy, readsRace: RaceReader): FightRequest {
     race = raced.race;
     monster = raced.rest;
   }
-  let gender = "";
-  const gendered = GENDER_IN_LINE.exec(monster);
-  if (gendered) {
-    gender = gendered[1];
-    monster = without(monster, gendered);
+  let sex = "";
+  const sexed = SEX_IN_LINE.exec(monster);
+  if (sexed) {
+    sex = sexed[1];
+    monster = without(monster, sexed);
   }
   const named = NAMED_AS.exec(monster);
   const out: FightRequest = { monster: named ? named[1].trim() : monster, count: row.count };
@@ -151,8 +151,8 @@ function fightLine(row: TemplateEnemy, readsRace: RaceReader): FightRequest {
   if (race) {
     out.race = race;
   }
-  if (gender) {
-    out.gender = gender;
+  if (sex) {
+    out.sex = sex;
   }
   return out;
 }
@@ -181,8 +181,8 @@ export function parseFightRoster(value: unknown, readsRace: RaceReader = () => f
         if (typeof row.race === "string" && row.race.trim()) {
           out.race = row.race.trim();
         }
-        if (typeof row.gender === "string" && row.gender.trim()) {
-          out.gender = row.gender.trim();
+        if (typeof row.sex === "string" && row.sex.trim()) {
+          out.sex = row.sex.trim();
         }
         return [out];
       })

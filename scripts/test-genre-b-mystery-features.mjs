@@ -484,7 +484,7 @@ function spellSave(enemy, face) {
   clearDice();
   return out;
 }
-const person = async (name) => rig.must(await world.invoke("set_npc", { name, attitude: "indifferent", gender: "Female" }), "set_npc");
+const person = async (name) => rig.must(await world.invoke("set_npc", { name, attitude: "indifferent", sex: "Female" }), "set_npc");
 async function sway(hero, npc, approach, face = 11) {
   clearDice();
   diceLog();

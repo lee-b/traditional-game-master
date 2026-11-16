@@ -4,7 +4,7 @@
 
 import { sceneIds } from "@/lib/ambience/catalog";
 import { BUILDING_SIDES, MAX_OPENINGS } from "@/lib/battlemap/building";
-import { GENDERS } from "@/lib/gender";
+import { TOLD_SEXES } from "@/lib/sex";
 import { ENCOUNTER_OUTCOMES } from "@/lib/dm/encounter-logic";
 import { waypointProperty } from "@/lib/dm/waypoint-logic";
 import { ADVANTAGE_SOURCES } from "@/lib/dm/pc-attack-options";
@@ -47,7 +47,7 @@ export const startEncounterTool: ToolDef = {
               },
               returning: { type: "string", description: "An earlier fight's enemyId." },
               race: { type: "string", description: "A humanoid's people (elf, dwarf...), for their face." },
-              gender: { type: "string", enum: [...GENDERS] },
+              sex: { type: "string", enum: [...TOLD_SEXES] },
             },
             required: ["monster"],
           },

@@ -54,7 +54,7 @@ type LibraryCharacter = {
   updatedAt: string;
   portraitStatus?: "queued" | "generating" | "failed" | null;
   campaigns?: CharacterAssignment[];
-  sheet?: { portrait?: { url: string } | null; gender?: string; classes?: Array<{ id: string; level: number }> };
+  sheet?: { portrait?: { url: string } | null; sex?: string; classes?: Array<{ id: string; level: number }> };
 };
 
 function portraitPending(character: LibraryCharacter) {

@@ -22,7 +22,7 @@ const scenario = {
       check(response.ok() && body.ok !== false, `${tool} ran (${response.status()}): ${JSON.stringify(body).slice(0, 200)}`);
       return body;
     };
-    await call("add_companion", { name, class: "rogue", race: "human", gender: "Female", personality: "Quiet, watchful, counts the exits.", kind: "guest", level: 1 });
+    await call("add_companion", { name, class: "rogue", race: "human", sex: "Female", personality: "Quiet, watchful, counts the exits.", kind: "guest", level: 1 });
     const table = await (await api.get(`${base}/api/campaigns/${tableId}`)).json();
     const wren = (table.sheets ?? []).find((sheet) => sheet.name === name);
     check(Boolean(wren?.background), `${name} has a background (${wren?.background})`);

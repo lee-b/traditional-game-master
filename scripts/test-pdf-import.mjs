@@ -45,7 +45,7 @@ const server = http.createServer((req, res) => {
     const user = String(body.messages?.at(-1)?.content ?? "");
     const found = {
       npcs: [
-        { name: "Mother Reed", role: "hag of the mill", gender: "female", attitude: "hostile", description: "A gaunt woman in a cloak of river weed.", goals: "To ring the bell and call back the drowned.", secret: "She drowned the lower village herself.", location: "2. Grinding Room", statBlock: "Bog Hag" },
+        { name: "Mother Reed", role: "hag of the mill", sex: "female", attitude: "hostile", description: "A gaunt woman in a cloak of river weed.", goals: "To ring the bell and call back the drowned.", secret: "She drowned the lower village herself.", location: "2. Grinding Room", statBlock: "Bog Hag" },
         { name: "a guard", role: "nobody" },
       ],
       places: [{ name: "Marrowford", description: "A village half under the river.", connections: ["The Sunken Mill"] }, { name: "Cellar", description: "The bell hangs here." }],
@@ -239,9 +239,9 @@ await test("The draft becomes a bundle the bundle import's own schema takes, lin
 });
 
 await test("A model's answer is coerced: an unnamed person, an item with no words and a link to oneself are dropped; a known room is merged, not doubled.", () => {
-  const found = readChunkReply('Sure!\n```json\n{"npcs":[{"name":"a guard"},{"name":"Mother Reed","gender":"witch","attitude":"furious"}],"items":[{"name":"x"}],"links":[{"from":"A","to":"a","label":"self"}],"places":[{"name":"Cellar","description":"Wet."}]}\n```');
+  const found = readChunkReply('Sure!\n```json\n{"npcs":[{"name":"a guard"},{"name":"Mother Reed","sex":"witch","attitude":"furious"}],"items":[{"name":"x"}],"links":[{"from":"A","to":"a","label":"self"}],"places":[{"name":"Cellar","description":"Wet."}]}\n```');
   assert.deepEqual(found.npcs.map((npc) => npc.name), ["Mother Reed"]);
-  assert.equal(found.npcs[0].gender, "");
+  assert.equal(found.npcs[0].sex, "");
   assert.equal(found.npcs[0].attitude, "indifferent");
   assert.equal(found.items.length, 0);
   assert.equal(found.links.length, 0);

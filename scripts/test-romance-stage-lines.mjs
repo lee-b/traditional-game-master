@@ -26,8 +26,8 @@ const NEUTRAL = { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, co
 // Vex and an NPC at a rung and a meter, with no personality to bend a beat.
 async function pair({ gameSettings = {}, name = "Ivo", romance = "courting", approval = 60, attitude = "friendly" } = {}) {
   const world = await openWorld({ gameSettings });
-  const hero = world.addHero({ name: "Vex", gender: "Female" });
-  const set = await world.invoke("set_npc", { name, gender: "Male", attitude });
+  const hero = world.addHero({ name: "Vex", sex: "Female" });
+  const set = await world.invoke("set_npc", { name, sex: "Male", attitude });
   assert.equal(set.ok, true, set.error);
   npcs.patchNpcAgency(npcs.getNpcByName(world.campaignId, name).id, { personality: NEUTRAL });
   const row = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: hero.id, characterName: hero.name, subjectKind: "npc", subjectName: name });

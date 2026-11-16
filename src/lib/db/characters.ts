@@ -10,7 +10,7 @@ import { XP_THRESHOLDS, levelForXp } from "@/lib/srd";
 import { subclassExtrasFor } from "@/lib/db/subclass-extras";
 import { populateFeaturesForClasses } from "@/lib/srd/features";
 import { normalizeSpellcasting } from "@/lib/srd/spell-lists";
-import { storedGender } from "@/lib/gender";
+import { storedSex } from "@/lib/sex";
 import { repairedWeight } from "@/lib/content/item-weights";
 import { dedupeName } from "@/lib/workshop/import";
 import { normalizeCampaignKind, type CampaignKind } from "@/lib/workshop/kind";
@@ -98,8 +98,8 @@ function withKeyedFeatChoices(sheet: CreateSheetInput): CreateSheetInput {
   return sheet.featChoices ? { ...sheet, featChoices: keyedFeatChoices(sheet.featChoices) } : sheet;
 }
 
-function withStoredGender(sheet: CreateSheetInput): CreateSheetInput {
-  return { ...sheet, gender: storedGender(sheet.gender) };
+function withStoredSex(sheet: CreateSheetInput): CreateSheetInput {
+  return { ...sheet, sex: storedSex(sheet.sex) };
 }
 
 // A weight the builder or a table copied from a pack built before issue
@@ -134,7 +134,7 @@ function mapCharacter(row: LibraryRow): LibraryCharacter {
     background: row.background,
     level: row.level,
     xp: row.xp,
-    sheet: withRepairedWeights(withKeyedFeatChoices(withStoredGender(withSplitCantrips(parseJson(row.sheet_json, {} as CreateSheetInput))))),
+    sheet: withRepairedWeights(withKeyedFeatChoices(withStoredSex(withSplitCantrips(parseJson(row.sheet_json, {} as CreateSheetInput))))),
     workshopId: row.workshop_id ?? "",
     offered: Boolean(row.workshop_id) && row.offered_to_table === 1,
     pregenOriginId: row.pregen_origin_id ?? "",

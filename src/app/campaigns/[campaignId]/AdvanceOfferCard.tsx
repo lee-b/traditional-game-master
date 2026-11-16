@@ -101,10 +101,10 @@ function AdvanceOfferCard({
   const suitor = proposal.advance?.suitor || "Someone";
   const look = proposal.advance?.look;
   // A companion's look carries a class and draws as the character they are;
-  // an NPC's carries a role, and their race and gender pick its plate.
+  // an NPC's carries a role, and their race and sex pick its plate.
   const face = look?.class
-    ? characterPlaceholder({ race: look.race, class: look.class, gender: look.gender })
-    : npcPlaceholder(look?.role, suitor, { race: look?.race, gender: look?.gender });
+    ? characterPlaceholder({ race: look.race, class: look.class, sex: look.sex })
+    : npcPlaceholder(look?.role, suitor, { race: look?.race, sex: look?.sex });
   const characterName = character?.name ?? "a character";
 
   async function answer(action: "approve" | "decline" | "cancel") {

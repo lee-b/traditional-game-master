@@ -136,7 +136,7 @@ await test("A new character's fighting style is held to its class's list: a pala
   const backgrounds = options.srdBackgroundOptions();
   const problems = (cls, style) => {
     const sheet = {
-      name: "Brakka", race: "human", class: cls, subclass: "", background: "soldier", alignment: "N", gender: "", appearance: "",
+      name: "Brakka", race: "human", class: cls, subclass: "", background: "soldier", alignment: "N", sex: "", appearance: "",
       abilities: { str: 16, dex: 15, con: 14, int: 13, wis: 11, cha: 9 }, maxHp: 1, ac: 16, acOverride: false, speed: 30,
       hitDice: { die: "d10", total: 2, spent: 0 }, classes: [], hitDicePools: null,
       proficiencies: { saves: [], skills: [], expertise: [], languages: ["Common"], tools: [], armor: [], weapons: [] },

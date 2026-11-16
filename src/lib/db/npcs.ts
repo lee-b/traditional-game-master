@@ -6,7 +6,7 @@ import { matchEntity, mergeAliases, normalizeName, type EntityMatch } from "@/li
 import { namesHeard } from "@/lib/dm/cast-logic";
 import { normalizeNpcVoice, type NpcDraft, type NpcVoice } from "@/lib/npcs/forge";
 import { isUploadedImagePath } from "@/lib/uploads";
-import { storedGender, type Gender } from "@/lib/gender";
+import { storedSex, type Sex } from "@/lib/sex";
 import { storedRace } from "@/lib/npc-race";
 import { attractionJson, keptAttraction, normalizeAttraction, type Attraction } from "@/lib/attraction";
 import { knownBeforeColumn, parseKnownBefore, type KnownBefore } from "@/lib/dm/known-before-logic";
@@ -79,10 +79,10 @@ export type Npc = {
   role: string;
   // The stat block they fight with (a monster reference), or "".
   statBlock: string;
-  // src/lib/gender.ts; "" for unspecified.
-  gender: Gender;
+  // src/lib/sex.ts; "" for unspecified.
+  sex: Sex;
   // An SRD race id (src/lib/npc-race.ts); "" for unrecorded. Picks the
-  // placeholder face with role and gender; no rule reads it.
+  // placeholder face with role and sex; no rule reads it.
   race: string;
   // Who they are drawn to (src/lib/attraction.ts); blank = undecided.
   attraction: Attraction;
@@ -128,7 +128,7 @@ type NpcRow = {
   arc_cast_id: string;
   portrait_url: string | null;
   role: string | null;
-  gender: string | null;
+  sex: string | null;
   race?: string | null;
   voice_json: string | null;
   faction_id: string | null;
@@ -152,7 +152,7 @@ function mapNpc(row: NpcRow): Npc {
     trait: row.trait,
     location: row.location,
     role: row.role ?? "",
-    gender: storedGender(row.gender),
+    sex: storedSex(row.sex),
     race: storedRace(row.race),
     attraction: normalizeAttraction(row.attraction_json ?? ""),
     companionSheetId: row.companion_sheet_id ?? "",
@@ -296,7 +296,7 @@ export function upsertNpc(input: {
   attitude?: Attitude;
   trait?: string;
   location?: string;
-  gender?: Gender;
+  sex?: Sex;
   race?: string;
   attraction?: Attraction | null;
 }): Npc {
@@ -314,13 +314,13 @@ export function upsertNpc(input: {
     const attraction = keptAttraction(existing.attraction, input.attraction);
     db.prepare(
       `UPDATE npcs
-       SET attitude = ?, trait = ?, location = ?, gender = ?, race = ?, attraction_json = ?, aliases_json = ?, updated_at = ?
+       SET attitude = ?, trait = ?, location = ?, sex = ?, race = ?, attraction_json = ?, aliases_json = ?, updated_at = ?
        WHERE id = ?`,
     ).run(
       input.attitude ?? existing.attitude,
       input.trait ?? existing.trait,
       input.location ?? existing.location,
-      input.gender ?? existing.gender,
+      input.sex ?? existing.sex,
       input.race || existing.race,
       attractionJson(attraction),
       JSON.stringify(aliases),
@@ -332,7 +332,7 @@ export function upsertNpc(input: {
   }
   const id = crypto.randomUUID();
   db.prepare(
-    `INSERT INTO npcs (id, campaign_id, name, attitude, trait, location, gender, race, attraction_json, last_shift_turn, created_at, updated_at)
+    `INSERT INTO npcs (id, campaign_id, name, attitude, trait, location, sex, race, attraction_json, last_shift_turn, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?)`,
   ).run(
     id,
@@ -341,7 +341,7 @@ export function upsertNpc(input: {
     input.attitude ?? "indifferent",
     input.trait ?? "",
     input.location ?? "",
-    input.gender ?? "",
+    input.sex ?? "",
     input.race ?? "",
     attractionJson(input.attraction),
     now,
@@ -367,7 +367,7 @@ export function createNpcFromDraft(campaignId: string, draft: NpcDraft): Npc {
   const id = crypto.randomUUID();
   db.prepare(
     `INSERT INTO npcs
-       (id, campaign_id, name, attitude, trait, location, role, gender, race, attraction_json, last_shift_turn,
+       (id, campaign_id, name, attitude, trait, location, role, sex, race, attraction_json, last_shift_turn,
         aliases_json, personality_json, goals_json, relations_json,
         bonds_json, pressure_json, arc_cast_id, portrait_url, voice_json, faction_id, stat_block, archived, known_before_json, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, ?, ?, '[]', '', '', '', ?, ?, ?, 0, ?, ?, ?)`,
@@ -379,7 +379,7 @@ export function createNpcFromDraft(campaignId: string, draft: NpcDraft): Npc {
     draft.trait,
     draft.location,
     draft.role,
-    draft.gender,
+    draft.sex,
     draft.race ?? "",
     attractionJson(draft.attraction),
     JSON.stringify(draft.aliases),
@@ -411,7 +411,7 @@ export function updateNpcFromDraft(campaignId: string, npcId: string, draft: Npc
   }
   db.prepare(
     `UPDATE npcs
-     SET name = ?, attitude = ?, trait = ?, location = ?, role = ?, gender = ?, race = ?, attraction_json = ?, aliases_json = ?,
+     SET name = ?, attitude = ?, trait = ?, location = ?, role = ?, sex = ?, race = ?, attraction_json = ?, aliases_json = ?,
          personality_json = ?, goals_json = ?, relations_json = ?, voice_json = ?, faction_id = ?, stat_block = ?, updated_at = ?
      WHERE id = ?`,
   ).run(
@@ -420,7 +420,7 @@ export function updateNpcFromDraft(campaignId: string, npcId: string, draft: Npc
     draft.trait,
     draft.location,
     draft.role,
-    draft.gender,
+    draft.sex,
     // No race in the draft (an older app's form) keeps the stored one.
     draft.race ?? row.race ?? "",
     attractionJson(draft.attraction),

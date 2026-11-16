@@ -281,7 +281,7 @@ await test("A creature on the party's side under Dominate is not frightened by t
 await test("A turned companion is frightened by the area.", async () => {
   const { moveToSide } = await import("../src/lib/dm/combat-sides.ts");
   await kit.endFight();
-  const joined = await world.invoke("add_companion", { gender: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 5, personality: "Grim.", kind: "guest" });
+  const joined = await world.invoke("add_companion", { sex: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 5, personality: "Grim.", kind: "guest" });
   const turned = joined.result.characterId;
   await stage(oathbreaker, ["beast", "humanoid", "beast"]);
   moveToSide(world.campaign(), turned, "foe", { quiet: true });

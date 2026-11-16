@@ -67,7 +67,7 @@ const SYSTEM = [
   "You read pages of a tabletop roleplaying adventure and list what a game master needs to run it, as JSON.",
   "Use only what the pages say. Never invent a name, a number or an event. Leave a field out when the pages do not say it.",
   "Answer with one JSON object and nothing else, with these keys (each a list, each list at most 12 items):",
-  '"npcs": [{"name", "role" (their job or place in the story, a few words), "race", "gender" ("male", "female" or "nonbinary"), "attitude" ("hostile", "indifferent" or "friendly" toward the heroes), "description" (looks and manner), "personality", "goals", "secret" (what the GM knows that the heroes do not), "location" (the place they are found), "faction", "statBlock" (the creature stat block they fight with, by its printed name)}]',
+  '"npcs": [{"name", "role" (their job or place in the story, a few words), "race", "sex" ("male" or "female"), "attitude" ("hostile", "indifferent" or "friendly" toward the heroes), "description" (looks and manner), "personality", "goals", "secret" (what the GM knows that the heroes do not), "location" (the place they are found), "faction", "statBlock" (the creature stat block they fight with, by its printed name)}]',
   '"places": [{"name", "description", "partOf" (the bigger place it is in), "connections" (names of places it leads to)}]',
   '"factions": [{"name", "goal", "description", "attitude" ("hostile", "wary", "neutral", "friendly" or "allied" toward the heroes), "members" (names of people in it)}] only organized groups with a shared aim (a cult, a guild, a gang, a noble house, a tribe with a leader). Not a kind of creature ("kobolds") or a set of objects',
   '"items": [{"name", "kind" ("magic_item" or "gear"), "rarity", "attunement" (true or false), "description" (what it does, in the book\'s words)}] only things with an effect in play: magic items, potions, scrolls, and gear the story turns on (a key, a map, a relic). Not coins, gems, art objects or ordinary weapons and armor',
@@ -149,7 +149,7 @@ export function readChunkReply(raw: string): ChunkFindings | null {
         name: named(item),
         role: str(item.role, 40),
         race: str(item.race, 40),
-        gender: oneOf(item.gender, ["male", "female", "nonbinary"] as const, "" as never),
+        sex: oneOf(item.sex, ["male", "female"] as const, "" as never),
         attitude: oneOf(item.attitude, ["hostile", "indifferent", "friendly"] as const, "indifferent"),
         description: str(item.description, 500),
         personality: str(item.personality, 2_000),
@@ -261,7 +261,7 @@ export function mergeFindings(draft: Draft, findings: Array<{ chunk: Chunk; foun
     const source = chunk.text.slice(0, 1_200);
     for (const npc of found.npcs) {
       upsert("npc", String(npc.name), pages, source, { ...npc }, (record) => {
-        for (const field of ["role", "race", "gender", "location", "faction", "statBlock"] as const) if (!record.data[field] && npc[field]) record.data[field] = npc[field];
+        for (const field of ["role", "race", "sex", "location", "faction", "statBlock"] as const) if (!record.data[field] && npc[field]) record.data[field] = npc[field];
         record.data.description = join(record.data.description, npc.description, 500);
         record.data.personality = join(record.data.personality, npc.personality, 4_000);
         record.data.goals = join(record.data.goals, npc.goals, 4_000);

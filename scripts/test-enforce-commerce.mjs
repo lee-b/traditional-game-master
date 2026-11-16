@@ -318,7 +318,7 @@ await test("only who can stand at the counter shares a haggle: the dead and a co
   const camp = await openWorld({ gameSettings: { companions: "full" } });
   const kael = camp.addHero({ name: "Kael", class: "rogue", level: 3, abilities: { cha: 10 } });
   const brin = camp.addHero({ name: "Brin", class: "fighter", level: 3 });
-  const added = await camp.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern and devout.", kind: "party" });
+  const added = await camp.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern and devout.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   const seren = camp.sheets().find((entry) => entry.name === "Seren");
   const stall = shops.insertShop(camp.campaignId, { name: "Crossroads Stall", kind: "general", size: "town", markup: 1, stock: [{ itemName: "Rope", qty: 5, priceCp: LIST.Rope, note: "" }] });

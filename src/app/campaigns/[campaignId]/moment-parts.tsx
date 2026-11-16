@@ -8,12 +8,12 @@ import { CharacterPortrait } from "@/lib/ui";
 // character's face and Escape as a way out. Kept apart so the lobby's
 // banner does not bring the table's set pieces with it.
 
-export function Face({ sheet }: { sheet: Pick<CharacterSheet, "name" | "race" | "class" | "gender" | "portrait"> }) {
+export function Face({ sheet }: { sheet: Pick<CharacterSheet, "name" | "race" | "class" | "sex" | "portrait"> }) {
   return sheet.portrait ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={sheet.portrait.url} alt={sheet.name} />
   ) : (
-    <CharacterPortrait look={{ race: sheet.race, class: sheet.class, gender: sheet.gender }} alt={sheet.name} size="size-full" />
+    <CharacterPortrait look={{ race: sheet.race, class: sheet.class, sex: sheet.sex }} alt={sheet.name} size="size-full" />
   );
 }
 

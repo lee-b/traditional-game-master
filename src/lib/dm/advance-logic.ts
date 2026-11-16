@@ -15,7 +15,7 @@
 import type { RomanceStage, RelationshipStatus } from "./relationship-logic.ts";
 import { friendshipTier, romanceIndex, ROMANCE_THRESHOLD, tierIndex } from "./relationship-logic.ts";
 import { attractionFits, type Attraction } from "../attraction.ts";
-import type { Gender } from "../gender.ts";
+import { sameKnownSex, type Sex } from "../sex.ts";
 import { compareNames, containsPhrase, textKey } from "../language/text-logic.ts";
 import { livingHero } from "../characters/fallen-logic.ts";
 
@@ -201,7 +201,7 @@ export type Suitor = {
   approval: number;
   romance: RomanceStage;
   warmth: number;
-  gender: Gender;
+  sex: Sex;
   attraction: Attraction | null;
   // Together, betrothed or married to someone else.
   committedElsewhere: boolean;
@@ -215,7 +215,7 @@ export type Suitor = {
 
 export type AdvanceTarget = {
   name: string;
-  gender: Gender;
+  sex: Sex;
   attraction: Attraction | null;
   open: boolean;
   isCompanion: boolean;
@@ -259,8 +259,14 @@ export function suitorProblem(suitor: Suitor, target: AdvanceTarget): string | n
   if (suitor.pendingAdvance) {
     return `${suitor.name} already has an advance waiting on an answer.`;
   }
+  // Romance follows a traditional table's rule: opposite-sex pairs only. A
+  // same-sex pair is refused outright; an unknown sex never blocks, so the
+  // story never stalls on a field nobody set.
+  if (sameKnownSex(suitor.sex, target.sex)) {
+    return `${suitor.name} and ${target.name} are of the same sex, so this is not that kind of moment.`;
+  }
   if (!attractionFits(suitor, target)) {
-    return `${suitor.name} and ${target.name} are not drawn to each other's gender, so this is not that kind of moment.`;
+    return `${suitor.name} and ${target.name} are not drawn to each other's sex, so this is not that kind of moment.`;
   }
   return null;
 }

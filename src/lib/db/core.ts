@@ -1406,6 +1406,21 @@ function ensureSchema(db: SqliteDatabase) {
     db.exec(`ALTER TABLE characters ADD COLUMN spells TEXT NOT NULL DEFAULT ''`);
   }
 
+  // The sex field was named "gender" until the rename: older databases
+  // carry the column under the old name, renamed in place, guarded so a
+  // database opened twice or created fresh does not stumble.
+  const renameColumns = (table: string, renames: Array<[string, string]>) => {
+    const existing = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+    for (const [from, to] of renames) {
+      if (existing.some((column) => column.name === from) && !existing.some((column) => column.name === to)) {
+        db.exec(`ALTER TABLE ${table} RENAME COLUMN ${from} TO ${to}`);
+      }
+    }
+  };
+  renameColumns("character_sheets", [["gender", "sex"]]);
+  renameColumns("npcs", [["gender", "sex"]]);
+  renameColumns("encounter_enemies", [["gender", "sex"]]);
+
   // Multiplayer additive columns, one PRAGMA per table.
   const addColumns = (table: string, columns: Array<[name: string, ddl: string]>) => {
     const existing = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
@@ -1641,7 +1656,7 @@ function ensureSchema(db: SqliteDatabase) {
     // Free text off the builder's identity step. Only ever read by the
     // portrait prompt and the placeholder resolver (src/lib/placeholders.ts);
     // no rule depends on it. Sheets from before the column read as "".
-    ["gender", `TEXT NOT NULL DEFAULT ''`],
+    ["sex", `TEXT NOT NULL DEFAULT ''`],
     // Player-authored backstory, visible to the whole party and the DM.
     ["backstory", `TEXT NOT NULL DEFAULT ''`],
     // The picks a feat or a subclass grant left to the player (Linguist's
@@ -1711,7 +1726,7 @@ function ensureSchema(db: SqliteDatabase) {
     // (src/lib/dm/companion-command.ts).
     ["commanded_by", `TEXT`],
     // Who the character is drawn to (src/lib/attraction.ts, issue 501):
-    // {genders, note}, '' = unspecified. Identity, set in the builder.
+    // {sexes, note}, '' = unspecified. Identity, set in the builder.
     ["attraction_json", `TEXT NOT NULL DEFAULT ''`],
     // 1 = the owner opened this character to romantic advances from NPCs
     // at this table (issue 501). Consent is per table, so it never syncs to
@@ -2215,10 +2230,10 @@ function ensureSchema(db: SqliteDatabase) {
     ["npc_id", `TEXT NOT NULL DEFAULT ''`],
     ["carried_from", `TEXT NOT NULL DEFAULT ''`],
     // Who a nameless foe is as start_encounter told it (an SRD race id and a
-    // gender, '' for unspecified), so an elf bandit draws the elf bandit
+    // sex, '' for unspecified), so an elf bandit draws the elf bandit
     // plate (src/lib/placeholders.ts). A Cast NPC's own record wins.
     ["race", `TEXT NOT NULL DEFAULT ''`],
-    ["gender", `TEXT NOT NULL DEFAULT ''`],
+    ["sex", `TEXT NOT NULL DEFAULT ''`],
   ]);
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_encounter_enemies_npc ON encounter_enemies(campaign_id, npc_id);
@@ -2416,13 +2431,13 @@ function ensureSchema(db: SqliteDatabase) {
     // portrait exists (src/lib/placeholders.ts) and is shown on the cast
     // list; no rule reads it.
     ["role", `TEXT NOT NULL DEFAULT ''`],
-    // One of the builder's genders or '' (src/lib/gender.ts): what the voice
+    // One of the builder's sexes or '' (src/lib/sex.ts): what the voice
     // cast and the speech reader's pronouns read, never their prose.
-    ["gender", `TEXT NOT NULL DEFAULT ''`],
+    ["sex", `TEXT NOT NULL DEFAULT ''`],
     // An SRD race id or '' (src/lib/npc-race.ts): which race's face they
     // draw before a portrait exists. No rule reads it.
     ["race", `TEXT NOT NULL DEFAULT ''`],
-    // Who they are drawn to (src/lib/attraction.ts, issue 501): {genders,
+    // Who they are drawn to (src/lib/attraction.ts, issue 501): {sexes,
     // note}, '' = undecided. The DM's set_npc writes it once.
     ["attraction_json", `TEXT NOT NULL DEFAULT ''`],
     // The lasting AI companion this row is the person behind (#503 Phase

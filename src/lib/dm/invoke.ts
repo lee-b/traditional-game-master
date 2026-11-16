@@ -192,7 +192,7 @@ export function normalizeArgs(
     }
     if (key === "enemies") {
       // The fight's own reading: a challenge rating, a name, a race and a
-      // gender and an earlier fight's enemyId ride with the monster
+      // sex and an earlier fight's enemyId ride with the monster
       // (encounter-template-logic.ts); only a race the server reads is one.
       out.enemies = parseFightRoster(value, (words) => Boolean(storedRace(words)));
       continue;

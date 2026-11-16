@@ -61,7 +61,7 @@ const wren = world.addHero({ user: world.addUser(), name: "Wren", maxHp: 27, gol
 for (const [name, args] of [
   ["move_party", { name: "Harrowmere Market", layoutDescription: "A crowded market square with stalls on every side and a well at its centre. Lanes lead off north and east.", visionClear: true }],
   ["open_shop", { name: "The Rusty Anchor", kind: "general", size: "town", keeper: "Old Tam" }],
-  ["set_npc", { name: "Marla the Fence", attitude: "indifferent", trait: "wary", location: "Harrowmere Market", gender: "Female" }],
+  ["set_npc", { name: "Marla the Fence", attitude: "indifferent", trait: "wary", location: "Harrowmere Market", sex: "Female" }],
 ]) {
   const out = await world.invoke(name, args);
   assert.ok(out.ok, `the stage's ${name}: ${out.error}`);

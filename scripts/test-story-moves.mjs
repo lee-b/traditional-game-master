@@ -31,10 +31,10 @@ const facts = await import("../src/lib/db/facts.ts");
 const turns = await import("../src/lib/db/dm-turns.ts");
 const { heldStepOf } = await import("../src/lib/db/romance-held.ts");
 
-const bram = world.addHero({ name: "Bram", gender: "Male", abilities: { cha: 16 }, proficiencies: TRAINED });
+const bram = world.addHero({ name: "Bram", sex: "Male", abilities: { cha: 16 }, proficiencies: TRAINED });
 const EVEN = { drive: 0, diligence: 0, boldness: 0, warmth: 0, empathy: 0, composure: 0 };
 for (const name of ["Lyra", "Old Pike"]) {
-  const set = await world.invoke("set_npc", { name, gender: name === "Lyra" ? "Female" : "Male", location: "Highmoor" });
+  const set = await world.invoke("set_npc", { name, sex: name === "Lyra" ? "Female" : "Male", location: "Highmoor" });
   assert.equal(set.ok, true, set.error);
   npcs.patchNpcAgency(npcs.getNpcByName(world.campaignId, name).id, { personality: EVEN });
 }
@@ -254,7 +254,7 @@ await test("Mid-fight an ask is held for its answer after the fight (issue 640),
 // ---- a connected agent program ----
 
 await test("An agent program's narration notes the deeds it shows and the moves nobody recorded", async () => {
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   setBond("Lyra", { approval: 40, romance: "interested", lastShiftTurn: "" });
   turns.createDmTurn(world.campaignId, [{ role: "user", content: AGENT_MARK }]);

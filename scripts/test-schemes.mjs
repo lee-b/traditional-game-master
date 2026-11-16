@@ -104,14 +104,15 @@ test("seeing through an act adds each character once; a reveal is for everyone",
 
 // ---- who may run one on whom ----
 
-const mira = { name: "Mira", kind: "npc", status: "active", gender: "Female", attraction: { genders: ["Male"], note: "" }, actToward: null };
-const kael = { name: "Kael", gender: "Male", attraction: { genders: [], note: "" }, open: true, isCompanion: false };
+const mira = { name: "Mira", kind: "npc", status: "active", sex: "Female", attraction: { sexes: ["Male"], note: "" }, actToward: null };
+const kael = { name: "Kael", sex: "Male", attraction: { sexes: [], note: "" }, open: true, isCompanion: false };
 
 test("only toward a character open to advances, by an NPC drawn to them and they to the NPC", () => {
   assert.equal(scheme.schemeStartProblem(mira, kael, null), null);
   assert.match(scheme.schemeStartProblem(mira, { ...kael, open: false }, null), /has not opened Kael to advances/);
-  assert.match(scheme.schemeStartProblem(mira, { ...kael, gender: "Female" }, null), /not drawn to each other/);
-  assert.match(scheme.schemeStartProblem(mira, { ...kael, attraction: { genders: ["Male"], note: "" } }, null), /not drawn to each other/, "both ways");
+  // A same-sex pair is refused outright at this table (opposite-sex romance).
+  assert.match(scheme.schemeStartProblem(mira, { ...kael, sex: "Female" }, null), /of the same sex/);
+  assert.match(scheme.schemeStartProblem(mira, { ...kael, attraction: { sexes: ["Male"], note: "" } }, null), /not drawn to each other/, "both ways");
   assert.equal(scheme.schemeStartProblem({ ...mira, attraction: null }, kael, null), null, "an NPC left blank is open to anyone");
 });
 

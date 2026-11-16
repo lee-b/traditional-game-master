@@ -27,7 +27,7 @@ const { saveGlobalConfig } = await import("../src/lib/db/app-settings.ts");
 const { enqueueNarrationAudio, narrationAudioPath, listNarrationAudio } = await import("../src/lib/tts.ts");
 const { voiceRoster, setRosterVoice, castUnvoiced } = await import("../src/lib/tts-roster.ts");
 const { listCampaignVoices } = await import("../src/lib/db/voices.ts");
-const { voiceGender } = await import("../src/lib/tts-cast.ts");
+const { voiceSex } = await import("../src/lib/tts-cast.ts");
 const { subscribe } = await import("../src/lib/events.ts");
 const { createUser } = await import("../src/lib/db/users.ts");
 const { createCampaign } = await import("../src/lib/db/campaigns.ts");
@@ -64,8 +64,8 @@ saveGlobalConfig({ speech: { ttsProvider: "kokoro", kokoroUrl: `http://127.0.0.1
 
 const owner = createUser("voices-host", "x", { isAdmin: true });
 const CAMP = createCampaign(owner.id, { title: "Voices", description: "", theme: "high-fantasy", maxPlayers: 4, startingLevel: 1, difficulty: "normal" }).id;
-upsertNpc({ campaignId: CAMP, name: "Captain Marla Venn", attitude: "friendly", trait: "A weathered woman who has buried too many of her guard.", gender: "Female" });
-upsertNpc({ campaignId: CAMP, name: "Old Pike", attitude: "indifferent", trait: "A tired old man who drinks alone.", gender: "Male" });
+upsertNpc({ campaignId: CAMP, name: "Captain Marla Venn", attitude: "friendly", trait: "A weathered woman who has buried too many of her guard.", sex: "Female" });
+upsertNpc({ campaignId: CAMP, name: "Old Pike", attitude: "indifferent", trait: "A tired old man who drinks alone.", sex: "Male" });
 
 const events = [];
 const unsubscribe = subscribe(CAMP, (chunk) => {
@@ -84,17 +84,17 @@ await test("the roster is the cast, and nobody has a voice until one is chosen",
     ["npc", "Captain Marla Venn", null],
     ["npc", "Old Pike", null],
   ]);
-  assert.equal(entry("Captain Marla Venn").gender, "f");
-  assert.equal(entry("Old Pike").gender, "m");
+  assert.equal(entry("Captain Marla Venn").sex, "f");
+  assert.equal(entry("Old Pike").sex, "m");
 });
 
-await test("a voice's gender is the person's field, in any language, never their description", () => {
+await test("a voice's sex is the person's field, in any language, never their description", () => {
   const SIDE = createCampaign(owner.id, { title: "Voci", description: "", theme: "high-fantasy", maxPlayers: 4, startingLevel: 1, difficulty: "normal" }).id;
-  upsertNpc({ campaignId: SIDE, name: "Nonna Rosa", trait: "Una vecchia fornaia che non dorme mai.", gender: "Female" });
+  upsertNpc({ campaignId: SIDE, name: "Nonna Rosa", trait: "Una vecchia fornaia che non dorme mai.", sex: "Female" });
   upsertNpc({ campaignId: SIDE, name: "Brother Aldo", trait: "A tired old man who drinks alone." });
   const side = (name) => voiceRoster(SIDE).find((candidate) => candidate.name === name);
-  assert.equal(side("Nonna Rosa").gender, "f");
-  assert.equal(side("Brother Aldo").gender, "", "an English description says nothing without the field");
+  assert.equal(side("Nonna Rosa").sex, "f");
+  assert.equal(side("Brother Aldo").sex, "", "an English description says nothing without the field");
 });
 
 await test("without a chosen voice the narrator reads everything, as before", async () => {
@@ -129,7 +129,7 @@ await test("with casting on, a speaker without a voice is given one that suits a
   await enqueueNarrationAudio(CAMP, "m-cast", '"Not my fight," Pike mutters. He drinks.', lines('"Not my fight," Pike mutters. He drinks.'), { ttsVoice: "af_heart", ttsAutoCast: true });
   const pike = entry("Old Pike").voice;
   assert.ok(pike, "Pike was cast");
-  assert.equal(voiceGender(pike.voiceId), "m");
+  assert.equal(voiceSex(pike.voiceId), "m");
   assert.notEqual(pike.voiceId, "af_heart", "never the narrator's own voice");
   assert.ok(saved("m-cast").startsWith(`[${pike.voiceId}@1:Not my fight,]`));
   await enqueueNarrationAudio(CAMP, "m-cast-2", '"Still not my fight," says Pike.', lines('"Still not my fight," says Pike.'), { ttsVoice: "af_heart", ttsAutoCast: true });
@@ -147,14 +147,14 @@ await test("a monster is voiced by what it is, and a passage spoken as it is all
 });
 
 await test("casting the whole table gives everyone left a different voice", async () => {
-  upsertNpc({ campaignId: CAMP, name: "Brother Aldous", attitude: "friendly", trait: "A soft-spoken priest.", gender: "Male" });
-  upsertNpc({ campaignId: CAMP, name: "Wren", attitude: "friendly", trait: "A quick girl with a knife.", gender: "Female" });
+  upsertNpc({ campaignId: CAMP, name: "Brother Aldous", attitude: "friendly", trait: "A soft-spoken priest.", sex: "Male" });
+  upsertNpc({ campaignId: CAMP, name: "Wren", attitude: "friendly", trait: "A quick girl with a knife.", sex: "Female" });
   const cast = await castUnvoiced(CAMP, voiceRoster(CAMP), "af_heart");
   assert.equal(cast, 2);
   const voices = voiceRoster(CAMP).map((member) => member.voice?.voiceId);
   assert.ok(voices.every(Boolean));
   assert.equal(new Set(voices).size, voices.length, "four speakers, four voices");
-  assert.equal(voiceGender(entry("Wren").voice.voiceId), "f");
+  assert.equal(voiceSex(entry("Wren").voice.voiceId), "f");
   assert.equal(await castUnvoiced(CAMP, voiceRoster(CAMP), "af_heart"), 0, "and nobody already cast is recast");
 });
 

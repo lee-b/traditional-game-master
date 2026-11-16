@@ -36,7 +36,7 @@ export function classCard({
   option,
   entry,
   reading,
-  gender,
+  sex,
   numbers,
 }: {
   // The picker's row: its name, its book, and in `meta` the canonical class
@@ -44,7 +44,7 @@ export function classCard({
   option: { id: string; name: string; meta?: string; source?: string };
   entry: { hitDie: number; spellAbility?: string | null; packName?: string } | undefined;
   reading: ClassRoleReading | undefined;
-  gender?: string | null;
+  sex?: string | null;
   numbers: boolean;
 }): OptionCardView {
   // Under a reskin the canonical class name follows the play line, the same
@@ -54,7 +54,7 @@ export function classCard({
     id: option.id,
     name: option.name,
     meta: canonical,
-    art: classArt(option.id, gender),
+    art: classArt(option.id, sex),
     // The play line leads: what the class is, in words a new player and a
     // veteran new to the setting both read. Then the book where the group
     // heading does not say it (issue #116: a Marshal looked like a Core

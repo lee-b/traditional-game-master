@@ -379,7 +379,7 @@ function writeBundleRows(
       const voice = npc.voice ? normalizeNpcVoice(npc.voice) : null;
       db.prepare(
         `INSERT INTO npcs
-           (id, campaign_id, name, attitude, trait, location, role, gender, race, attraction_json, last_shift_turn,
+           (id, campaign_id, name, attitude, trait, location, role, sex, race, attraction_json, last_shift_turn,
             aliases_json, personality_json, goals_json, relations_json, bonds_json,
             pressure_json, arc_cast_id, portrait_url, voice_json, stat_block, archived, known_before_json, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, ?, ?, '[]', '', '', ?, ?, ?, 0, ?, ?, ?)`,
@@ -391,7 +391,7 @@ function writeBundleRows(
         npc.trait,
         npc.location,
         npc.role,
-        npc.gender,
+        npc.sex,
         npc.race,
         attractionJson(normalizeAttraction(npc.attraction)),
         JSON.stringify(npc.aliases),

@@ -205,7 +205,7 @@ test("the words break after the size or count, so the number reads first", () =>
 // card (its area, its shares, its target), so they say what this casting does.
 const wizard = {
   id: "s1", campaignId: "c1", userId: "u1", libraryCharacterId: null,
-  name: "Mira", race: "human", class: "wizard", subclass: "", background: "", alignment: "", gender: "",
+  name: "Mira", race: "human", class: "wizard", subclass: "", background: "", alignment: "", sex: "",
   level: 11, xp: 0,
   abilities: { str: 8, dex: 14, con: 14, int: 18, wis: 12, cha: 10 },
   maxHp: 60, currentHp: 60, tempHp: 0, ac: 12, acOverride: false, speed: 30,

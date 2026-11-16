@@ -102,8 +102,8 @@ test("a line the tag splits in two stays one speaker's, a reply does not", () =>
 // opens on the name, on "he" or on the verb.
 test("a line after its speaker's tag in the same paragraph stays theirs", () => {
   const table = [
-    { kind: "npc", id: "t", name: "Tobin", gender: "Male" },
-    { kind: "npc", id: "m", name: "Marla", gender: "Female" },
+    { kind: "npc", id: "t", name: "Tobin", sex: "Male" },
+    { kind: "npc", id: "m", name: "Marla", sex: "Female" },
   ];
   const lines = (text) =>
     attributeSpeech(text, table)
@@ -279,10 +279,10 @@ test("pronouns are followed back only at an English table", () => {
   assert.deepEqual(said('Marla looks up. She smiles. "Sit."', cast), ["Marla: Sit."]);
 });
 
-test("who 'she' can mean comes from the gender field", () => {
+test("who 'she' can mean comes from the sex field", () => {
   const table = [
-    { kind: "npc", id: "n1", name: "Marla", gender: "Female" },
-    { kind: "npc", id: "n2", name: "Old Pike", gender: "Male" },
+    { kind: "npc", id: "n1", name: "Marla", sex: "Female" },
+    { kind: "npc", id: "n2", name: "Old Pike", sex: "Male" },
   ];
   assert.deepEqual(said('"Hold still," he says. Marla kneels by the fire.', table), []);
   assert.deepEqual(said('Marla nods to Old Pike. She waits. "Fine."', table), ["Marla: Fine."], "only Marla is a she");
@@ -307,12 +307,12 @@ test("stored lines draw the same segments, survive a rewrite of other lines, and
   const kept = speech.mergeLines(lines, speech.linesOf(attributeSpeech(edited, cast)));
   assert.deepEqual(speech.segmentsOf(edited, kept).filter((segment) => segment.kind === "speech").map((segment) => segment.text), ["Hold the gate,", "Never,"]);
   assert.deepEqual(speech.normalizeSpokenLines([{ line: "Hi", speaker: { kind: "pc", id: "s1", name: "Kara" } }, { line: "x", speaker: { kind: "narrator", name: "N" } }, "junk"]), [{ line: "Hi", speaker: { kind: "pc", id: "s1", name: "Kara" } }]);
-  assert.equal(speech.storedSpeaker({ kind: "npc", id: "n1", name: "Marla", aliases: ["M"], gender: "Female" }).gender, undefined, "a stored line keeps who, not how they were found");
+  assert.equal(speech.storedSpeaker({ kind: "npc", id: "n1", name: "Marla", aliases: ["M"], sex: "Female" }).sex, undefined, "a stored line keeps who, not how they were found");
 });
 
 test("a line split by a short tag is one card with the tag inside it (issue #917)", () => {
   // As the transcript draws a message: the stored lines, then the cards.
-  const people = [{ ...cast[0], gender: "Female" }, cast[1]];
+  const people = [{ ...cast[0], sex: "Female" }, cast[1]];
   const cardsFor = (text) =>
     speech.cardsOf(speech.segmentsOf(text, speech.linesOf(attributeSpeech(text, people)))).map((card) =>
       card.kind === "speech" ? `${card.speaker.name}: ${card.parts.map((part) => (part.kind === "tag" ? `[${part.text}]` : part.text)).join(" ")}` : `prose: ${card.text.trim()}`,
@@ -341,7 +341,7 @@ test("a line split by a short tag is one card with the tag inside it (issue #917
 // spoke before it. The words around a line that tie it to someone the table
 // does not list say so, with who the paragraph does name.
 test("a line the prose gives to someone unlisted is a stranger's, with who its paragraph names", () => {
-  const people = [{ kind: "npc", id: "t1", name: "Tobin", gender: "male" }, ...cast];
+  const people = [{ kind: "npc", id: "t1", name: "Tobin", sex: "male" }, ...cast];
   const strangers = (text) => [...speech.unlistedSpeakerLines(text, people, { englishPronouns: true })].map(([line, named]) => [line, [...named].sort()]);
   const scene = 'Tobin stands beside you. "They\'re coming," he whispers.\n\nThe lead cultist raises a hand, his voice a low, guttural growl. "The heir. Give us the fragment, and you may live."';
   assert.deepEqual(strangers(scene), [["The heir. Give us the fragment, and you may live.", []]], "the cultist's line names nobody listed; Tobin's own line is no stranger's");

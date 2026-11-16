@@ -29,8 +29,8 @@ const HOPES_MAX = 500;
 // lineage already chosen), who they are drawn to (issue 501), alignment, the
 // portrait and how they look, and their story. None of it changes a number
 // on the sheet, so nothing before this step waits on it. How they play, the
-// gender, the level and the background are asked on the steps before; the
-// gender is said here beside the rest of who they are, with the way back to
+// sex, the level and the background are asked on the steps before; the
+// sex is said here beside the rest of who they are, with the way back to
 // the class step that asks it.
 export function IdentityStep({
   state,
@@ -41,7 +41,7 @@ export function IdentityStep({
   onUploadPortrait,
   alignmentGroups,
   alignmentInfo,
-  onEditGender,
+  onEditSex,
 }: {
   state: BuilderState;
   pack: WorldPack | null;
@@ -56,8 +56,8 @@ export function IdentityStep({
   onUploadPortrait: () => void;
   alignmentGroups: PickerGroup[];
   alignmentInfo: string;
-  // To the gender on the class step, where the cards it changes are.
-  onEditGender?: () => void;
+  // To the sex on the class step, where the cards it changes are.
+  onEditSex?: () => void;
 }) {
   const { portrait, setPortrait } = state;
   const appearanceId = useId();
@@ -118,11 +118,11 @@ export function IdentityStep({
 
       <StepPanel title="Details">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Field label="Gender">
+          <Field label="Sex">
             <span className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-stone-300">{state.gender || "Not chosen"}</span>
-              {onEditGender ? (
-                <button type="button" onClick={onEditGender} className={cn(ui.btnSmall, "min-h-10")}>
+              <span className="text-sm text-stone-300">{state.sex || "Not chosen"}</span>
+              {onEditSex ? (
+                <button type="button" onClick={onEditSex} className={cn(ui.btnSmall, "min-h-10")}>
                   Change on the Class step
                 </button>
               ) : null}

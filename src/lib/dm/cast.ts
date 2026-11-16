@@ -81,7 +81,7 @@ function departedPlate(npc: Npc): string {
     return "";
   }
   const word = (value: unknown) => (typeof value === "string" ? value : undefined);
-  return characterPlaceholder({ race: word(sheet.race) ?? "", class: word(sheet.class), gender: word(sheet.gender) });
+  return characterPlaceholder({ race: word(sheet.race) ?? "", class: word(sheet.class), sex: word(sheet.sex) });
 }
 
 // What a table's seats were last sent of its cast: the whole cast the

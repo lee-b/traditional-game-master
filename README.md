@@ -25,6 +25,13 @@
 > worlds and accounts carry over unchanged; only the name and the website
 > (now [opengamemaster.com](https://opengamemaster.com)) moved.
 
+> [!NOTE]
+> This is **a more traditional fork** of
+> [Open Game Master](https://github.com/Lebbitheplow/open-game-master), which
+> emphasises classic, ca. 1990's-style tabletop gameplay. It follows upstream's
+> releases and carries a set of corrections on top of each; the fork's intent is
+> deliberately kept broad and will evolve over time.
+
 **Open Game Master** runs multiplayer (and solo) 5e
 campaigns with an AI Game Master, on your own machine. The narrator is whichever
 AI you already have: **a local model** (llama.cpp, Ollama, LM Studio, vLLM), **an

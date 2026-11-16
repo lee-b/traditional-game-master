@@ -8,7 +8,7 @@ import { classDisplayName, speciesName } from "@/lib/characters/class-words";
 // the lobby opened are the baseline and never replay; companions are the
 // story's, not a player taking a seat.
 
-export type Arrival = Pick<CharacterSheet, "id" | "name" | "race" | "raceLabel" | "class" | "gender" | "portrait">;
+export type Arrival = Pick<CharacterSheet, "id" | "name" | "race" | "raceLabel" | "class" | "sex" | "portrait">;
 
 type Seatable = Pick<CharacterSheet, "id" | "isCompanion">;
 
@@ -70,7 +70,7 @@ function pickArrival(sheet: Arrival): Arrival {
     race: sheet.race,
     raceLabel: sheet.raceLabel,
     class: sheet.class,
-    gender: sheet.gender,
+    sex: sheet.sex,
     portrait: sheet.portrait,
   };
 }

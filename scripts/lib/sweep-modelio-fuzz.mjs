@@ -86,9 +86,9 @@ export async function modelDoor(world) {
     // goblins stand. Each call starts from the same sequence.
     const sharedRandom = Math.random;
     Math.random = seededRandom(0x5eed);
-    // And a new record's id: an enemy told no gender takes one picked from
-    // its own id (src/lib/db/encounters.ts pickedGender), so two calls with
-    // fresh random ids "differed" by a goblin's gender, about one run in two.
+    // And a new record's id: an enemy told no sex takes one picked from
+    // its own id (src/lib/db/encounters.ts pickedSex), so two calls with
+    // fresh random ids "differed" by a goblin's sex, about one run in two.
     // A call that is kept keeps real ids, so a later one cannot repeat them.
     const sharedUuid = globalThis.crypto.randomUUID;
     const idRandom = seededRandom(0x1d5eed);

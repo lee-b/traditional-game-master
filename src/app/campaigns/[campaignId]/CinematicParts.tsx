@@ -99,14 +99,14 @@ export function facesFor(
   if (entry.kind === "pc" || entry.kind === "npc") {
     const sheet = sheets.find((candidate) => candidate.id === entry.id);
     if (sheet) {
-      // The gender too, so the cinematic table draws the face the Party tab,
+      // The sex too, so the cinematic table draws the face the Party tab,
       // the board and the chronicle draw (src/lib/speaker-faces.ts).
-      return [sheet.portrait?.url, characterPlaceholder({ race: sheet.race, class: sheet.class, gender: sheet.gender, genre })];
+      return [sheet.portrait?.url, characterPlaceholder({ race: sheet.race, class: sheet.class, sex: sheet.sex, genre })];
     }
     return [entry.kind === "npc" ? entry.face : null, npcPlaceholder(null, entry.name)];
   }
   const enemy = enemies?.find((candidate) => candidate.id === entry.id);
-  return [enemy ? monsterPlaceholder(enemy.type, { cr: enemy.cr, genre, seed: enemy.name, slug: enemy.slug, name: enemy.name, race: enemy.race, gender: enemy.gender }) : null];
+  return [enemy ? monsterPlaceholder(enemy.type, { cr: enemy.cr, genre, seed: enemy.name, slug: enemy.slug, name: enemy.name, race: enemy.race, sex: enemy.sex }) : null];
 }
 
 // ---- the initiative ribbon along the top ----
@@ -258,7 +258,7 @@ export function PartyRail({
           >
             <span key={`pulse-${hp}`} className="cine-party-pulse" data-dir={dir} aria-hidden="true" />
             <TokenFace
-              candidates={[sheet.portrait?.url, characterPlaceholder({ race: sheet.race, class: sheet.class, gender: sheet.gender, genre })]}
+              candidates={[sheet.portrait?.url, characterPlaceholder({ race: sheet.race, class: sheet.class, sex: sheet.sex, genre })]}
               name={sheet.name}
               className="cine-party-face"
             />

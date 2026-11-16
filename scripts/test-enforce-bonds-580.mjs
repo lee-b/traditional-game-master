@@ -23,16 +23,16 @@ const { endedByDeath } = await import("../src/lib/dm/relationship-logic.ts");
 
 async function table({ gameSettings = {} } = {}) {
   const world = await openWorld({ gameSettings: { companions: "full", ...gameSettings } });
-  const kael = world.addHero({ name: "Kael", gender: "Male" });
-  const lyra = world.addHero({ name: "Lyra", gender: "Female" });
+  const kael = world.addHero({ name: "Kael", sex: "Male" });
+  const lyra = world.addHero({ name: "Lyra", sex: "Female" });
   const bond = (who, subject) => relationships.getRelationship(world.campaignId, who.id, subject);
-  const prepare = (name, attitude) => npcs.upsertNpc({ campaignId: world.campaignId, name, attitude, gender: "Female" });
+  const prepare = (name, attitude) => npcs.upsertNpc({ campaignId: world.campaignId, name, attitude, sex: "Female" });
   return { world, kael, lyra, bond, prepare };
 }
 
 await test("a companion who joins has a bond with every character, at neutral; a guest for one fight has none", async () => {
   const { world, kael, lyra, bond } = await table();
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   for (const hero of [kael, lyra]) {
     const row = bond(hero, "Seren");
@@ -41,7 +41,7 @@ await test("a companion who joins has a bond with every character, at neutral; a
     assert.equal(row.subjectKind, "companion");
     assert.equal(row.status, "active");
   }
-  const guest = await world.invoke("add_companion", { name: "Dace", class: "fighter", gender: "Male", personality: "Hired blade.", kind: "guest" });
+  const guest = await world.invoke("add_companion", { name: "Dace", class: "fighter", sex: "Male", personality: "Hired blade.", kind: "guest" });
   assert.equal(guest.ok, true, guest.error);
   assert.equal(bond(kael, "Dace"), null, "a guest is scene-scoped");
 });
@@ -57,7 +57,7 @@ await test("an NPC a bundle prepared as friendly opens every bond once the story
 
 await test("registering someone the party has only heard of opens nothing, attitude or not", async () => {
   const { world, kael, bond } = await table();
-  const villain = await world.invoke("set_npc", { name: "The Ashen Abbot", attitude: "hostile", gender: "Male" });
+  const villain = await world.invoke("set_npc", { name: "The Ashen Abbot", attitude: "hostile", sex: "Male" });
   assert.equal(villain.ok, true, villain.error);
   assert.equal(bond(kael, "The Ashen Abbot"), null, "a first registration is not a meeting");
   assert.equal(npcs.getNpcByName(world.campaignId, "The Ashen Abbot").metAt, "");
@@ -78,7 +78,7 @@ await test("an attitude the story shifts opens any bond still missing", async ()
 await test("a reaction roll and a first social check open the whole party's bonds", async () => {
   const { world, kael, lyra, bond, prepare } = await table();
   world.dice(4, 4);
-  const met = await world.invoke("npc_reaction", { name: "Brother Aldo", gender: "Male" });
+  const met = await world.invoke("npc_reaction", { name: "Brother Aldo", sex: "Male" });
   assert.equal(met.ok, true, met.error);
   assert.ok(bond(kael, "Brother Aldo") && bond(lyra, "Brother Aldo"));
   prepare("Tamsin", "indifferent");
@@ -152,14 +152,14 @@ await test("a death closes every character's bond with the dead, says died, and 
 
 await test("a companion who fell and is dismissed is dead, not away, and comes back whole if brought back", async () => {
   const { world, kael, lyra, bond } = await table();
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   const sheet = world.sheets().find((entry) => entry.name === "Seren");
   relationships.patchRelationship(bond(kael, "Seren").id, { approval: 65 });
   world.patch(sheet.id, { deathSaves: { successes: 0, failures: 3, stable: false, dead: true } });
   const dismissed = await world.invoke("dismiss_companion", { characterId: sheet.id, reason: "she fell at the bridge" });
   assert.equal(dismissed.ok, true, dismissed.error);
   assert.ok(endedByDeath(bond(kael, "Seren")) && endedByDeath(bond(lyra, "Seren")), "a fallen companion's bonds close on the death");
-  const raised = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  const raised = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   assert.equal(raised.ok, true, raised.error);
   assert.equal(bond(kael, "Seren").status, "active", "brought back to life, the bond opens again");
   assert.equal(bond(kael, "Seren").approval, 65, "where it stopped");
@@ -167,7 +167,7 @@ await test("a companion who fell and is dismissed is dead, not away, and comes b
 
 await test("a companion who walks away alive is parted, as before", async () => {
   const { world, kael, bond } = await table();
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   const sheet = world.sheets().find((entry) => entry.name === "Seren");
   await world.invoke("dismiss_companion", { characterId: sheet.id, reason: "she goes home" });
   assert.equal(bond(kael, "Seren").status, "parted");
@@ -195,10 +195,10 @@ await test("a renamed NPC keeps their bonds, and a merged one folds into the kee
 
 await test("the chapter's close opens a companion's missing bonds: one who joined before this, a character who joined after", async () => {
   const { world, kael, bond } = await table();
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   const { getDatabase } = await import("../src/lib/db/core.ts");
   getDatabase().prepare(`DELETE FROM relationships WHERE campaign_id = ?`).run(world.campaignId);
-  const late = world.addHero({ name: "Tor", gender: "Male" });
+  const late = world.addHero({ name: "Tor", sex: "Male" });
   advanceRelationships(world.campaignId, "");
   assert.ok(bond(kael, "Seren") && bond(late, "Seren"));
 });
@@ -233,7 +233,7 @@ await test("a person narrating at a human GM's table meets whoever speaks in it"
 
 await test("a companion a deed is done to still weighs it on its conscience, as a witness would", async () => {
   const { world, kael, bond } = await table({ gameSettings: { companionConscience: "talk" } });
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   const { companionNpcFor } = await import("../src/lib/db/companion-npcs.ts");
   const { setCompanionValues, companionConscience } = await import("../src/lib/db/companion-conscience.ts");
   const row = companionNpcFor(world.sheets().find((entry) => entry.name === "Seren"));
@@ -270,13 +270,13 @@ await test("an NPC merged in keeps the bond that holds something over one opened
 
 await test("a bond that ended in a falling-out stays ended through a death and a return", async () => {
   const { world, kael, lyra, bond } = await table();
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   const fell = await world.invoke("relationship_end", { characterId: kael.id, subject: "Seren", reason: "falling_out" });
   assert.equal(fell.ok, true, fell.error);
   const sheet = world.sheets().find((entry) => entry.name === "Seren");
   world.patch(sheet.id, { deathSaves: { successes: 0, failures: 3, stable: false, dead: true } });
   await world.invoke("dismiss_companion", { characterId: sheet.id, reason: "she fell" });
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   assert.equal(bond(kael, "Seren").status, "ended", "the falling-out stands");
   assert.equal(bond(lyra, "Seren").status, "active", "the bond the death closed opens again");
 });
@@ -298,7 +298,7 @@ await test("a rename in the NPC editor moves the bonds, and the Bonds panel hear
 
 await test("a companion's bonds stay under its sheet's name when its row is renamed", async () => {
   const { world, kael, bond } = await table();
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   const row = npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren");
   npcs.renameNpc(row.id, "Seren the Grey", ["Seren"]);
   assert.ok(bond(kael, "Seren"), "the bond stays with the sheet");
@@ -306,7 +306,7 @@ await test("a companion's bonds stay under its sheet's name when its row is rena
 
 await test("a bond opened at neutral reads as no bond to whatever weighs a party's standing", async () => {
   const { world, kael, lyra, bond } = await table();
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   relationships.patchRelationship(bond(kael, "Seren").id, { approval: 60 });
   assert.equal(bond(lyra, "Seren").approval, 0);
   const { worstApproval } = await import("../src/lib/dm/conscience.ts");
@@ -326,7 +326,7 @@ await test("restating the default attitude is not meeting a stranger, so the rea
 
 await test("with bonds off nothing opens", async () => {
   const { world, kael, bond } = await table({ gameSettings: { relationships: "off" } });
-  await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", personality: "Stern and devout.", kind: "party" });
+  await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", personality: "Stern and devout.", kind: "party" });
   assert.equal(bond(kael, "Seren"), null);
 });
 

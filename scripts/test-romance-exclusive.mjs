@@ -73,18 +73,18 @@ await test("an amends repairs at most what is owed, and spends it", () => {
 });
 
 await test("open to more than one partner is kept only when on, and the GM's word sets it", async () => {
-  assert.deepEqual(attraction.normalizeAttraction({ genders: ["Male"], note: "", open: true }), { genders: ["Male"], note: "", open: true });
-  assert.deepEqual(attraction.normalizeAttraction({ genders: ["Male"], note: "", open: false }), { genders: ["Male"], note: "" }, "absent is exclusive");
-  assert.equal(attraction.attractionJson({ genders: [], note: "", open: true }), '{"genders":[],"note":"","open":true}', "open alone still stores");
-  assert.equal(attraction.attractionJson({ genders: [], note: "" }), "");
-  assert.deepEqual(attraction.attractionFromTold(["men", "open relationships"]), { genders: ["Male"], note: "", open: true });
+  assert.deepEqual(attraction.normalizeAttraction({ sexes: ["Male"], note: "", open: true }), { sexes: ["Male"], note: "", open: true });
+  assert.deepEqual(attraction.normalizeAttraction({ sexes: ["Male"], note: "", open: false }), { sexes: ["Male"], note: "" }, "absent is exclusive");
+  assert.equal(attraction.attractionJson({ sexes: [], note: "", open: true }), '{"sexes":[],"note":"","open":true}', "open alone still stores");
+  assert.equal(attraction.attractionJson({ sexes: [], note: "" }), "");
+  assert.deepEqual(attraction.attractionFromTold(["men", "open relationships"]), { sexes: ["Male"], note: "", open: true });
   assert.ok(attraction.TOLD_ATTRACTION.includes(attraction.TOLD_OPEN), "the DM's tools offer the word");
-  const kept = attraction.keptAttraction({ genders: ["Male"], note: "" }, { genders: ["Female"], note: "", open: true });
-  assert.deepEqual(kept, { genders: ["Male"], note: "", open: true }, "who they are drawn to stays; openness may still turn on");
-  assert.deepEqual(attraction.keptAttraction({ genders: [], note: "", open: true }, { genders: ["Female"], note: "" }), { genders: ["Female"], note: "", open: true });
+  const kept = attraction.keptAttraction({ sexes: ["Male"], note: "" }, { sexes: ["Female"], note: "", open: true });
+  assert.deepEqual(kept, { sexes: ["Male"], note: "", open: true }, "who they are drawn to stays; openness may still turn on");
+  assert.deepEqual(attraction.keptAttraction({ sexes: [], note: "", open: true }, { sexes: ["Female"], note: "" }), { sexes: ["Female"], note: "", open: true });
   // The builder's save and the sheet routes read it through this schema.
   const { attractionSchema } = await import("../src/lib/schemas/sheet.ts");
-  assert.equal(attractionSchema.parse({ genders: ["Male"], open: true }).open, true);
+  assert.equal(attractionSchema.parse({ sexes: ["Male"], open: true }).open, true);
 });
 
 // ---- the engine ----
@@ -100,12 +100,12 @@ const { exclusiveLinesForPrompt, unfaithfulMove } = await import("../src/lib/dm/
 const { describeSheet } = await import("../src/lib/dm/prompt.ts");
 const { npcRosterForPrompt } = await import("../src/lib/dm/social-tools.ts");
 
-const tamsin = world.addHero({ name: "Tamsin", gender: "Female", abilities: { cha: 16 } });
-const kit = world.addHero({ name: "Kit", gender: "Male", abilities: { cha: 16 } });
-const ash = world.addHero({ name: "Ash", gender: "Female" });
+const tamsin = world.addHero({ name: "Tamsin", sex: "Female", abilities: { cha: 16 } });
+const kit = world.addHero({ name: "Kit", sex: "Male", abilities: { cha: 16 } });
+const ash = world.addHero({ name: "Ash", sex: "Female" });
 
-for (const [name, gender] of [["Sir Hollis", "Male"], ["Bram", "Male"], ["Mira", "Female"], ["Orrin", "Male"], ["Wren", "Female"]]) {
-  await world.invoke("set_npc", { name, gender, location: "Highmoor" });
+for (const [name, sex] of [["Sir Hollis", "Male"], ["Bram", "Male"], ["Mira", "Female"], ["Orrin", "Male"], ["Wren", "Female"]]) {
+  await world.invoke("set_npc", { name, sex, location: "Highmoor" });
 }
 const pair = (sheet, subject) => relationships.getRelationship(world.campaignId, sheet.id, subject);
 function bond(sheet, subject, approval, romance = "none") {
@@ -252,12 +252,12 @@ await test("an insult then amends nets nothing above where it started", async ()
 });
 
 await test("everyone open lets a second romance start, and nobody minds the flirt", async () => {
-  const pip = world.addHero({ name: "Pip", gender: "Female", attraction: { genders: [], note: "", open: true } });
+  const pip = world.addHero({ name: "Pip", sex: "Female", attraction: { sexes: [], note: "", open: true } });
   assert.equal(world.sheet(pip.id).attraction.open, true, "the trait is kept on the sheet");
   assert.match(describeSheet(world.sheet(pip.id), "pip", false, { romance: true }), /Open to more than one partner/);
-  await world.invoke("set_npc", { name: "Corin", gender: "Male", drawnTo: ["women"] });
+  await world.invoke("set_npc", { name: "Corin", sex: "Male", drawnTo: ["women"] });
   await world.invoke("set_npc", { name: "Corin", drawnTo: ["women", "open relationships"] });
-  assert.deepEqual(npcs.getNpcByName(world.campaignId, "Corin").attraction, { genders: ["Female"], note: "", open: true }, "openness added after the first answer");
+  assert.deepEqual(npcs.getNpcByName(world.campaignId, "Corin").attraction, { sexes: ["Female"], note: "", open: true }, "openness added after the first answer");
   assert.match(npcRosterForPrompt(world.campaignId, { romance: true }).find((npc) => npc.name === "Corin").identity, /open to more than one partner/);
   bond(pip, "Corin", 80, "together");
   bond(pip, "Bram", 60);

@@ -88,7 +88,7 @@ test("the gloom follows the paladin's token", () => {
 function paladin() {
   return {
     id: "pal", campaignId: "c1", userId: "u1", libraryCharacterId: null,
-    name: "Mordrin", race: "human", class: "paladin", subclass: "Oathbreaker", background: "", alignment: "", gender: "",
+    name: "Mordrin", race: "human", class: "paladin", subclass: "Oathbreaker", background: "", alignment: "", sex: "",
     level: 20, xp: 0,
     abilities: { str: 18, dex: 10, con: 14, int: 10, wis: 12, cha: 20 },
     maxHp: 180, currentHp: 180, tempHp: 0, ac: 18, acOverride: false, speed: 30,

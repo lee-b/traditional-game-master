@@ -43,9 +43,9 @@ export type PlayerMapView = {
     kind: TokenKind;
     refId: string;
     name: string;
-    // The model a 3D board view draws an enemy or an NPC as: the gender
-    // their flat face reads, when it is Female or Male; absent for one
-    // recorded as Nonbinary or a Cast NPC whose gender is not recorded
+    // The model a 3D board view draws an enemy or an NPC as: the sex
+    // their flat face reads, when it is Female or Male; absent for an
+    // unspecified one or a Cast NPC whose sex is not recorded
     // (src/lib/actor-sex-logic.ts).
     sex?: Sex;
     x: number;
@@ -65,7 +65,7 @@ export type PlayerMapView = {
     // plain figure (public/assets/props/manifest.json ids).
     stamp: string;
     // An "npc" token the Cast knows by its name: their portrait, or the
-    // plate their role, race and gender pick (src/lib/db/npc-faces.ts).
+    // plate their role, race and sex pick (src/lib/db/npc-faces.ts).
     // Absent for a bystander nobody tracks, who keeps a face by name.
     face?: string;
     // The side a creature fights on when it is not its kind's (issue 503):

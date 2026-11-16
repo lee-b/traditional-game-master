@@ -38,8 +38,8 @@ async function suitor(name, gameSettings = {}) {
   const world = await openWorld({ gameSettings });
   // At a table a person runs, the hero is a player's, as an NPC's first move
   // needs (a person may make one from the console without a window).
-  const hero = world.addHero({ name: "Vex", gender: "Female", ...(gameSettings.dmMode === "human" ? { user: world.addUser("vex") } : {}) });
-  const set = await world.invoke("set_npc", { name, gender: "Male", location: "Highmoor", drawnTo: ["women"] });
+  const hero = world.addHero({ name: "Vex", sex: "Female", ...(gameSettings.dmMode === "human" ? { user: world.addUser("vex") } : {}) });
+  const set = await world.invoke("set_npc", { name, sex: "Male", location: "Highmoor", drawnTo: ["women"] });
   assert.equal(set.ok, true, set.error);
   npcs.patchNpcAgency(npcs.getNpcByName(world.campaignId, name).id, { personality: EVEN });
   const row = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: hero.id, characterName: hero.name, subjectKind: "npc", subjectName: name });
@@ -142,8 +142,8 @@ await test("an NPC's first move waits a day after the player's own first step, a
 
 await test("a paladin's regard for mercy wears with each mercy, and the fourth moves nothing", async () => {
   const world = await openWorld({ gameSettings: { companions: "full" } });
-  const kael = world.addHero({ name: "Kael", gender: "Male" });
-  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", gender: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
+  const kael = world.addHero({ name: "Kael", sex: "Male" });
+  const added = await world.invoke("add_companion", { name: "Seren", class: "paladin", sex: "Female", alignment: "LG", personality: "Stern.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   npcs.patchNpcAgency(npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Seren").id, { personality: EVEN });
   const moved = [];
@@ -170,8 +170,8 @@ await test("a paladin's regard for mercy wears with each mercy, and the fourth m
 async function humanTable({ composure = 0, gameSettings = {}, open = false } = {}) {
   const world = await openWorld({ gameSettings: { dmMode: "human", companions: "full", ...gameSettings } });
   const player = world.addUser("kael");
-  const kael = world.addHero({ user: player, name: "Kael", gender: "Male", ...(open ? { attraction: { genders: [], note: "", open: true } } : {}) });
-  const added = await world.invoke("add_companion", { name: "Lyra", class: "bard", gender: "Female", personality: "Bright and restless.", kind: "party" });
+  const kael = world.addHero({ user: player, name: "Kael", sex: "Male", ...(open ? { attraction: { sexes: [], note: "", open: true } } : {}) });
+  const added = await world.invoke("add_companion", { name: "Lyra", class: "bard", sex: "Female", personality: "Bright and restless.", kind: "party" });
   assert.equal(added.ok, true, added.error);
   npcs.patchNpcAgency(npcs.listNpcs(world.campaignId).find((npc) => npc.name === "Lyra").id, { personality: { ...EVEN, composure } });
   const lyra = () => relationships.getRelationship(world.campaignId, kael.id, "Lyra");
@@ -259,7 +259,7 @@ await test("never in a fight: a due scene holds through one and nothing new come
 await test("a jealous moment comes first when the character courts someone else and the companion lets a hurt show", async () => {
   const { world, kael, lyra, narrate, card } = await humanTable({ composure: -2 });
   relationships.patchRelationship(lyra().id, { romance: "courting" });
-  const set = await world.invoke("set_npc", { name: "Mira", gender: "Female", location: "Highmoor" });
+  const set = await world.invoke("set_npc", { name: "Mira", sex: "Female", location: "Highmoor" });
   assert.equal(set.ok, true, set.error);
   const mira = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: kael.id, characterName: "Kael", subjectKind: "npc", subjectName: "Mira" });
   relationships.patchRelationship(mira.id, { approval: 30, beats: { flirt: 1 } });
@@ -274,7 +274,7 @@ await test("no jealous moment when both of them are open to more than one partne
   const { world, kael, lyra, narrate, card } = await humanTable({ composure: -2, open: true });
   await world.invoke("set_npc", { name: "Lyra", drawnTo: ["open relationships"] });
   relationships.patchRelationship(lyra().id, { romance: "courting" });
-  await world.invoke("set_npc", { name: "Mira", gender: "Female", location: "Highmoor" });
+  await world.invoke("set_npc", { name: "Mira", sex: "Female", location: "Highmoor" });
   const mira = relationships.ensureRelationship({ campaignId: world.campaignId, characterId: kael.id, characterName: "Kael", subjectKind: "npc", subjectName: "Mira" });
   relationships.patchRelationship(mira.id, { approval: 30, beats: { flirt: 1 } });
   await narrate("Dawn.");
@@ -313,8 +313,8 @@ await test("nothing romantic is offered where romance is off or the table's safe
 
 await test("at an AI table the scene is a director note, counted as handed when the prompt is built, and the reply that plays it records it", async () => {
   const world = await openWorld({ gameSettings: { companions: "full" } });
-  const kael = world.addHero({ name: "Kael", gender: "Male" });
-  await world.invoke("add_companion", { name: "Lyra", class: "bard", gender: "Female", personality: "Bright.", kind: "party" });
+  const kael = world.addHero({ name: "Kael", sex: "Male" });
+  await world.invoke("add_companion", { name: "Lyra", class: "bard", sex: "Female", personality: "Bright.", kind: "party" });
   const lyra = () => relationships.getRelationship(world.campaignId, kael.id, "Lyra");
   relationships.patchRelationship(lyra().id, { romance: "together", approval: 80 });
   const reply = (content) => readRomanceScene(world.campaign(), world.say("dm", content), { handedNow: false });

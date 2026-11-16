@@ -33,6 +33,7 @@ import { featChoice } from "@/lib/schemas/sheet";
 import { normalizeAttraction } from "@/lib/attraction";
 import { personaOrNothing } from "@/lib/backgrounds/persona-logic";
 
+
 export type BuilderResult = { level: number; sheet: CreateSheetInput };
 
 // Where on its step the missing pick sits, named for the block that collects
@@ -825,9 +826,9 @@ export function buildBuilderResult(input: SubmitInput): BuilderResult {
       subclass: picks.subclass,
       background: background.id,
       alignment: state.alignment,
-      gender: state.gender,
+      sex: state.sex,
       // Who they are drawn to (issue 501): identity, so an edit keeps it
-      // the way it keeps the gender, because the builder holds it.
+      // the way it keeps the sex, because the builder holds it.
       attraction: normalizeAttraction(state.attraction),
       appearance: state.appearance.trim(),
       abilities,

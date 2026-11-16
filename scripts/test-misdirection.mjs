@@ -443,7 +443,7 @@ await test("Instinctive Charm: before the round's tick the bar refuses even with
   // A guest leaves with the fight it joined, so this one joins between fights.
   await kit.endFight();
   const { moveToSide } = await import("../src/lib/dm/combat-sides.ts");
-  const joined = await world.invoke("add_companion", { gender: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest" });
+  const joined = await world.invoke("add_companion", { sex: "Unknown", name: "Aldric", class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest" });
   assert.equal(joined.ok, true, joined.error);
   const turncoat = joined.result.characterId;
   world.patch(turncoat, { proficiencies: TRAINED, maxHp: 30, currentHp: 30, ac: 12, acOverride: true, equipment: [{ name: "Longsword", qty: 1 }], conditions: [], conditionMeta: {} });

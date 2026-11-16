@@ -1,4 +1,4 @@
-// The NPC form's Race, beside Gender: the pair picks the stand-in face, so
+// The NPC form's Race, beside Sex: the pair picks the stand-in face, so
 // an elf archer in the Cast draws the elf archer plate (PR 710's art), and
 // the card in the list follows the record. A finger-sized select, named for
 // screen readers, clean under axe, legible night and day, phone and desktop.
@@ -15,7 +15,7 @@ export default {
     await api.post(`${base}/api/profile/tours`, { data: { finished: ["world", "cast"].map((tool) => ({ id: `workshop-${tool}`, version: 1, how: "ended" })) } });
     try {
       const saved = await api.post(`${base}/api/campaigns/${id}/dm/npcs`, {
-        data: { draft: { name: "Ilya Thornwood", role: "archer", gender: "Female", race: "wood_elf", attitude: "friendly", trait: "Keeps watch on the north road." } },
+        data: { draft: { name: "Ilya Thornwood", role: "archer", sex: "Female", race: "wood_elf", attitude: "friendly", trait: "Keeps watch on the north road." } },
       });
       check(saved.ok(), `the NPC was saved (${saved.status()})`);
       const npc = (await saved.json()).npc;
@@ -30,7 +30,7 @@ export default {
       const race = dialog.getByRole("button", { name: "Race" }).locator("visible=true").first();
       await race.waitFor({ state: "visible", timeout: 20_000 });
       check(/Elf \(Wood\)/.test((await race.innerText()) ?? ""), `the picker shows the stored race (${await race.innerText()})`);
-      // A finger-sized target where fingers are: the kit's select, as Gender's.
+      // A finger-sized target where fingers are: the kit's select, as Sex's.
       if (t.touch) {
         const box = await race.boundingBox();
         check(box && box.height >= 40, `a finger-sized select on a phone (${box?.height})`);

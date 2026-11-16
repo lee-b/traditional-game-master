@@ -294,7 +294,7 @@ function parseStartArgs(rawArguments: string): { args: z.infer<typeof startArgsS
     .safeParse(raw);
   if (flat.success) {
     // Every field an enemy takes, so one added to enemyRequestSchema (a
-    // race, a gender) is not dropped from a weak model's flat call.
+    // race, a sex) is not dropped from a weak model's flat call.
     const { summary, absent, building, ...enemy } = flat.data;
     return { args: { enemies: [enemy], summary, absent, building } };
   }
@@ -456,7 +456,7 @@ function handleStartEncounter(
       stats: entry.stats,
       ...(entry.npcId ? { npcId: entry.npcId } : {}),
       race: entry.race,
-      gender: entry.gender,
+      sex: entry.sex,
       ...(carry ? { arrives: carry.arrives } : {}),
     });
   });

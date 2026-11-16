@@ -176,7 +176,7 @@ export function heroInput(overrides = {}) {
     subclass: "",
     background: "",
     alignment: "",
-    gender: "",
+    sex: "",
     appearance: "",
     abilities: scoresOf(overrides.abilities),
     maxHp: 30,

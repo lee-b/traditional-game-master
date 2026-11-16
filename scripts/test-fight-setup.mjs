@@ -17,6 +17,7 @@ const { createWorkshop } = await import("../src/lib/db/workshops.ts");
 const templates = await import("../src/lib/db/encounter-templates.ts");
 const { createCharacter } = await import("../src/lib/db/characters.ts");
 const { listSheets, patchSheet, getSheetById } = await import("../src/lib/db/sheets.ts");
+const { pickedSex } = await import("../src/lib/actor-sex-logic.ts");
 const { getActiveEncounter, listEnemies, patchEnemyHp, patchEnemyConditions, saveEncounter } = await import("../src/lib/db/encounters.ts");
 const { getBattleMapForEncounter, getTokenByRef, listTokens, placeToken } = await import("../src/lib/db/battle-maps.ts");
 const { nearestOpenTile } = await import("../src/lib/battlemap/paint.ts");
@@ -118,10 +119,11 @@ await test("Save as set-up keeps the moment on the workshop's fight, and the gen
   patchEnemyHp(g1.id, 2, "alive");
   patchEnemyConditions(g2.id, ["prone"], {});
   // Who each goblin is (PR 747's faces, PR 745's 3D model): a foe told no
-  // gender takes a pick from its own row id, and a test's rows are new each
-  // time, so the set-up keeps what the moment had. Nonbinary is no pick.
-  getDatabase().prepare("UPDATE encounter_enemies SET gender = ?, race = ? WHERE id = ?").run("Nonbinary", "", g1.id);
-  getDatabase().prepare("UPDATE encounter_enemies SET gender = ?, race = ? WHERE id = ?").run("Female", "half_orc", g2.id);
+  // sex takes a pick from its own row id, and a test's rows are new each
+  // time, so the set-up keeps what the moment had. "Nonbinary" is a value
+  // the choice held before it was dropped: it reads as unspecified.
+  getDatabase().prepare("UPDATE encounter_enemies SET sex = ?, race = ? WHERE id = ?").run("Nonbinary", "", g1.id);
+  getDatabase().prepare("UPDATE encounter_enemies SET sex = ?, race = ? WHERE id = ?").run("Female", "half_orc", g2.id);
   const caster = listSheets(first).find((sheet) => (sheet.spellcasting?.slots?.["1"]?.max ?? 0) > 0);
   patchSheet(h1.id, { currentHp: 3, conditions: ["poisoned"] });
   if (caster) {
@@ -162,7 +164,7 @@ await test("Save as set-up keeps the moment on the workshop's fight, and the gen
   assert.deepEqual(saved.foes.find((foe) => foe.slot === 0).at, tiles.goblin);
   assert.equal(saved.heroes[0].currentHp, 3);
   assert.equal(saved.foes.find((foe) => foe.slot === 1).initiative, 22);
-  assert.equal(saved.foes.find((foe) => foe.slot === 0).gender, "Nonbinary");
+  assert.equal(saved.foes.find((foe) => foe.slot === 0).sex, undefined, "the dropped choice reads as unspecified");
   assert.equal(saved.foes.find((foe) => foe.slot === 1).race, "half_orc");
   assert.ok(out.json.lines.some((line) => /Goblin 1 \(2 of \d+ HP\)/.test(line)), out.json.lines.join(" | "));
   // The list says so, and with what party.
@@ -187,7 +189,7 @@ await test("the next test opens on the saved moment, on the kept map, with the s
   const [g1, g2] = goblinsOf(next);
   assert.equal(g1.currentHp, 2);
   assert.ok(g2.conditions.includes("prone"), g2.conditions.join(", "));
-  assert.deepEqual([g1.gender, g2.gender, g2.race], ["Nonbinary", "Female", "half_orc"], "the goblins came back as someone else");
+  assert.deepEqual([g1.sex, g2.sex, g2.race], [pickedSex(g1.id), "Female", "half_orc"], "the goblins came back as someone else");
   assert.deepEqual(tokenAt(next, g1.id), tiles.goblin);
   assert.deepEqual(tokenAt(next, sheets[1].id), tiles.hero);
   const fight = getActiveEncounter(next);

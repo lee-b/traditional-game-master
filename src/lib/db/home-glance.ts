@@ -54,7 +54,7 @@ type FaceRow = {
   name: string;
   race: string;
   class: string;
-  gender: string | null;
+  sex: string | null;
   portrait_json: string | null;
 };
 
@@ -69,7 +69,7 @@ export function partyFacesByCampaign(campaignIds: string[], genreById: Map<strin
   const marks = campaignIds.map(() => "?").join(", ");
   const rows = getDatabase()
     .prepare(
-      `SELECT campaign_id, name, race, class, gender, portrait_json FROM character_sheets
+      `SELECT campaign_id, name, race, class, sex, portrait_json FROM character_sheets
        WHERE campaign_id IN (${marks}) AND (is_companion IS NULL OR is_companion = 0)
        ORDER BY created_at ASC`,
     )
@@ -87,7 +87,7 @@ export function partyFacesByCampaign(campaignIds: string[], genreById: Map<strin
         characterPlaceholder({
           race: row.race,
           class: row.class,
-          gender: row.gender,
+          sex: row.sex,
           genre: genreById.get(row.campaign_id) ?? null,
         }),
     });

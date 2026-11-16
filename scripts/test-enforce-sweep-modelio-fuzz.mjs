@@ -73,7 +73,7 @@ async function table(fight) {
     // A place to stand, someone to talk to and a quest to tick.
     for (const [name, args] of [
       ["move_party", { name: "The Crossroads", layoutDescription: "A signpost where two roads meet.", visionClear: true }],
-      ["set_npc", { name: "Orla", attitude: "indifferent", gender: "Female" }],
+      ["set_npc", { name: "Orla", attitude: "indifferent", sex: "Female" }],
       ["set_quest", { title: "Find the bell" }],
     ]) {
       const done = await world.invoke(name, args);

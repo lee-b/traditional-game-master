@@ -30,7 +30,7 @@ const sheet = (id, name, extra = {}) => ({
   name,
   race: "hill_dwarf",
   class: "Fighter",
-  gender: "",
+  sex: "",
   portrait: null,
   isCompanion: false,
   ...extra,

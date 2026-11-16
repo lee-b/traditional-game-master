@@ -117,7 +117,7 @@ function builderEdit(initial, level, overrides = {}) {
     name: initial.name,
     subclass: initial.subclass,
     alignment: initial.alignment,
-    gender: "",
+    sex: "",
     appearance: "",
     acOverride: null,
     portrait: initial.portrait,

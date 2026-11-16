@@ -94,7 +94,7 @@ export async function POST(
   if (parsed.data.portrait) {
     queueNpcPortrait(context.campaign, {
       id: npc.id,
-      gender: npc.gender,
+      sex: npc.sex,
       race: npc.race,
       role: npc.role,
       trait: npc.trait,

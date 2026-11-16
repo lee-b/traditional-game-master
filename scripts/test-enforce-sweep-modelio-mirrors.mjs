@@ -152,7 +152,7 @@ for (const fight of [false, true]) {
 // ---- D. the watch stop against the tools that roll --------------------------
 
 {
-  await world.invoke("set_npc", { name: "Orla", attitude: "indifferent", gender: "Female" });
+  await world.invoke("set_npc", { name: "Orla", attitude: "indifferent", sex: "Female" });
   const encounter = await world.beginFight([{ monster: "goblin", count: 2 }], { heroFaces: { [mage.id]: 20, [sword.id]: 19 } });
   // A fight whose tokens stand nowhere, as scripts/test-enforce-tool-args.mjs
   // makes one: start_encounter places them at random, and which tools reach

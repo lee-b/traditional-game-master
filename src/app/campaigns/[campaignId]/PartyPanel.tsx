@@ -575,7 +575,7 @@ export function PartyPanel({
               <CharacterPortrait
                 url={sheet.portrait?.url}
                 fallback={packArt.characterUrl({ race: sheet.race, class: sheet.class })}
-                look={{ race: sheet.race, class: sheet.class, gender: sheet.gender }}
+                look={{ race: sheet.race, class: sheet.class, sex: sheet.sex }}
                 alt={sheet.name}
                 size="size-12"
                 className="party-card-portrait border-amber-500/30 shadow-glow-gold"

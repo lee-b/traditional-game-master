@@ -244,8 +244,8 @@ await test("a module carries the mark: imported in the issue's words, copied to 
     version: 1,
     manifest: { name: "Sample module", blurb: "sample", inspiredBy: "none" },
     npcs: [
-      { name: "Maren Dusk", attitude: "friendly", gender: "Female", knownAtStart: { grade: "friend", source: "Their old friend and patron hires them to escort a wagon." } },
-      { name: "Hidden Boss", attitude: "hostile", gender: "Male", knownAtStart: { grade: "acquainted", source: "export error" } },
+      { name: "Maren Dusk", attitude: "friendly", sex: "Female", knownAtStart: { grade: "friend", source: "Their old friend and patron hires them to escort a wagon." } },
+      { name: "Hidden Boss", attitude: "hostile", sex: "Male", knownAtStart: { grade: "acquainted", source: "export error" } },
       { name: "No Reason", attitude: "friendly", knownAtStart: { grade: "close" } },
       { name: "Newer Grade", attitude: "friendly", knownAtStart: { grade: "rival", source: "a grade from a later version" } },
       // A long quote from the adventure's opening is clipped as the form

@@ -32,6 +32,15 @@ code really does.
   The role is the GM (Game Master). Creatures and art follow
   [docs/art/creature-art-guidance.md](../docs/art/creature-art-guidance.md):
   a named SRD creature, an original design, or a subject licensed for it.
+- **A traditional table.** This fork keeps romance opposite-sex only:
+  characters have a sex (never a "sex"), the choices are women and men,
+  and a same-sex pair is refused outright at the gate in
+  [src/lib/dm/advance-logic.ts](../src/lib/dm/advance-logic.ts) and
+  [src/lib/dm/scheme-logic.ts](../src/lib/dm/scheme-logic.ts), before the
+  attraction check. Keep the gate additive — upstream lines untouched, the
+  check inserted before `attractionFits` — so future merges from upstream
+  stay small, and keep the compat shims that read old values written under
+  retired names or choices.
 
 ## Setting up
 

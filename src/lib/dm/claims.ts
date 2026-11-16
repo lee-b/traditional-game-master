@@ -238,7 +238,7 @@ const SKILL_IDS = SRD_SKILLS.map((skill) => skill.id);
 // the cast (src/lib/dm/cast.ts wholeCast), the party, the
 // fight's creatures, and the NPCs the reply being read registers, whose row
 // does not exist yet (an id-less speaker, resolved by name when the message
-// is written: src/lib/dm/speech-lines.ts). Aliases and the gender field ride
+// is written: src/lib/dm/speech-lines.ts). Aliases and the sex field ride
 // along for the reading of person-written text.
 export function speakerRoster(
   campaignId: string,
@@ -250,12 +250,12 @@ export function speakerRoster(
   // A companion's own row stands behind its sheet, which speaks for them.
   const npcs = listCastNpcs(campaignId).filter((npc) => !npc.archived);
   for (const npc of npcs) {
-    roster.set(npc.id, { kind: "npc", id: npc.id, name: npc.name, aliases: npc.aliases, gender: npc.gender });
+    roster.set(npc.id, { kind: "npc", id: npc.id, name: npc.name, aliases: npc.aliases, sex: npc.sex });
   }
   const taken = new Set(npcs.map((npc) => textKey(npc.name)));
   for (const sheet of sheets) {
     if (!sheet.summon && !taken.has(textKey(sheet.name))) {
-      roster.set(sheet.id, { kind: "pc", id: sheet.id, name: sheet.name, gender: sheet.gender });
+      roster.set(sheet.id, { kind: "pc", id: sheet.id, name: sheet.name, sex: sheet.sex });
     }
   }
   for (const [ref, display] of creatures) {

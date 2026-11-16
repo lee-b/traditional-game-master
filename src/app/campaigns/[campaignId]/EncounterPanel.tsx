@@ -72,13 +72,13 @@ export function EncounterPanel({
       if (sheet) {
         return [
           sheet.portrait?.url,
-          characterPlaceholder({ race: sheet.race, class: sheet.class, gender: sheet.gender }),
+          characterPlaceholder({ race: sheet.race, class: sheet.class, sex: sheet.sex }),
           familyIconPath(`class-${sheet.class}`),
         ];
       }
       const enemy = enemiesById.get(entry.id);
       if (enemy) {
-        return [monsterPlaceholder(enemy.type, { cr: enemy.cr, genre, seed: enemy.name, slug: enemy.slug, name: enemy.name, race: enemy.race, gender: enemy.gender })];
+        return [monsterPlaceholder(enemy.type, { cr: enemy.cr, genre, seed: enemy.name, slug: enemy.slug, name: enemy.name, race: enemy.race, sex: enemy.sex })];
       }
       return entry.kind === "npc" ? [entry.face, npcPlaceholder(null, entry.name)] : [];
     };

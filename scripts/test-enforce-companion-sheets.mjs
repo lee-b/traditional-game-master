@@ -44,7 +44,7 @@ async function table(settings = {}) {
 
 async function recruit(world, classId, extra = {}) {
   const joined = await world.invoke("add_companion", {
-    gender: "Unknown",
+    sex: "Unknown",
     name: `The ${classId}`,
     class: classId,
     race: "human",
@@ -335,7 +335,7 @@ await test("every setting class makes a companion, and the companion levels", as
     const world = await table({ genre, maxGuests: 3 });
     for (const classId of genreClassIds(genre)) {
       const joined = await world.invoke("add_companion", {
-        gender: "Unknown",
+        sex: "Unknown",
         name: `The ${classId}`,
         class: classId,
         race: "human",
@@ -435,7 +435,7 @@ await test("the background and skills a recruiter names are kept, a skill off th
   assert.ok(!sheet.proficiencies.skills.includes("arcana"));
   assert.match(note, /Arcana is not among the skills/);
   const refused = await world.invoke("add_companion", {
-    gender: "Unknown", name: "Other", class: "fighter", personality: "Quiet.", kind: "guest", background: "Astronaut",
+    sex: "Unknown", name: "Other", class: "fighter", personality: "Quiet.", kind: "guest", background: "Astronaut",
   });
   assert.match(refused.error ?? refused.result?.error ?? "", /"Astronaut" is not a background this table offers\. Call add_companion again with one of: .*Soldier/);
 });

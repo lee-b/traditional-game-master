@@ -55,7 +55,7 @@ export function CallingStep({
   classNote = null,
   subclassNote = null,
   notices = null,
-  genderField = null,
+  sexField = null,
   levelField = null,
   multiclassAllowed = true,
 }: {
@@ -84,12 +84,12 @@ export function CallingStep({
     intro?: string;
     onHelpMeBuild?: (style: PlaystyleId | null) => void;
   };
-  // The setting's notices (ContentNotices), the gender (GenderField), which
+  // The setting's notices (ContentNotices), the sex (SexField), which
   // the class cards' art follows, so it is asked above them, and the level
   // (LevelField): the level decides what this step and every later one
   // offers, so it is set here, under the class.
   notices?: ReactNode;
-  genderField?: ReactNode;
+  sexField?: ReactNode;
   levelField?: ReactNode;
   // "Pick for me" on the subclass (quickBuild.ts), offered once the level
   // asks for one.
@@ -108,7 +108,7 @@ export function CallingStep({
   // shows its own in its card (MulticlassSection).
   const primaryLevel = derived.primaryLevel ?? effectiveLevel;
   const grantedFeatures = derived.multiclass ? (derived.featuresByClass[0]?.features ?? []) : derived.grantedFeatures;
-  const { gender } = state;
+  const { sex } = state;
   // A genre class's feature text arrives on demand (issue 411).
   useClassFeatureText([klass?.id]);
   const [detailsFor, setDetailsFor] = useState<string | null>(null);
@@ -156,12 +156,12 @@ export function CallingStep({
             option,
             entry: classes.find((candidate) => candidate.id === option.id),
             reading: readings.get(option.id),
-            gender,
+            sex,
             numbers,
           }),
         ),
       })),
-    [classGroups, classes, gender, readings, numbers],
+    [classGroups, classes, sex, readings, numbers],
   );
   // The class grid's filters (OptionCardGrid): its job in a fight, how much
   // magic it has, which of the core four it plays like, and its book or
@@ -232,7 +232,7 @@ export function CallingStep({
           intro={playstyle?.intro}
           onHelpMeBuild={playstyle?.onHelpMeBuild}
         />
-        {genderField}
+        {sexField}
         <Field label="Class" className="mt-4">
           {klass ? (
             <span className="mb-3 flex flex-wrap items-center gap-x-1 text-xs text-stone-500">

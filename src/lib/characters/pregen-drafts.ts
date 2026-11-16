@@ -176,7 +176,7 @@ function freshFields(proposal: HeroProposal, level: number, ids: { classId: stri
     optionPicks: [],
     backstory: proposal.backstory,
     hopes: "",
-    gender: proposal.gender,
+    sex: proposal.sex,
     attraction: normalizeAttraction(undefined),
     appearance: "",
     portrait: null,

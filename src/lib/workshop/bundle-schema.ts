@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { storedSheetSchema } from "@/lib/schemas/sheet";
-import { GENDERS } from "@/lib/gender";
+import { SEXES } from "@/lib/sex";
 import { storedRace } from "@/lib/npc-race";
 import { GENRES } from "@/lib/schemas/game-settings";
 import { BEAT_KINDS, BODY_MAX, ROUTE_KINDS, ROUTE_LABEL_MAX } from "@/lib/workshop/board";
@@ -122,15 +122,15 @@ const locationSchema = z.object({
   shared: sharedSchema,
 });
 
-const npcSchema = z.object({
+const npcSchemaObject = z.object({
   name: z.string().trim().min(1).max(120),
   attitude: z.enum(["hostile", "indifferent", "friendly"]).default("indifferent"),
   trait: z.string().max(500).default(""),
   location: z.string().max(120).default(""),
   // A role id or free text; bundles written before the field have none.
   role: z.string().trim().max(40).default(""),
-  // src/lib/gender.ts; bundles written before the field have none.
-  gender: z.enum(["", ...GENDERS]).default(""),
+  // src/lib/sex.ts; bundles written before the field have none.
+  sex: z.enum(["", ...SEXES]).default(""),
   // An SRD race id (src/lib/npc-race.ts); bundles written before the field
   // have none, and one this server does not know reads as unrecorded.
   race: z.string().max(40).default("").transform(storedRace),
@@ -166,6 +166,16 @@ const npcSchema = z.object({
   ref: refSchema,
   shared: sharedSchema,
 });
+
+// Bundles written before the sex rename carried the value under "gender";
+// the shim copies it over so the older bundles still import.
+export const npcSchema = z.preprocess(
+  (raw) =>
+    raw && typeof raw === "object"
+      ? { ...(raw as Record<string, unknown>), sex: (raw as { sex?: unknown }).sex ?? (raw as { gender?: unknown }).gender }
+      : raw,
+  npcSchemaObject,
+);
 
 // Factions (docs/vtt-parity-implementation-plan.md section 6). Members are
 // matched back by NPC name on import, the way relations are.
@@ -409,7 +419,7 @@ export const workshopBundleSchema = z.object({
   variantRules: z.record(z.string(), z.unknown()).default({}),
   lore: z.array(loreSchema).max(BUNDLE_LIMITS.lore).default([]),
   locations: z.array(locationSchema).max(BUNDLE_LIMITS.locations).default([]),
-  npcs: z.array(npcSchema).max(BUNDLE_LIMITS.npcs).default([]),
+  npcs: z.array(npcSchemaObject).max(BUNDLE_LIMITS.npcs).default([]),
   factions: z.array(factionSchema).max(60).default([]),
   encounters: z.array(encounterSchema).max(BUNDLE_LIMITS.encounters).default([]),
   tables: z.array(tableSchema).max(BUNDLE_LIMITS.tables).default([]),

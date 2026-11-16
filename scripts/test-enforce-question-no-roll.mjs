@@ -24,10 +24,10 @@ const { listRecentRolls } = await import("../src/lib/db/rolls.ts");
 
 const kara = world.addHero({ name: "Kara", abilities: { cha: 16, wis: 14 } });
 const brom = world.addHero({ name: "Brom", abilities: { cha: 12 } });
-const added = await world.invoke("add_companion", { name: "Corin", class: "fighter", gender: "Male", personality: "Quiet, watchful.", kind: "party" });
+const added = await world.invoke("add_companion", { name: "Corin", class: "fighter", sex: "Male", personality: "Quiet, watchful.", kind: "party" });
 assert.equal(added.ok, true, added.error);
 const corin = world.sheets().find((sheet) => sheet.name === "Corin");
-await world.invoke("set_npc", { name: "Tamsin", gender: "Female" });
+await world.invoke("set_npc", { name: "Tamsin", sex: "Female" });
 
 const REFUSAL = (name) =>
   `${name}'s player only asked a question or listened, and that sways no one, so nothing was rolled. Answer in character, as the one spoken to feels about the party, and do not narrate a check. If the player then presses, argues or bargains, that attempt is the roll.`;

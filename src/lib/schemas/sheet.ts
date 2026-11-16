@@ -3,7 +3,7 @@ import { homebrewGearSchema } from "@/lib/schemas/homebrew";
 import { ITEM_TAGS } from "@/lib/schemas/item-tags";
 import { summonAttackSchema, type SheetSummon } from "@/lib/schemas/summon";
 import { ABILITIES } from "@/lib/schemas/abilities";
-import { GENDERS, storedGender, type Gender } from "@/lib/gender";
+import { SEXES, storedSex, type Sex } from "@/lib/sex";
 import { ATTRACTION_NOTE_MAX, normalizeAttraction, type Attraction } from "@/lib/attraction";
 import { conditionMetaSchema, ROUND_CEILING, type ConditionMetaMap } from "@/lib/schemas/condition-meta";
 import { textKey } from "@/lib/language/text-logic";
@@ -481,7 +481,7 @@ export type AsiChoice = z.infer<typeof asiChoiceSchema>;
 // Who a character is drawn to (src/lib/attraction.ts, issue 501). Blank is
 // unspecified, and nothing changes for a character left blank.
 export const attractionSchema = z.object({
-  genders: z.array(z.enum(GENDERS)).max(GENDERS.length).default([]),
+  sexes: z.array(z.enum(SEXES)).max(SEXES.length).default([]),
   note: z.string().trim().max(ATTRACTION_NOTE_MAX).default(""),
   // Open to more than one partner (issue 642); absent is exclusive.
   open: z.boolean().optional(),
@@ -508,7 +508,7 @@ export const createSheetSchema = z.object({
   subclass: z.string().trim().max(80).default(""),
   background: z.string().trim().max(60).default(""),
   alignment: z.string().trim().max(30).default(""),
-  gender: z.enum(["", ...GENDERS]).default(""),
+  sex: z.enum(["", ...SEXES]).default(""),
   // Optional rather than defaulted: a sheet written before the field (a
   // pregen, a library blob, a file) simply has none, which is blank.
   attraction: attractionSchema.optional(),
@@ -635,7 +635,7 @@ export const createSheetSchema = z.object({
 });
 export type CreateSheetInput = z.infer<typeof createSheetSchema>;
 
-// A sheet read back from a file or a stored bundle: a gender written as free
+// A sheet read back from a file or a stored bundle: a sex written as free
 // text before the field was fixed reads as unspecified rather than refusing
 // the whole sheet, and so does an attraction it cannot read.
 export const storedSheetSchema = z.preprocess(
@@ -643,7 +643,9 @@ export const storedSheetSchema = z.preprocess(
     raw && typeof raw === "object"
       ? {
           ...raw,
-          gender: storedGender((raw as { gender?: unknown }).gender),
+          // A sheet written before the sex rename carries the value under
+          // "gender"; either key reads, and "Nonbinary" degrades to "".
+          sex: storedSex((raw as { sex?: unknown }).sex ?? (raw as { gender?: unknown }).gender),
           attraction: normalizeAttraction((raw as { attraction?: unknown }).attraction),
         }
       : raw,
@@ -899,9 +901,9 @@ export type CharacterSheet = {
   // A homebrew background's name, derived like raceLabel.
   backgroundLabel?: string;
   alignment: string;
-  // The builder's choice, or "" (src/lib/gender.ts): read by the portrait
+  // The builder's choice, or "" (src/lib/sex.ts): read by the portrait
   // prompt, the placeholder face, the voice cast and the speech reader.
-  gender: Gender;
+  sex: Sex;
   // Who they are drawn to (src/lib/attraction.ts); blank = unspecified.
   // Optional only for test doubles: every stored sheet reads one.
   attraction?: Attraction;

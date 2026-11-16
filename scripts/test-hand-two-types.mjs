@@ -26,7 +26,7 @@ function test(name, fn) {
 
 const sheet = (prepared = ["Ice Storm", "Flame Strike", "Meteor Swarm", "Fireball"]) => ({
   id: "s1", campaignId: "c1", userId: "u1", libraryCharacterId: null,
-  name: "Kael", race: "human", class: "wizard", subclass: "", background: "", alignment: "", gender: "",
+  name: "Kael", race: "human", class: "wizard", subclass: "", background: "", alignment: "", sex: "",
   level: 17, xp: 0,
   abilities: { str: 10, dex: 14, con: 14, int: 18, wis: 14, cha: 12 },
   maxHp: 80, currentHp: 80, tempHp: 0, ac: 12, acOverride: false, speed: 30,

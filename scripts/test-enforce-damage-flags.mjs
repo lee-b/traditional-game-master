@@ -70,7 +70,7 @@ async function turncoat(extra = {}) {
     world.patch(sheet.id, { currentHp: 40, tempHp: 0, conditions: [], conditionMeta: {}, deathSaves: null, concentratingOn: null });
   }
   const joined = await world.invoke("add_companion", {
-    gender: "Unknown", name: `Aldric ${Math.random().toString(36).slice(2, 6)}`, class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest",
+    sex: "Unknown", name: `Aldric ${Math.random().toString(36).slice(2, 6)}`, class: "fighter", race: "human", level: 3, personality: "Grim.", kind: "guest",
   });
   assert.equal(joined.ok, true, joined.error);
   const id = joined.result.characterId;

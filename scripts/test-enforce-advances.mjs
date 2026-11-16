@@ -29,15 +29,16 @@ const { npcRosterForPrompt } = await import("../src/lib/dm/social-tools.ts");
 
 const world = await openWorld();
 // The owner leads the table and plays Bram; Kael and Nysa are players.
-const bram = world.addHero({ name: "Bram", gender: "Male" });
+const bram = world.addHero({ name: "Bram", sex: "Male" });
 const kaelUser = world.addUser("kael");
-const kael = world.addHero({ user: kaelUser, name: "Kael", gender: "Male", abilities: { cha: 16 } });
+const kael = world.addHero({ user: kaelUser, name: "Kael", sex: "Male", abilities: { cha: 16 } });
 const nysaUser = world.addUser("nysa");
 const nysa = world.addHero({
   user: nysaUser,
   name: "Nysa",
-  gender: "Female",
-  attraction: { genders: ["Female"], note: "" },
+  sex: "Female",
+  // Her suitor is a man: opposite-sex romance only at this table.
+  attraction: { sexes: ["Male"], note: "" },
   abilities: { cha: 12 },
 });
 
@@ -86,13 +87,13 @@ const lastLine = () => messages.listRecentMessages(world.campaignId, 1)[0];
 const npcMove = (sheet, subject, note = "") =>
   world.invoke("romance_advance", { characterId: sheet.id, subject, to: "courting", initiator: "npc", ...(note ? { note } : {}) });
 
-await world.invoke("set_npc", { name: "Mira", gender: "Female", drawnTo: ["men"], location: "Highmoor" });
-await world.invoke("set_npc", { name: "Ilse", gender: "Female", location: "Low Fen" });
+await world.invoke("set_npc", { name: "Mira", sex: "Female", drawnTo: ["men"], location: "Highmoor" });
+await world.invoke("set_npc", { name: "Ilse", sex: "Male", location: "Low Fen" });
 
 await test("an NPC's attraction is written once by the DM and kept", async () => {
-  assert.deepEqual(npcs.getNpcByName(world.campaignId, "Mira").attraction, { genders: ["Male"], note: "" });
+  assert.deepEqual(npcs.getNpcByName(world.campaignId, "Mira").attraction, { sexes: ["Male"], note: "" });
   await world.invoke("set_npc", { name: "Mira", drawnTo: ["women"] });
-  assert.deepEqual(npcs.getNpcByName(world.campaignId, "Mira").attraction, { genders: ["Male"], note: "" }, "a second answer never rewrites who she is");
+  assert.deepEqual(npcs.getNpcByName(world.campaignId, "Mira").attraction, { sexes: ["Male"], note: "" }, "a second answer never rewrites who she is");
 });
 
 await test("the opt-in is the owner's alone, off by default, and needs a romance table", async () => {
@@ -105,11 +106,11 @@ await test("the opt-in is the owner's alone, off by default, and needs a romance
   assert.equal((await setOpen(nysaUser, nysa.id, true)).status, 200);
 });
 
-await test("the DM is told who is open, their gender and who they are drawn to", async () => {
+await test("the DM is told who is open, their sex and who they are drawn to", async () => {
   const kaelLine = describeSheet(world.sheet(kael.id), "kael", false, { romance: true, advances: true });
-  assert.match(kaelLine, /Gender: Male \| Open to advances from NPCs/);
+  assert.match(kaelLine, /Sex: Male | Open to advances\| Open to advances from NPCs/);
   const nysaLine = describeSheet(world.sheet(nysa.id), "nysa", false, { romance: true, advances: true });
-  assert.match(nysaLine, /Gender: Female \| Drawn to: women \| Open to advances from NPCs/);
+  assert.match(nysaLine, /Sex: Female \| Drawn to: men \|Sex: Male | Open to advances from NPCs/);
   assert.doesNotMatch(describeSheet(world.sheet(nysa.id), "nysa", false, {}), /Drawn to|Open to advances/, "nothing without romance");
   const mira = npcRosterForPrompt(world.campaignId, { romance: true }).find((npc) => npc.name === "Mira");
   assert.equal(mira.identity, "Female, drawn to men");
@@ -213,8 +214,8 @@ await test("declining stings a little, is remembered, and cools the pair down", 
 });
 
 await test("switching the opt-in off closes the moment and withdraws a waiting advance at once", async () => {
-  await world.invoke("set_npc", { name: "Corin", gender: "Male", location: "Highmoor" });
-  const bard = world.addHero({ user: world.addUser("tam"), name: "Tam", gender: "Female", abilities: { cha: 20 } });
+  await world.invoke("set_npc", { name: "Corin", sex: "Female", location: "Highmoor" });
+  const bard = world.addHero({ user: world.addUser("tam"), name: "Tam", sex: "Male", abilities: { cha: 20 } });
   const tamUser = { id: bard.userId };
   assert.equal((await setOpen(tamUser, bard.id, true)).status, 200);
   liking(bard, "Corin", 65);
@@ -232,19 +233,20 @@ await test("switching the opt-in off closes the moment and withdraws a waiting a
 });
 
 await test("an advance nobody answers lapses into no answer, with no sting", async () => {
-  liking(kael, "Ilse", 60);
-  // Kael is courting Mira, so Ilse may still court him: nobody else is.
+  await world.invoke("set_npc", { name: "Sorsa", sex: "Female", location: "Low Fen" });
+  liking(kael, "Sorsa", 60);
+  // Kael is courting Mira, so Sorsa may still court him: nobody else is.
   world.dice(1);
-  tick(40, "Ilse finds Kael at the well.");
-  assert.ok(pair(kael, "Ilse").advanceReadyUntil > 0, "Ilse is ready");
-  assert.equal((await npcMove(kael, "Ilse")).ok, true);
+  tick(40, "Sorsa finds Kael at the well.");
+  assert.ok(pair(kael, "Sorsa").advanceReadyUntil > 0, "Sorsa is ready");
+  assert.equal((await npcMove(kael, "Sorsa")).ok, true);
   const [row] = pendingAdvances();
-  const before = pair(kael, "Ilse").approval;
+  const before = pair(kael, "Sorsa").approval;
   tick(46);
   assert.equal(proposals.getItemProposal(row.id).status, "expired");
-  assert.equal(pair(kael, "Ilse").approval, before, "no sting");
-  assert.equal(pair(kael, "Ilse").advanceCooldownUntil, 46 + 24);
-  assert.match(lastLine().content, /Kael gave Ilse no answer/);
+  assert.equal(pair(kael, "Sorsa").approval, before, "no sting");
+  assert.equal(pair(kael, "Sorsa").advanceCooldownUntil, 46 + 24);
+  assert.match(lastLine().content, /Kael gave Sorsa no answer/);
 });
 
 await test("an NPC partnered with someone else is not ready for anyone", async () => {
@@ -257,10 +259,35 @@ await test("an NPC partnered with someone else is not ready for anyone", async (
   world.clearDice();
 });
 
+await test("romance is opposite-sex only: a same-sex pair is refused outright, and an unknown sex never blocks", async () => {
+  // Nysa (a woman) and Mira (a woman): the gate refuses before any die rolls,
+  // and no advance is ever written for them to answer.
+  liking(nysa, "Mira", 90);
+  world.dice(1);
+  tick(52, "Mira smiles at Nysa across the fire.");
+  assert.equal(pair(nysa, "Mira").advanceReadyUntil, 0, "the gate refuses before a die");
+  const refused = await npcMove(nysa, "Mira");
+  assert.equal(refused.ok, false);
+  assert.match(refused.error, /of the same sex/);
+  assert.equal(pendingAdvances().length, 0, "no advance waits on a same-sex pair");
+  world.clearDice();
+  // A sex nobody set never blocks: the story does not stall on a blank field.
+  // A fresh hero: nobody's romanced them yet, so only the gate is at issue.
+  await world.invoke("set_npc", { name: "Aldous", sex: "", location: "Highmoor" });
+  const perrinUser = world.addUser("perrin");
+  const perrin = world.addHero({ user: perrinUser, name: "Perrin", sex: "Male" });
+  await setOpen(perrinUser, perrin.id, true);
+  liking(perrin, "Aldous", 90);
+  world.dice(1);
+  tick(56, "Aldous bows to Perrin.");
+  assert.ok(pair(perrin, "Aldous").advanceReadyUntil > 0, "a blank sex never blocks");
+  world.clearDice();
+});
+
 await test("a romanced NPC is never rostered out, though one nobody knows is", async () => {
   const mira = npcs.getNpcByName(world.campaignId, "Mira");
   npcs.patchNpcAgency(mira.id, { pressure: { ignored: 8, engaged: 0 } });
-  await world.invoke("set_npc", { name: "Old Petch", gender: "Male" });
+  await world.invoke("set_npc", { name: "Old Petch", sex: "Male" });
   const petch = npcs.getNpcByName(world.campaignId, "Old Petch");
   npcs.patchNpcAgency(petch.id, { pressure: { ignored: 8, engaged: 0 } });
   advanceNpcAgency(world.campaignId, "Nothing of note happened.");
@@ -269,7 +296,7 @@ await test("a romanced NPC is never rostered out, though one nobody knows is", a
 });
 
 await test("an NPC's words past the note's limit are fitted at a word, and a refused note is named (issue 634)", async () => {
-  await world.invoke("set_npc", { name: "Wren", gender: "Female", drawnTo: ["women"], location: "Highmoor" });
+  await world.invoke("set_npc", { name: "Wren", sex: "Male", drawnTo: ["women"], location: "Highmoor" });
   liking(nysa, "Wren", 60);
   relationships.patchRelationship(pair(nysa, "Wren").id, { advanceReadyUntil: advances.getAiTurns(world.campaignId) + 3 });
   // The kind of call that lost the step: no note field was wrong but this one.
@@ -329,9 +356,9 @@ await test("a family table, Romance switched off, or a line or veil naming roman
     const table = await openWorld({ gameSettings });
     table.addHero({ name: "Host" });
     const player = table.addUser("p");
-    const hero = table.addHero({ user: player, name: "Rook", gender: "Male", abilities: { cha: 20 } });
+    const hero = table.addHero({ user: player, name: "Rook", sex: "Male", abilities: { cha: 20 } });
     (await import("../src/lib/db/sheets.ts")).setOpenToAdvances(hero.id, true);
-    await table.invoke("set_npc", { name: "Vela", gender: "Female", drawnTo: ["men"] });
+    await table.invoke("set_npc", { name: "Vela", sex: "Female", drawnTo: ["men"] });
     const row = relationships.ensureRelationship({ campaignId: table.campaignId, characterId: hero.id, characterName: "Rook", subjectKind: "npc", subjectName: "Vela" });
     relationships.patchRelationship(row.id, { approval: 80 });
     while (advances.getAiTurns(table.campaignId) < 8) advances.bumpAiTurns(table.campaignId);
@@ -348,18 +375,18 @@ await test("a family table, Romance switched off, or a line or veil naming roman
 
 await test("a lasting companion has a person behind the sheet: axes a deed weighs against, reachable by social_check", async () => {
   const solo = await openWorld();
-  const hero = solo.addHero({ name: "Wren", gender: "Female", abilities: { cha: 18 } });
+  const hero = solo.addHero({ name: "Wren", sex: "Female", abilities: { cha: 18 } });
   const added = await solo.invoke("add_companion", {
     name: "Brannoc",
     class: "fighter",
-    gender: "Male",
+    sex: "Male",
     drawnTo: ["women"],
     personality: "Gruff, loyal, laughs at his own jokes.",
     kind: "party",
   });
   assert.equal(added.ok, true, added.error);
   const companion = solo.sheets().find((sheet) => sheet.name === "Brannoc");
-  assert.deepEqual(companion.attraction, { genders: ["Female"], note: "" });
+  assert.deepEqual(companion.attraction, { sexes: ["Female"], note: "" });
   const row = npcs.listNpcs(solo.campaignId).find((npc) => npc.companionSheetId === companion.id);
   assert.ok(row, "a linked row");
   assert.ok(row.agency.personality, "seeded axes");
@@ -393,8 +420,8 @@ await test("a lasting companion has a person behind the sheet: axes a deed weigh
 
 await test("a guest ally never courts", async () => {
   const solo = await openWorld();
-  const hero = solo.addHero({ name: "Ash", gender: "Male", abilities: { cha: 18 } });
-  const added = await solo.invoke("add_companion", { name: "Gate Guard", class: "fighter", gender: "Female", personality: "Brisk.", kind: "guest" });
+  const hero = solo.addHero({ name: "Ash", sex: "Male", abilities: { cha: 18 } });
+  const added = await solo.invoke("add_companion", { name: "Gate Guard", class: "fighter", sex: "Female", personality: "Brisk.", kind: "guest" });
   assert.equal(added.ok, true, added.error);
   assert.ok(!npcs.listNpcs(solo.campaignId).some((npc) => npc.name === "Gate Guard"), "a guest has no row behind them");
   (await import("../src/lib/db/sheets.ts")).setOpenToAdvances(hero.id, true);
@@ -412,8 +439,8 @@ await test("a guest ally never courts", async () => {
 await test("at a human-run table the console makes the move without a window, by the same rules", async () => {
   const table = await openWorld({ gameSettings: { dmMode: "human" } });
   const player = table.addUser("p");
-  const hero = table.addHero({ user: player, name: "Lio", gender: "Male" });
-  await table.invoke("set_npc", { name: "Senna", gender: "Female", drawnTo: ["men"] });
+  const hero = table.addHero({ user: player, name: "Lio", sex: "Male" });
+  await table.invoke("set_npc", { name: "Senna", sex: "Female", drawnTo: ["men"] });
   const row = relationships.ensureRelationship({ campaignId: table.campaignId, characterId: hero.id, characterName: "Lio", subjectKind: "npc", subjectName: "Senna" });
   relationships.patchRelationship(row.id, { approval: 60 });
   const closed = await table.invoke("romance_advance", { characterId: hero.id, subject: "Senna", to: "courting", initiator: "npc" });

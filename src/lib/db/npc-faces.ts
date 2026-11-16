@@ -3,7 +3,7 @@
 // token or an entry with a name and nothing else (an npc:<uuid> ref), so it
 // drew one of the neutral faces by that name even when the Cast already said
 // who they are: an elf archer fighting beside the party now draws the elf
-// archer (src/lib/placeholders.ts), and a 3D board view draws the gender the
+// archer (src/lib/placeholders.ts), and a 3D board view draws the sex the
 // Cast records (src/lib/actor-sex-logic.ts). The link is the one
 // start_encounter makes: an NPC id, else the whole name or an alias.
 //
@@ -30,7 +30,7 @@ export function castLookup(campaignId: string): CastLookup {
   };
 }
 
-// Their portrait, or the plate their role, race and gender pick.
+// Their portrait, or the plate their role, race and sex pick.
 export function npcFace(npc: Npc): string {
-  return npc.portraitUrl || npcPlaceholder(npc.role, npc.name, { race: npc.race, gender: npc.gender });
+  return npc.portraitUrl || npcPlaceholder(npc.role, npc.name, { race: npc.race, sex: npc.sex });
 }

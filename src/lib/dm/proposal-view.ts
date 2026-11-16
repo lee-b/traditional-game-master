@@ -101,7 +101,7 @@ function advanceCard(argsJson: string) {
   return {
     suitor: text(args.subject),
     portraitUrl: text(args.portraitUrl),
-    look: { gender: text(look.gender), race: text(look.race), class: text(look.class), role: text(look.role) },
+    look: { sex: text(look.sex), race: text(look.race), class: text(look.class), role: text(look.role) },
   };
 }
 
@@ -109,6 +109,6 @@ function approachCard(argsJson: string) {
   const args = approachArgs(argsJson);
   return {
     choices: APPROACH_CHOICES.map((id) => ({ id, ...APPROACH_CHOICE_TEXT[id] })),
-    from: { name: args?.recruiter ?? "", portraitUrl: args?.portraitUrl ?? "", look: args?.look ?? { gender: "", race: "", class: "" } },
+    from: { name: args?.recruiter ?? "", portraitUrl: args?.portraitUrl ?? "", look: args?.look ?? { sex: "", race: "", class: "" } },
   };
 }

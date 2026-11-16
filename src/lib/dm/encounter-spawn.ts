@@ -16,8 +16,8 @@ import { d20Expression } from "@/lib/dice";
 import { resolveMonster } from "@/lib/bestiary";
 import { listNpcs } from "@/lib/db/npcs";
 import { storedRace } from "@/lib/npc-race";
-import { GENDERS, type Gender } from "@/lib/gender";
-import { pickedGender } from "@/lib/actor-sex-logic";
+import { storedSex, SEXES, TOLD_SEXES, type Sex } from "@/lib/sex";
+import { pickedSex } from "@/lib/actor-sex-logic";
 import { synthesizeStats } from "@/lib/bestiary/synthesize";
 import { encounterCeiling, evaluateEncounter } from "@/lib/srd/encounter-math";
 import { nameArrivals, spliceIntoOrder } from "@/lib/dm/encounter-logic";
@@ -53,11 +53,11 @@ export const enemyRequestSchema = z.object({
   // one from a weak caller is the same as none.
   returning: z.preprocess((value) => (typeof value === "string" && value.trim() ? value.trim() : undefined), z.string().max(80).optional()),
   // Who a nameless humanoid foe is, which picks their face (an elf bandit
-  // draws the elf bandit plate, PR 710). Loose on purpose: a race or gender
+  // draws the elf bandit plate, PR 710). Loose on purpose: a race or sex
   // the server cannot read leaves the face as it was, never the fight
   // refused.
   race: z.string().max(40).optional(),
-  gender: z.string().max(20).optional(),
+  sex: z.string().max(20).optional(),
 });
 export type EnemyRequest = z.infer<typeof enemyRequestSchema>;
 
@@ -78,18 +78,18 @@ export type ResolvedEnemyRequest = {
   // Which entry of the request it came from: a monster and its count are
   // one group of identical creatures, on one initiative roll.
   group?: number;
-  // An SRD race id and a gender for the face, "" or absent for unspecified.
+  // An SRD race id and a sex for the face, "" or absent for unspecified.
   race?: string;
-  gender?: Gender;
+  sex?: Sex;
 };
 
 // The look a request told, as stored values. A Cast NPC's own record is
 // read instead (src/lib/db/encounter-view.ts), so it is not copied here.
-function toldLook(request: EnemyRequest): { race?: string; gender?: Gender } {
+function toldLook(request: EnemyRequest): { race?: string; sex?: Sex } {
   const race = storedRace(request.race);
-  const told = textKey(String(request.gender ?? ""));
-  const gender = GENDERS.find((entry) => textKey(entry) === told);
-  return { ...(race ? { race } : {}), ...(gender ? { gender } : {}) };
+  const told = textKey(String(request.sex ?? ""));
+  const sex = SEXES.find((entry) => textKey(entry) === told);
+  return { ...(race ? { race } : {}), ...(sex ? { sex } : {}) };
 }
 
 // One initiative roll for each group of identical creatures: "The GM makes
@@ -207,7 +207,7 @@ function carriedEntry(row: EncounterEnemy): ResolvedEnemyRequest {
   // Its look comes back with it (src/lib/actor-sex-logic.ts): a row from
   // before the column keeps the pick the board drew it with, from its id. A
   // Cast NPC's is read from the Cast instead.
-  const gender = row.gender || (row.npcId ? "" : pickedGender(row.id));
+  const sex = storedSex(row.sex) || (row.npcId ? "" : pickedSex(row.id));
   return {
     slug: row.slug,
     name: row.displayName,
@@ -215,7 +215,7 @@ function carriedEntry(row: EncounterEnemy): ResolvedEnemyRequest {
     returning: row.id,
     ...(row.npcId ? { npcId: row.npcId } : {}),
     ...(row.race ? { race: row.race } : {}),
-    ...(gender ? { gender } : {}),
+    ...(sex ? { sex } : {}),
   };
 }
 
@@ -257,7 +257,7 @@ export const addEnemiesTool: ToolDef = {
               },
               returning: { type: "string", description: "An earlier fight's enemyId." },
               race: { type: "string", description: "A humanoid's people (elf, dwarf...), for their face." },
-              gender: { type: "string", enum: [...GENDERS] },
+              sex: { type: "string", enum: [...TOLD_SEXES] },
             },
             required: ["monster"],
           },
@@ -410,7 +410,7 @@ export function handleAddEnemies(
       stats: arrival.entry.stats,
       ...(arrival.entry.npcId ? { npcId: arrival.entry.npcId } : {}),
       race: arrival.entry.race,
-      gender: arrival.entry.gender,
+      sex: arrival.entry.sex,
       ...(arrival.carry ? { arrives: arrival.carry.arrives } : {}),
     }),
   );
